@@ -1,0 +1,175 @@
+---
+name: documentation-drafting
+description: >
+  Draft, review, and rewrite documentation to remove weak AI-patterned writing:
+  generic importance claims, promotional tone, unsupported synthesis, vague
+  attribution, unnecessary verbosity, negative parallelisms, purposeless
+  fourth-wall references, placeholder residue, citation artifacts, malformed
+  markup, and over-formatted prose. Use for READMEs, guides, reports,
+  procedures, reference pages, and Writerside-compatible documentation.
+---
+
+# Documentation Drafting
+
+## Goal
+
+Produce documentation that is specific, verifiable, neutral, and easy to use.
+When revising existing text, treat suspicious patterns as quality risks due for
+improvement. Preserve the author's useful meaning.
+
+## Default Approach
+
+1. Identify the audience, document type, and reader task.
+   For software or systems technical documentation, read
+   `references/technical-documentation-routing.md` and
+   `references/writerside-technical-documentation.md`, then any migrated
+   reference for the matching documentation type if it exists.
+   For comments, docstrings, or API comment blocks, read
+   `references/code-comment-documentation.md`.
+2. Preserve verified facts, concrete examples, source-backed claims, and useful
+   structure.
+3. Flag suspicious text as a quality risk due for improvement.
+4. Replace broad claims with precise facts, steps, constraints, or stated
+   unknowns.
+5. Use Writerside-compatible Markdown for software and systems technical
+   documentation, and follow the code comment guide for source-level
+   documentation. This does not apply to ordinary reports, word-processing
+   documents, or non-technical prose unless the user asks for Writerside.
+6. Remove text that does no work for the reader.
+7. If the text already meets the target quality, preserve it. Do not force
+   edits just to show activity.
+8. Do a final residue pass before delivery.
+
+## Core Checks
+
+Apply these checks on every documentation task. For detailed watchlists and
+examples, read `references/weak-ai-writing-patterns.md` when the user asks for
+a close rewrite, quality cleanup, or editorial review.
+
+### Specificity
+
+Replace broad claims with the concrete fact, source-backed consequence, or
+explicit unknown.
+
+### Economy
+
+Every sentence in an artifact must do useful work. Keep text that narrows the
+subject, adds context, gives an instruction, states a constraint, verifies a
+claim, warns about a real risk, or connects two necessary ideas.
+
+Remove text that merely announces, decorates, repeats, praises, previews,
+summarizes without adding a decision, or explains why the document exists.
+Technical documentation needs this rule most because filler hides the command,
+parameter, failure mode, or operational constraint the reader came to find.
+
+Before keeping a sentence, ask what would break if it disappeared. If the answer
+is "nothing," delete it or merge the one useful detail into a nearby sentence.
+
+### Neutrality
+
+Use plain descriptions. Attribute evaluative claims or remove them.
+
+### Analysis
+
+Remove interpretation that the source does not support. Keep facts,
+recommendations, and constraints distinct.
+
+### Negative Parallelism
+
+Reduce `not just X, but Y` style contrast formulas. Use a direct positive
+sentence unless the contrast is necessary for accuracy.
+
+### Attribution
+
+Replace vague authority with named, checkable sources. Watch for `experts
+argue`, `observers note`, `industry reports`, `critics say`, `several sources`,
+`media outlets`, `independent coverage`, `active social media presence`, and
+notability claims that summarize coverage instead of explaining substance.
+
+Do not imply broad agreement from one or two sources.
+
+### Structure
+
+Keep headings, lists, emphasis, tables, and conclusions proportional to the
+reader task. Remove scaffolding that only makes the artifact look complete.
+
+### Fourth Wall
+
+Keep every section focused on its subject, not on the document as a medium. The
+writer is the researcher, programmer, analyst, operator, or actor who did the
+work. Write from that position.
+
+Do not write purposeless medium references:
+
+- `This report analyzes...`
+- `This document outlines...`
+- `This section discusses...`
+- `The purpose of this guide is...`
+
+Name the subject directly:
+
+- `The problem exposes...`
+- `The deployment failed because...`
+- `The experiment measured...`
+- `The migration requires...`
+
+For each section, identify the section subject before drafting. A problem
+statement talks about the problem, who it affects, how it was found, and what it
+changes. A method section talks about the method. A results section talks about
+the results. Do not drift into the document's intent unless the user explicitly
+asked for a meta-description.
+
+Allowed fourth-wall references are narrow:
+
+- Cross-references that help navigation, such as `As noted in Prerequisites`.
+- Required structural labels, such as `Scope`, `Assumptions`, or `Method`.
+- Explicit user requests to explain document structure.
+
+### Em Dash Character
+
+Avoid the U+2014 dash in normal prose. It is allowed only for preserved
+quotations, legal or policy-style enumerated exceptions, authorized headings,
+and formal names that already include the character.
+
+### Markup and Residue
+
+Remove chatbot artifacts, placeholders, malformed markup, tracking parameters,
+broken references, and citation residue. Repair the underlying source or claim.
+
+## Rewrite Procedure
+
+1. Read the text once for purpose and structure.
+2. Use internal notes to identify weak passages. Do not include those notes in
+   the final documentation unless the user asks for an editorial report.
+3. Apply these transformations across the draft:
+   - tighten wordy but valid text
+   - attribute interpretive claims when a source supports them
+   - replace vague claims with concrete facts, steps, constraints, or explicit
+     unknowns
+   - remove sentences that do not narrow, contextualize, instruct, verify, warn,
+     or connect
+   - remove unsupported significance claims, decorative contrast, and
+     unverifiable fluff
+   - preserve text that is already clear, factual, and human-written
+4. Verify citations and links for claims that depend on external evidence when
+   browsing, local source files, or accessible references are available. If a
+   source cannot be accessed, do not invent verification. Preserve plausible
+   URLs, but flag high-risk claims for user verification.
+5. Normalize headings, lists, emphasis, tables, and code fences.
+6. Re-read the result for a human documentation voice: direct, grounded, and
+   free of ornamental certainty.
+
+## Final Pass
+
+Before handing off documentation, confirm:
+
+- no unsupported significance, legacy, or trend claims remain
+- no promotional phrasing remains unless quoted or explicitly attributed
+- no sentence remains only because it sounds polished or complete
+- no source says less than the prose claims it says
+- no unnecessary `not just X, but Y` contrast pattern remains
+- no purposeless references to the report, document, guide, or section remain
+- no U+2014 dash remains outside the narrow allowed cases
+- no placeholders, chatbot artifacts, or stale knowledge disclaimers remain
+- formatting serves the reader instead of advertising structure
+- known unknowns are stated plainly instead of filled with speculation
