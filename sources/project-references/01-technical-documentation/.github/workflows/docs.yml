@@ -1,0 +1,139 @@
+name: Documentation Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - 'api-specs/**'
+      - 'graphql/**'
+      - 'proto/**'
+      - 'CHANGELOG.md'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - 'api-specs/**'
+      - 'graphql/**'
+      - 'proto/**'
+      - 'CHANGELOG.md'
+
+jobs:
+  validate:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install validation tools
+        run: |
+          # Python tools
+          pip install rstcheck sphinx sphinx-rtd-theme
+          
+          # Node.js tools
+          npm install -g @apidevtools/swagger-cli
+          npm install -g graphql
+          npm install -g markdownlint-cli
+      
+      - name: Validate reStructuredText
+        if: always()
+        run: |
+          if [ -d "docs/source" ]; then
+            find docs/source -name "*.rst" -exec rstcheck {} +
+          fi
+      
+      - name: Validate OpenAPI specs
+        if: always()
+        run: |
+          if [ -d "api-specs" ]; then
+            find api-specs -name "*.yaml" -o -name "*.yml" | while read file; do
+              swagger-cli validate "$file"
+            done
+          fi
+      
+      - name: Validate GraphQL schemas
+        if: always()
+        run: |
+          if [ -d "graphql" ]; then
+            find graphql -name "*.graphql" -o -name "*.gql" | while read file; do
+              node -e "const fs = require('fs'); const { buildSchema } = require('graphql'); buildSchema(fs.readFileSync('$file', 'utf8'));"
+            done
+          fi
+      
+      - name: Validate Markdown
+        if: always()
+        run: |
+          markdownlint CHANGELOG.md || true
+          if [ -d "docs/decisions" ]; then
+            markdownlint docs/decisions/** || true
+          fi
+      
+      - name: Build Sphinx docs
+        if: always()
+        run: |
+          if [ -d "docs/source" ] && [ -f "docs/source/conf.py" ]; then
+            sphinx-build -W -b html docs/source docs/build
+          fi
+      
+      - name: Check formatting rules
+        if: always()
+        run: |
+          # Check for emojis
+          ! grep -r "😀\|😁\|😂\|🎉\|✅\|❌\|⚠️" docs/ || (echo "Emojis found" && exit 1)
+          
+          # Check for emdashes
+          ! grep -r "—" docs/ || (echo "Emdashes found" && exit 1)
+      
+      - name: Upload Sphinx build
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: sphinx-docs
+          path: docs/build/
+          retention-days: 7
+
+  deploy-docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Sphinx
+        run: |
+          pip install sphinx sphinx-rtd-theme
+      
+      - name: Build Sphinx docs
+        run: |
+          if [ -d "docs/source" ] && [ -f "docs/source/conf.py" ]; then
+            sphinx-build -b html docs/source docs/build
+          fi
+      
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build
+          cname: docs.example.com  # Optional: custom domain
