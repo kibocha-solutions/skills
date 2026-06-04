@@ -1,15 +1,18 @@
 ---
-name: documentation-drafting
+name: documentation
 description: >
-  Draft, review, and rewrite documentation to remove weak AI-patterned writing:
-  generic importance claims, promotional tone, unsupported synthesis, vague
-  attribution, unnecessary verbosity, negative parallelisms, purposeless
-  fourth-wall references, placeholder residue, citation artifacts, malformed
-  markup, and over-formatted prose. Use for READMEs, guides, reports,
-  procedures, reference pages, and Writerside-compatible documentation.
+  Draft, review, rewrite, and improve documentation, README files, guides,
+  procedures, reference pages, Writerside-compatible technical documentation,
+  API prose, docstrings, comments, and API comment blocks. Use to remove weak
+  AI-patterned writing such as generic importance claims, promotional tone,
+  unsupported synthesis, vague attribution, unnecessary verbosity, negative
+  parallelisms, purposeless fourth-wall references, placeholder residue,
+  citation artifacts, malformed markup, and over-formatted prose. For
+  technical diagrams, architecture visuals, Draw.io sources, diagram palettes,
+  and SVG exports, route to the technical-diagrams skill.
 ---
 
-# Documentation Drafting
+# Documentation
 
 ## Goal
 

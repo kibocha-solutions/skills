@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "name": "default-technical-diagram-palette",
+    "source": "technical-diagrams fallback",
+    "created_for": "technical diagrams",
+    "notes": "Large fills use pale tints. Borders and headers carry color identity. Semantic colors keep semantic meaning."
+  },
+  "page": {
+    "background": "#FFFFFF"
+  },
+  "text": {
+    "primary": "#172033",
+    "secondary": "#526071",
+    "label": "#1F2937"
+  },
+  "families": {
+    "blue": {
+      "fill": "#DAE8FC",
+      "border": "#6C8EBF",
+      "header": "#B7D1F3",
+      "text": "#172033"
+    },
+    "red": {
+      "fill": "#FBD0D0",
+      "border": "#D95C5C",
+      "header": "#F3A7A7",
+      "text": "#172033"
+    },
+    "green": {
+      "fill": "#D5E8D4",
+      "border": "#82B366",
+      "header": "#B9DDB5",
+      "text": "#172033"
+    },
+    "yellow": {
+      "fill": "#FFF2CC",
+      "border": "#D6B656",
+      "header": "#FFE599",
+      "text": "#172033"
+    },
+    "neutral": {
+      "fill": "#F8FAFC",
+      "border": "#CBD5E1",
+      "header": "#E2E8F0",
+      "text": "#172033"
+    }
+  },
+  "roles": {
+    "core_system": {
+      "fill": "#DAE8FC",
+      "border": "#6C8EBF",
+      "text": "#172033"
+    },
+    "external_system": {
+      "fill": "#F8FAFC",
+      "border": "#CBD5E1",
+      "text": "#172033"
+    },
+    "container": {
+      "fill": "#F8FAFC",
+      "border": "#CBD5E1",
+      "text": "#172033"
+    },
+    "data_store": {
+      "fill": "#FFF2CC",
+      "border": "#D6B656",
+      "text": "#172033"
+    },
+    "success": {
+      "fill": "#D5E8D4",
+      "border": "#82B366",
+      "text": "#172033"
+    },
+    "warning": {
+      "fill": "#FFF2CC",
+      "border": "#D6B656",
+      "text": "#172033"
+    },
+    "risk": {
+      "fill": "#FBD0D0",
+      "border": "#D95C5C",
+      "text": "#172033"
+    }
+  },
+  "edges": {
+    "default": {
+      "stroke": "#526071",
+      "width": 2,
+      "label_background": "#FFFFFF"
+    },
+    "primary": {
+      "stroke": "#6C8EBF",
+      "width": 2,
+      "label_background": "#FFFFFF"
+    },
+    "risk": {
+      "stroke": "#D95C5C",
+      "width": 2,
+      "label_background": "#FFFFFF"
+    }
+  }
+}

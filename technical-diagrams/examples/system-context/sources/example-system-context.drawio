@@ -1,0 +1,31 @@
+<mxfile host="app.diagrams.net" modified="2026-06-04T00:00:00.000Z" agent="Codex technical-diagrams" version="24.0.0" type="device">
+  <diagram id="diagram:example_system_context" name="Example System Context">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="960" pageHeight="540" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="node:operator" value="Operations user" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontColor=#172033;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="72" y="204" width="96" height="132" as="geometry"/>
+        </mxCell>
+        <mxCell id="node:portal" value="Service portal" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#172033;fontSize=16;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="340" y="212" width="220" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="node:identity_provider" value="Identity provider" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontColor=#172033;fontSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="720" y="120" width="184" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="node:notification_service" value="Notification service" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontColor=#172033;fontSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="720" y="318" width="184" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge:operator_uses_portal" value="Manages work" style="endArrow=block;html=1;rounded=1;strokeColor=#526071;strokeWidth=2;fontColor=#1F2937;labelBackgroundColor=#FFFFFF;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="node:operator" target="node:portal">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge:portal_authenticates_user" value="Authenticates" style="endArrow=block;html=1;rounded=1;strokeColor=#526071;strokeWidth=2;fontColor=#1F2937;labelBackgroundColor=#FFFFFF;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="node:portal" target="node:identity_provider">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge:portal_sends_notifications" value="Sends updates" style="endArrow=block;html=1;rounded=1;strokeColor=#526071;strokeWidth=2;fontColor=#1F2937;labelBackgroundColor=#FFFFFF;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="node:portal" target="node:notification_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
