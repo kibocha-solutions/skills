@@ -97,7 +97,7 @@ This protocol has FOUR mandatory phases that MUST be followed for ALL developmen
 
 1. **Read the task request carefully**
 
-2. **Proactively read relevant READMEs** from `00-project-references/` to determine which standards apply:
+2. **Proactively read relevant READMEs** from `sources/project-references/` to determine which standards apply:
    - `00-technical-documentation/README.md` - Documentation standards
    - `02-security/README.md` - Security standards
    - `03-ci-cd/README.md` - CI/CD standards
@@ -233,7 +233,7 @@ This protocol has FOUR mandatory phases that MUST be followed for ALL developmen
 
 2. **Identify Relevant Files** (Do NOT load everything - avoid context overwhelm)
    
-   Read ONLY the READMEs in `00-project-references/` to determine which domains are relevant:
+   Read ONLY the READMEs in `sources/project-references/` to determine which domains are relevant:
    - `00-technical-documentation/` - If creating/updating documentation
    - `01-security/` - If handling authentication, encryption, or sensitive data
    - `02-ci-cd/` - If working with Git, commits, or pipelines
@@ -507,7 +507,7 @@ If attempting to apply branch protection rules (via `gh` or API) fails with an "
 
 **CRITICAL:** This repository contains git submodules that have their own repositories and MUST NOT be committed to the main repository:
 
-- **`00-project-references/`** - Vibe Code Canon standards (separate repository)
+- **`sources/project-references/`** - Vibe Code Canon standards (separate repository)
 - **`docs/`** - Project documentation (separate repository)
 
 These submodules are managed independently with their own commit histories. Changes within these directories are tracked in their respective repositories, not in the main repository.
@@ -518,7 +518,7 @@ These submodules are managed independently with their own commit histories. Chan
 
 ```gitignore
 # Git Submodules (have their own repositories)
-00-project-references/
+sources/project-references/
 docs/
 
 # Project references and agent files
@@ -552,7 +552,7 @@ copilot-instructions.md
 - `AGENTS.md` (in root or any folder)
 - `RULE.md`
 - `copilot-instructions.md`
-- Any file matching `00-project-references/` content structure
+- Any file matching `sources/project-references/` content structure
 - Any file from `docs/` submodule (managed in separate repository)
 
 **Action:**
@@ -561,7 +561,7 @@ copilot-instructions.md
 - **Alert**: User must be notified of the security violation.
 
 > [!CRITICAL]
-> **NEVER EVER push agent instruction files.** These contain internal logic and must remain local-only or in the `00-project-references` submodule.
+> **NEVER EVER push agent instruction files.** These contain internal logic and must remain local-only or in the `sources/project-references` submodule.
 
 # Dependencies
 node_modules/
@@ -576,7 +576,7 @@ target/
 - [ ] No `.env` files in staging
 - [ ] No API keys, passwords, tokens in code
 - [ ] No files with `_key`, `_secret`, `_password` in name
-- [ ] `00-project-references/` submodule is ignored
+- [ ] `sources/project-references/` submodule is ignored
 - [ ] `docs/` submodule is ignored
 - [ ] No temporary files outside `scripts.tmp/` or `.bkp/`
 - [ ] No sensitive documentation (check access levels)
@@ -592,9 +592,9 @@ git diff --cached
 ### CRITICAL: Pre-Staging Verification Workflow
 
 **IMPORTANT CONTEXT:**
-- During development, sensitive folders and submodules (like `00-project-references/` and `docs/`) are **commented** in `.gitignore` so AI agents can access them
+- During development, sensitive folders and submodules (like `sources/project-references/` and `docs/`) are **commented** in `.gitignore` so AI agents can access them
 - Before committing, these folders must be **uncommented** to exclude them from staging
-- **Git submodules** (`00-project-references/` and `docs/`) have their own repositories and must NEVER be committed to the main repository
+- **Git submodules** (`sources/project-references/` and `docs/`) have their own repositories and must NEVER be committed to the main repository
 
 **To ensure no forbidden files or submodule files are accidentally committed, follow this MANDATORY workflow:**
 
@@ -604,13 +604,13 @@ Uncomment submodules and sensitive paths in `.gitignore`:
 
 ```bash
 # In .gitignore, change FROM (commented, used during development):
-#00-project-references/
+#sources/project-references/
 #docs/
 #.cursor/
 #copilot-instructions.md
 
 # TO (uncommented, for commit):
-00-project-references/
+sources/project-references/
 docs/
 .cursor/
 copilot-instructions.md
@@ -627,7 +627,7 @@ Verify that NO files from submodules or sensitive folders appear in the untracke
 **3. Verify forbidden files:**
 
 Check that NONE of these are visible in `git status`:
-- `00-project-references/` (git submodule - any files within)
+- `sources/project-references/` (git submodule - any files within)
 - `docs/` (git submodule - any files within)
 - `.cursor/` (any files within)
 - `.github/copilot-instructions/` (any files within)  
@@ -668,13 +668,13 @@ git push
 
 ```bash
 # In .gitignore, change FROM (uncommented):
-00-project-references/
+sources/project-references/
 docs/
 .cursor/
 copilot-instructions.md
 
 # BACK TO (commented, for development):
-#00-project-references/
+#sources/project-references/
 #docs/
 #.cursor/
 #copilot-instructions.md
@@ -684,16 +684,16 @@ copilot-instructions.md
 
 ```bash
 git status
-# Should show 00-project-references/ and docs/ if they have changes
+# Should show sources/project-references/ and docs/ if they have changes
 ```
 
 **10. Handle Submodule Commits (Recursive):**
 
-If submodules (`00-project-references/` or `docs/`) have changes:
+If submodules (`sources/project-references/` or `docs/`) have changes:
 
 ```bash
 # For each submodule with changes:
-cd 00-project-references/  # or docs/
+cd sources/project-references/  # or docs/
 
 # Check if this submodule has its own .gitignore with uncommitable files
 if [ -f .gitignore ]; then
@@ -715,7 +715,7 @@ fi
 cd ..
 ```
 
-**CRITICAL:** If you skip this workflow and accidentally commit files from submodules (`00-project-references/` or `docs/`), you MUST immediately revert the commit and remove those files from Git history. Submodules are managed in their own repositories.
+**CRITICAL:** If you skip this workflow and accidentally commit files from submodules (`sources/project-references/` or `docs/`), you MUST immediately revert the commit and remove those files from Git history. Submodules are managed in their own repositories.
 
 ---
 
@@ -1029,7 +1029,7 @@ Where should this be stored?"
 When task requires domain-specific knowledge, read from:
 
 ```
-00-project-references/
+sources/project-references/
 ├── 00-technical-documentation/  # Use when: Creating/updating documentation
 ├── 01-security/                 # Use when: Auth, encryption, sensitive data
 ├── 02-ci-cd/                    # Use when: Git, commits, pipelines

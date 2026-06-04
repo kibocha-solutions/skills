@@ -1051,7 +1051,7 @@ refactor(documentation-drafting): move report scaffold into assets
 refactor(repo-inspection): move deep inspection rules into references
 chore(ci): validate skills and markdown in pull requests
 docs(privacy): add sanitization rules for publishable skills
-migrate(legacy): extract reusable report rules from 00-project-references
+migrate(legacy): extract reusable report rules from sources/project-references
 ```
 
 `migration-log.md` should stay factual and compact. Log source, destination, action, status, and sanitization notes. These are good examples:
@@ -1059,9 +1059,9 @@ migrate(legacy): extract reusable report rules from 00-project-references
 ```md
 | Date | Legacy source | New location | Action | Status | Sanitization notes |
 | --- | --- | --- | --- | --- | --- |
-| 2026-06-03 | 00-project-references/docs/report-writing-notes.md | documentation-drafting/references/document-architecture.md | distilled reusable writing rules | migrated | removed project names and client examples |
-| 2026-06-03 | 00-project-references/prompts/critique-reminder.md | communication-discipline/SKILL.md | converted repeated reminder into stable operating instructions | migrated | removed person-specific references |
-| 2026-06-04 | 00-project-references/notes/session-handoff.md | project-context-preservation/assets/session-handoff-template.md | normalized handoff format | migrated | kept only generic fields |
+| 2026-06-03 | sources/project-references/docs/report-writing-notes.md | documentation-drafting/references/document-architecture.md | distilled reusable writing rules | migrated | removed project names and client examples |
+| 2026-06-03 | sources/project-references/prompts/critique-reminder.md | communication-discipline/SKILL.md | converted repeated reminder into stable operating instructions | migrated | removed person-specific references |
+| 2026-06-04 | sources/project-references/notes/session-handoff.md | project-context-preservation/assets/session-handoff-template.md | normalized handoff format | migrated | kept only generic fields |
 ```
 
 Privacy policy should be strict because even local personal skills are executable context packages, not inert notes. Microsoft recommends treating skills like third-party code, reviewing all content, trusting only vetted sources, and sandboxing executable skills. Anthropic warns that skills can direct tool use, expose data, and fetch harmful external instructions. GitHub warns that installed skills are not verified and may contain prompt injection or malicious scripts. That means your repo policy should default to **sanitized methods and templates only**, even if the repository remains private.

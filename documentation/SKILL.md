@@ -25,23 +25,67 @@ improvement. Preserve the author's useful meaning.
 1. Identify the audience, document type, and reader task.
    For software or systems technical documentation, read
    `references/technical-documentation-routing.md` and
-   `references/writerside-technical-documentation.md`, then any migrated
+   `references/technical-documentation-library.md`, then
+   `references/writerside-technical-documentation.md` and any migrated
    reference for the matching documentation type if it exists.
-   For comments, docstrings, or API comment blocks, read
-   `references/code-comment-documentation.md`.
-2. Preserve verified facts, concrete examples, source-backed claims, and useful
+   For documentation comments, docstrings, API comment blocks, or
+   implementation comments, read
+   `references/code-comment-documentation.md`; consult
+   `examples/code-comments/` when the right comment level, language convention,
+   or amount of detail is unclear.
+2. Audit whether existing documentation is current and whether expected
+   documentation levels are missing. For source-level documentation, check
+   package, module, file, class/type, constructor, property/field,
+   function/method, and implementation comments where the language and repo
+   convention expect them.
+3. If a missing or stale documentation update is safe and non-destructive,
+   make it from local evidence and tell the user what was added or refreshed.
+   If the update would replace existing docs, delete disputed comments, or
+   require unverifiable contract details, ask before changing it, state what
+   is missing and wait for explicit confirmation.
+4. Preserve verified facts, concrete examples, source-backed claims, and useful
    structure.
-3. Flag suspicious text as a quality risk due for improvement.
-4. Replace broad claims with precise facts, steps, constraints, or stated
+5. Flag suspicious text as a quality risk due for improvement.
+6. Replace broad claims with precise facts, steps, constraints, or stated
    unknowns.
-5. Use Writerside-compatible Markdown for software and systems technical
+7. Use Writerside-compatible Markdown for software and systems technical
    documentation, and follow the code comment guide for source-level
    documentation. This does not apply to ordinary reports, word-processing
    documents, or non-technical prose unless the user asks for Writerside.
-6. Remove text that does no work for the reader.
-7. If the text already meets the target quality, preserve it. Do not force
+8. Remove text that does no work for the reader.
+9. If the text already meets the target quality, preserve it. Do not force
    edits just to show activity.
-8. Do a final residue pass before delivery.
+10. Do a final residue pass before delivery.
+
+## Technical Documentation Workflow
+
+For software or systems documentation, use the technical library workflow before
+drafting:
+
+1. Identify the requested document type, audience, lifecycle stage, and access
+   level.
+2. Decide the target path from
+   `references/technical-documentation-library.md`. Use the existing project
+   structure if present; otherwise use the default `docs/` library structure.
+   For quick path lookup, consult `assets/technical-docs-required-tree.md`
+   and `assets/technical-docs-optional-tree.md`.
+3. Choose the Writerside instance tree: `public.tree`, `internal.tree`,
+   `restricted.tree`, or `confidential.tree`. Use a TOC library tree only
+   when the project needs reusable navigation sections; use snippet library
+   topics for reusable content fragments.
+4. Gather local sources of truth first: source code, schemas, configs, tests,
+   tickets, existing docs, diagrams, and generated artifacts.
+5. If the repository contains `sources/reports/documentation-reference.md` or
+   an equivalent documentation architecture report, read the relevant sections
+   before creating or restructuring technical docs.
+6. Review authoritative online sources when the document type depends on an
+   external standard, framework, API, security rule, or Writerside behavior.
+7. If the document needs production diagrams or SVG exports, route that work to
+   the `technical-diagrams` skill and embed only the final documentation asset.
+8. Draft with the general writing rules in this skill: concrete facts,
+   neutral language, no filler, and explicit unknowns.
+9. Validate path, classification, sources, required sections, links, commands,
+   diagrams, and Writerside tree inclusion before handing off.
 
 ## Core Checks
 
