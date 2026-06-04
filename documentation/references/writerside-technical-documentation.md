@@ -47,19 +47,57 @@ the repository already has a Writerside structure:
 
 ```text
 docs/
-`-- writerside/
-    |-- writerside.cfg
-    |-- topics/
-    |   |-- index.md
-    |   `-- ...
-    |-- images/
-    |   `-- ...
-    `-- <instance>.tree
+|-- writerside.cfg
+|-- public.tree
+|-- internal.tree
+|-- restricted.tree
+|-- confidential.tree
+|-- cfg/
+|-- snippets/
+|-- topics/
+|   |-- product/
+|   |-- planning/
+|   |-- architecture/
+|   |-- domain/
+|   |-- data/
+|   |-- security/
+|   |-- api/
+|   |-- engineering/
+|   |-- testing/
+|   |-- operations/
+|   |-- user-guides/
+|   `-- releases/
+`-- diagrams/
 ```
 
-Use one instance for one coherent help output. Add another instance only when
-the same source project must publish a separate audience, product, edition, or
-output.
+Use one instance for one coherent help output. The default audience instances
+are Public, Internal, Restricted, and Confidential. Add or rename instances only
+when the repository already has a compatible convention or the same source
+project must publish a separate product, edition, audience, or output.
+
+Do not create a shared-library tree as a default output. Writerside has two
+separate reuse mechanisms:
+
+- snippet library topics for reusable content fragments, such as repeated
+  warnings, notes, prerequisites, and standard wording
+- TOC library tree files for reusable navigation chunks made of `toc-element`
+  entries
+
+Create a TOC library tree only when multiple output trees need the same
+navigation section. Mark the library tree as non-output library content and
+include its sections from normal instance trees.
+
+Keep audience names in tree files, not source folders. Source folders should be
+semantic volumes under the configured topics directory, such as
+`topics/architecture/`, `topics/domain/`, `topics/data/`, `topics/security/`,
+and `topics/operations/`, so topics can be reused across instances.
+
+Writerside tree `topic` and `start-page` attributes use flat topic filenames,
+not filesystem-relative paths. If the file is
+`topics/security/security-baseline.md`, reference it as
+`topic="security-baseline.md"` and `start-page="security-baseline.md"`, not
+`topic="security/security-baseline.md"`. Keep topic basenames unique across the
+whole help module.
 
 ## Topics
 
@@ -89,6 +127,17 @@ Use the tree file to define the help instance, home page, topic order, and
 topic hierarchy. Group topics by reader workflow, not by internal team
 ownership.
 
+Reference topics by basename only in tree files:
+
+```xml
+<instance-profile id="restricted" name="Restricted" start-page="security-baseline.md">
+    <toc-element toc-title="Security">
+        <toc-element topic="security-baseline.md"/>
+        <toc-element topic="permission-tenant-isolation.md"/>
+    </toc-element>
+</instance-profile>
+```
+
 Prefer this navigation order for technical docs:
 
 1. Overview or entry point
@@ -108,13 +157,19 @@ Use plain Markdown for:
 - headings
 - short paragraphs
 - simple lists
-- simple tables
-- links
 - ordinary code fences
 
-Use Writerside semantic markup when it adds meaning, validation, reuse, or
-better rendering:
+Prefer Writerside XML or semantic markup for inserted components, cross-topic
+references, and reusable structures. Use XML-style markup even when Markdown
+would render, because Writerside can validate and refactor these elements more
+reliably.
 
+- `<a href="topic-file.md">Label</a>` for cross-topic links when custom link
+  text adds context
+- `<a href="topic-file.md"/>` when the link text would match the target topic
+  title
+- `<img src="path/to/image.svg" alt="..."/>` for images
+- `<table>`, `<tr>`, `<th>`, and `<td>` for tables
 - `<procedure>` and `<step>` for ordered tasks
 - `<tabs>` and `<tab>` for platform, language, role, or scenario variants
 - `<note>`, `<tip>`, and `<warning>` for contextual callouts
@@ -244,7 +299,12 @@ Good candidates:
 - common troubleshooting notes
 
 Prefer dedicated reusable snippet libraries for content that appears across
-many topics. Use variables for values that must remain consistent.
+many topics. A snippet library is a topic file with `is-library: true`; keep it
+out of published instance trees and manage it through the Writerside Snippets
+node. Use variables for values that must remain consistent.
+
+Use TOC library trees only for reusable groups of tree entries. A TOC library
+tree is not a place for reusable prose and should not produce a help output.
 
 Do not introduce reuse for one-off text. It makes editing harder without
 reducing drift.
@@ -270,6 +330,16 @@ Before handing off Writerside technical documentation:
 
 - confirm each topic has one subject
 - confirm each published topic appears in the tree
+- confirm the topic is previewed in an instance that includes it; do not add
+  internal, restricted, or confidential topics to a lower-sensitivity instance
+  only to clear a preview warning
+- if a topic links to another local topic, include the target in the same
+  instance when the target content is safe for that audience; otherwise replace
+  the link with plain text or create a separate sanitized topic with a unique
+  filename
+- confirm tree `topic` and `start-page` attributes use basename-only topic
+  filenames
+- confirm no two topic files share the same basename
 - confirm links point to real topics, headings, files, or external URLs
 - confirm procedures have prerequisites and verification steps
 - confirm commands, paths, endpoint names, parameters, and versions are exact

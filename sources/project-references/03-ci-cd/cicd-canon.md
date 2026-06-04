@@ -157,7 +157,7 @@ Complex branching model with multiple long-lived branches (master, develop, feat
 - `AGENTS.md` (in root or any folder)
 - `RULE.md`
 - `copilot-instructions.md`
-- Any file matching `00-project-references/` content structure.
+- Any file matching `sources/project-references/` content structure.
 
 **Action:**
 - **Reject Commit**: Check status MUST fail.
@@ -165,7 +165,7 @@ Complex branching model with multiple long-lived branches (master, develop, feat
 - **Alert**: User must be notified of the security violation.
 
 > [!CRITICAL]
-> **NEVER EVER push agent instruction files.** These contain internal logic and must remain local-only or in the `00-project-references` submodule.
+> **NEVER EVER push agent instruction files.** These contain internal logic and must remain local-only or in the `sources/project-references` submodule.
 
 ---
 

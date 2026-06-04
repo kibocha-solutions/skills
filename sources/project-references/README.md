@@ -5,7 +5,7 @@ This directory contains comprehensive instructions for all AI coding assistants 
 ## Structure
 
 ```
-00-project-references/
+sources/project-references/
 ├── README.md (this file)
 ├── 00-core-canons/                     # Universal writing and formatting rules
 ├── 01-technical-documentation/         # Documentation canons and standards
