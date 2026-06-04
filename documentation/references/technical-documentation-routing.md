@@ -27,7 +27,7 @@ Writerside structure.
 
 API contract details belong in Writerside topics for this skill. Do not create
 separate contract files unless the user explicitly asks for that work outside
-the documentation-drafting task.
+the documentation task.
 
 Use `writerside-technical-documentation.md` for Writerside project structure,
 topic design, semantic markup, navigation, API topics, reuse, diagrams, and
@@ -56,7 +56,7 @@ validation concerns, and required facts.
 | User guides, tutorials, FAQs | `TBD: references/user-guide-documentation.md` |
 | Changelog, release notes, migration notes | `TBD: references/changelog-documentation.md` |
 | Documentation access classification | `TBD: references/access-level-classification.md` |
-| Diagrams and visual documentation | `TBD: references/diagram-documentation.md` |
+| Diagrams and visual documentation | Use the `technical-diagrams` skill. |
 
 ## Technical Documentation Procedure
 
@@ -71,7 +71,7 @@ validation concerns, and required facts.
    and lifecycle triggers. If a reference is still `TBD`, use the minimum
    technical checks below and note the migration gap.
 6. Prefer the target repository's existing Writerside structure when present.
-7. Apply the documentation-drafting core checks after applying the technical
+7. Apply the documentation core checks after applying the technical
    guidance: specificity, economy, neutral tone, citation/source verification,
    and no purposeless medium references.
 

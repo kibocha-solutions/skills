@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "name": "default-technical-diagram-style-tokens",
+    "source": "technical-diagrams fallback"
+  },
+  "font": {
+    "family": "Inter, Arial, sans-serif",
+    "size": 14,
+    "label_size": 12,
+    "title_size": 16
+  },
+  "shape": {
+    "corner_radius": 8,
+    "shadow": false,
+    "stroke_width": 2
+  },
+  "containers": {
+    "fill": "none",
+    "stroke_style": "dashed",
+    "stroke_width": 2,
+    "label_position": "top"
+  },
+  "edges": {
+    "routing": "orthogonal",
+    "rounded": true,
+    "stroke_width": 2,
+    "start_arrow": "none",
+    "end_arrow": "block",
+    "label_background": "#FFFFFF"
+  },
+  "shapes": {
+    "actor": "umlActor",
+    "component": "roundedRectangle",
+    "external_system": "roundedRectangle",
+    "data_store": "cylinder",
+    "boundary": "swimlane"
+  }
+}

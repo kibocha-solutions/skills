@@ -10,7 +10,7 @@ Primary source material:
 
 - JetBrains Writerside: topics, markup, instances, table of contents, API
   documentation, generated API reference, code blocks, tabs, admonitions,
-  variables, content reuse, Mermaid, PlantUML, build and publish.
+  variables, content reuse, images, build and publish.
 
 ## Contents
 
@@ -208,7 +208,7 @@ If an API contract already exists and the user asks to integrate it, use
 Writerside API-reference support from a topic. Add manual documentation for
 authentication and any unsupported contract details.
 
-Do not create separate contract files during a documentation-drafting task
+Do not create separate contract files during a documentation task
 unless the user explicitly asks for contract generation.
 
 ## Diagrams and Images
@@ -222,9 +222,11 @@ Use diagrams when structure or flow is easier to inspect visually than in prose:
 - deployment topology
 - data flow
 
-Use Mermaid for lightweight diagrams that should live near the topic source.
-Use PlantUML when UML structure or richer modeling is needed. Keep generated or
-source diagram files in a predictable location.
+Use the `technical-diagrams` skill for production technical diagrams, including
+architecture visuals, workflow diagrams, Draw.io sources, diagram palettes,
+render inspection, and SVG exports. Keep editable `.drawio` sources and final
+SVG exports in predictable locations. Reference the final SVG from Writerside
+topics; do not embed temporary QA PNGs or source files as the visible image.
 
 Every image or diagram needs useful alternative text and a nearby explanation
 of what the reader should notice.
@@ -293,6 +295,4 @@ source review.
 - https://www.jetbrains.com/help/writerside/admonitions.html
 - https://www.jetbrains.com/help/writerside/variables.html
 - https://www.jetbrains.com/help/writerside/reuse-pieces-of-content.html
-- https://www.jetbrains.com/help/writerside/mermaid-diagrams.html
-- https://www.jetbrains.com/help/writerside/plantuml-diagrams.html
 - https://www.jetbrains.com/help/writerside/build-and-publish.html

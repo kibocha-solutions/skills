@@ -1,0 +1,25 @@
+<mxfile host="app.diagrams.net" modified="2026-06-04T00:00:00.000Z" agent="Codex technical-diagrams" version="24.0.0" type="device">
+  <diagram id="diagram:system_context_template" name="System Context">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="960" pageHeight="540" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="node:user" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontColor=#172033;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="220" width="80" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="node:core_system" value="Core System" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#172033;fontSize=16;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="360" y="210" width="220" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="node:external_system" value="External System" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontColor=#172033;fontSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="740" y="210" width="180" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge:user_uses_system" value="Uses" style="endArrow=block;html=1;rounded=1;strokeColor=#526071;strokeWidth=2;fontColor=#1F2937;labelBackgroundColor=#FFFFFF;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="node:user" target="node:core_system">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge:system_calls_external" value="Requests data" style="endArrow=block;html=1;rounded=1;strokeColor=#526071;strokeWidth=2;fontColor=#1F2937;labelBackgroundColor=#FFFFFF;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="node:core_system" target="node:external_system">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "name": "default-technical-diagram-geometry",
+    "source": "technical-diagrams fallback"
+  },
+  "page": {
+    "margin": 48,
+    "background": "#FFFFFF"
+  },
+  "node": {
+    "min_width": 180,
+    "min_height": 72,
+    "corner_radius": 8,
+    "spacing_minimum": 72,
+    "spacing_preferred": 120,
+    "container_padding": 32
+  },
+  "edge": {
+    "stroke_width": 2,
+    "routing": "orthogonal",
+    "label_padding": 6,
+    "label_offset": 12
+  },
+  "quality_limits": {
+    "allow_node_overlap": false,
+    "allow_boundary_collision": false,
+    "allow_line_crossing_by_default": false
+  }
+}

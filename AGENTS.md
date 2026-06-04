@@ -12,8 +12,10 @@ This repository contains agent skills. Keep changes small, intentional, and easy
 - Add scripts only when deterministic tooling is worth the maintenance cost.
 - Do not commit secrets, client-confidential content, internal URLs, or private strategy.
 - Prefer Writerside-compatible documentation conventions for docs-facing artifacts unless a task explicitly asks for another format.
-- For software or systems technical documentation, use the `documentation-drafting` skill and its Writerside references. New technical documentation must be Writerside-compatible Markdown.
-- For comments, docstrings, or API comment blocks, use `documentation-drafting/references/code-comment-documentation.md`. Comments must explain contract, intent, constraints, side effects, risks, or non-obvious decisions, not restate obvious code.
+- For documentation prose, Writerside topics, technical references, guides, README work, and code comment documentation, use the `documentation` skill. New technical documentation must be Writerside-compatible Markdown.
+- For comments, docstrings, or API comment blocks, use `documentation/references/code-comment-documentation.md`. Comments must explain contract, intent, constraints, side effects, risks, or non-obvious decisions, not restate obvious code.
+- For technical diagrams, architecture visuals, workflow diagrams, Draw.io mxGraph files, diagram palettes, SVG exports, and visual diagram QA, use the `technical-diagrams` skill.
+- Production diagrams must preserve editable `.drawio` source files and final SVG exports. PNG is for temporary visual QA unless the user requests PNG output or the target platform requires raster output.
 - Keep comment documentation professional and maintained at the right level:
   - Package/module/file: document responsibility, boundaries, public entry points, generated status, ownership, source of truth, and system-level assumptions.
   - Class: document abstraction, lifecycle, resource ownership, thread safety, mutability, collaborators, and failure modes.
