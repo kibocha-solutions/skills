@@ -80,6 +80,9 @@ drafting:
    before creating or restructuring technical docs.
 6. Review authoritative online sources when the document type depends on an
    external standard, framework, API, security rule, or Writerside behavior.
+   For Writerside-specific structure, markup, navigation, or rendering claims,
+   consult the official Writerside documentation at
+   `https://www.jetbrains.com/help/writerside/`.
 7. If the document needs production diagrams or SVG exports, route that work to
    the `technical-diagrams` skill and embed only the final documentation asset.
 8. Draft with the general writing rules in this skill: concrete facts,

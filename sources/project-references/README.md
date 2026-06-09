@@ -1,57 +1,33 @@
 # Project-References Master Index
 
-This directory contains comprehensive instructions for all AI coding assistants working on Vibe Code Canon projects.
+This directory contains source reference material for skills and project
+standards. It is not the active instruction authority for this repository.
 
 ## Structure
 
 ```
 sources/project-references/
 ├── README.md (this file)
-├── 00-core-canons/                     # Universal writing and formatting rules
-├── 01-technical-documentation/         # Documentation canons and standards
 ├── 02-security/                        # Security standards
-├── 03-ci-cd/                           # Git, commits, pipelines
 ├── 04-testing/                         # Testing procedures
 ├── 05-programming-standards/           # Code standards
-├── 06-deployment/                      # Infrastructure, deployment
-└── 07-project-wide-instructions/       # Agent instructions (AGENTS.md, Copilot, Cursor)
-    ├── AGENTS.md                       # Universal instructions (all agents)
-    ├── github-copilot/                 # GitHub Copilot specific
-    └── cursor/                         # Cursor AI specific
+└── 06-deployment/                      # Infrastructure, deployment
 ```
 
-## Agent Instructions Files
+## Active Authority
 
-All three files (`AGENTS.md`, Copilot, Cursor) contain **IDENTICAL instructions with ABSOLUTE AUTHORITY**:
-
-1. **Task Clarification Protocol** - MANDATORY before starting work
-2. **Context Management** - Load ONLY relevant files (avoid overwhelm)
-3. **Core Canon** - MUST read `00-core-canons/_core_canon.md` first
-4. **Security Checklist** - NON-NEGOTIABLE before every commit
-5. **Formatting Rules** - No emojis, no emdashes, kebab-case naming
-6. **Conventional Commits** - Standard commit message format
-7. **.gitignore Management** - Active verification of staging area
-8. **Anti-Patterns** - No summary documents, no temp file litter
+Use the local skills repo `AGENTS.md` and installed skills as the active agent
+instruction layer. Do not treat files in this directory as a second authority.
+Extract techniques and standards from these references into local skills when a
+stable workflow needs to become agent-facing.
 
 ## Reference Domains
 
 Each reference directory contains deep-dive canonical instructions for specific domains:
 
-### 00-core-canons/
-**Use when:** ALWAYS - read `_core_canon.md` FIRST before any task  
-**Contains:** Universal writing rules, formatting absolutes, voice guidelines, quality assurance checklist
-
-### 01-technical-documentation/
-**Use when:** Creating or updating any technical documentation  
-**Contains:** Documentation canons for all types (API, architecture, etc.)
-
 ### 02-security/
 **Use when:** Authentication, encryption, sensitive data handling  
 **Contains:** Security standards, OWASP prevention, secure coding
-
-### 03-ci-cd/
-**Use when:** Git commits, pipeline setup, deployment automation  
-**Contains:** Git workflows, Conventional Commits, pipeline configs
 
 ### 04-testing/
 **Use when:** Writing tests (unit, integration, E2E, performance)  
@@ -65,34 +41,16 @@ Each reference directory contains deep-dive canonical instructions for specific 
 **Use when:** Infrastructure setup, Kubernetes, deployment procedures  
 **Contains:** Deployment patterns, IaC standards, monitoring
 
-## Installation
-
-Run these commands from your project root directory:
-
-### For GitHub Copilot
-```bash
-cp -r 07-project-wide-instructions/github-copilot/.github ./
-```
-
-### For Cursor AI
-```bash
-cp -r 07-project-wide-instructions/cursor/.cursor ./
-cp 07-project-wide-instructions/AGENTS.md ./
-```
-
-### For Google Antigravity (or other agents)
-```bash
-cp 07-project-wide-instructions/AGENTS.md ./
-```
-
 ## Critical Principles
 
-1. **Absolute Authority** - These instructions MUST be followed at all times
-2. **Context Management** - Load ONLY relevant files for current task
-3. **Read Core Canon First** - MANDATORY before any work
-4. **Task Clarification** - MUST confirm understanding before proceeding
-5. **Security First** - NON-NEGOTIABLE checklist before every commit
-6. **No Assumptions** - Read existing code explicitly before referencing
+1. Read only the references relevant to the task.
+2. Prefer repo truth over generic canon wording.
+3. Promote stable workflows into local skills instead of maintaining parallel
+   agent overlays.
+4. Treat security, deployment, and commit guidance as operational constraints,
+   not decorative prose.
+5. Do not assume these references are repo-specific until local evidence proves
+   it.
 
 ---
 
