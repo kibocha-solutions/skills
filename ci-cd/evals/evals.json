@@ -1,0 +1,47 @@
+{
+  "skill_name": "ci-cd",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "i made a mess on my feature branch. there are nine little fix commits after the real change and i want one clean final commit before i open the pr. tell me the safest cleanup flow and the kind of commit title i should end with.",
+      "expected_output": "Explains a safe fixup or autosquash workflow, distinguishes local cleanup from shared-history risk, and recommends a single meaningful final commit.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "please review this repo's github actions setup and tell me what to tighten before we rely on it for production deploys. i care about secrets handling, action pinning, and rollback readiness.",
+      "expected_output": "Reviews workflow security and deployment readiness, highlights evidence to inspect, and proposes concrete hardening steps with rollback considerations.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "we need to add a staging deploy gate before production, but i do not want a giant pipeline redesign. propose the smallest safe rollout order and what checks should block prod.",
+      "expected_output": "Produces a proportional CI/CD change plan with staging gate placement, required checks, rollout order, and rollback considerations.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "this branch is called fix/api but it is only a temporary cleanup branch off feat/docs. i have 14 little debug commits on it and nothing has been pushed for review yet. tell me what to do next and what to record in the handoff so the next agent does not mistake this for the real feature branch.",
+      "expected_output": "Chooses autonomous cleanup on a temporary local branch, identifies the intended base branch, and includes branch-state handoff details such as current branch, base branch, branch purpose, procedural commit count, history-cleaned status, and safe next Git action.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "our main branch gets lots of pull requests every day and people keep rebasing over each other. explain whether we should use a merge queue or merge train style control and what tradeoffs to watch for.",
+      "expected_output": "Surfaces merge queue or merge-train style validation for high-throughput branches, explains combined-state validation, and avoids naively recommending manual rebase churn.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "please harden this github actions deployment setup. i want less privilege, no long-lived cloud secrets if we can avoid them, and clearer rollback safety.",
+      "expected_output": "Recommends least-privilege workflow permissions, action pinning, OIDC or ephemeral credentials where supported, and explicit rollback-oriented deployment controls.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "i already pushed this branch and two other engineers have pulled it. the history is ugly, but i still want one clean final result if possible. what is safe and what is not?",
+      "expected_output": "Warns against silent history rewrite on a shared collaborative branch, distinguishes safe alternatives from unsafe rebases or force-pushes, and explains when explicit approval is required.",
+      "files": []
+    }
+  ]
+}
