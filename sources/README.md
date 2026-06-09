@@ -8,6 +8,6 @@ Agents must not delete this directory or its contents unilaterally. Only the use
 
 ## Contents
 
-- `sources/project-references/`: archived project reference material cloned from `kibocha-solutions/project-references`.
+- `sources/project-references/`: remaining archived project reference material
+  that has not yet been fully replaced by local skills.
 - `reports/skills-repository-reference.md`: research report guiding the structure and migration strategy for this skills repository.
-
