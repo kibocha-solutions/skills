@@ -59,7 +59,12 @@ source-backed and useful for the reader.
 
 ## Negative Parallelism
 
-Reduce contrast formulas that sound like generic AI emphasis:
+Eradicate the diminish-to-elevate rhetorical move in all its forms. The
+forbidden pattern is not a specific phrase — it is any construction that
+elevates Y by first diminishing X. Paraphrasing the surface words while
+preserving the move is not compliance.
+
+Forbidden forms include but are not limited to:
 
 - `not just X, but Y`
 - `not X. Y.`
@@ -67,20 +72,39 @@ Reduce contrast formulas that sound like generic AI emphasis:
 - `Y, rather than X`
 - `Y, not just X`
 - `not only X, but also Y`
+- `more than X` / `more than just X`
+- `went beyond X`
+- `exceeded mere X`
+- `was not limited to X`
+- `not merely X`
+- `X was secondary to Y`
 
-Use direct positive phrasing instead.
+**Paraphrase loophole example:**
 
-Weak:
+Original:
 
 ```text
-This is not just a deployment issue, but a governance failure.
+This was not just an alignment concern. All aspects of the structure appeared
+null if not nullable.
 ```
 
-Better:
+Malicious compliance (still a failure — the move survived under different words):
 
 ```text
-The deployment issue exposed a governance failure.
+This was more than alignment concerns. All aspects of the structure appeared
+null if not nullable.
 ```
+
+Compliant — remove the contrast frame, state the important point directly:
+
+```text
+All aspects of the structure appeared null if not nullable. [...paragraph...]
+Alignment concerns could not cure this document.
+```
+
+Use direct positive phrasing. The only exception is when the contrast itself
+is the factual point — when the distinction between X and Y is the
+information, not a rhetorical device for emphasis.
 
 ## Vague Attribution
 
