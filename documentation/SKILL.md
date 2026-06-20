@@ -126,8 +126,42 @@ recommendations, and constraints distinct.
 
 ### Negative Parallelism
 
-Reduce `not just X, but Y` style contrast formulas. Use a direct positive
-sentence unless the contrast is necessary for accuracy.
+Eradicate the diminish-to-elevate rhetorical move in all its forms. The
+forbidden pattern is not a specific phrase — it is any construction that
+elevates Y by first diminishing X. Paraphrasing the surface words while
+preserving the rhetorical move is not compliance.
+
+Forbidden forms include but are not limited to:
+
+- `not just X, but Y`
+- `not only X, but also Y`
+- `more than X` / `more than just X`
+- `went beyond X`
+- `exceeded mere X`
+- `was not limited to X`
+- `Y, rather than X`
+- `Y, not just X`
+- `not X. Y.` / `not just X. This is Y.`
+
+**Paraphrase loophole example:**
+
+Original: `This was not just an alignment concern.`
+
+Malicious compliance: `This was more than alignment concerns.` — the surface
+words changed but the diminish-to-elevate move survived. This is a failure.
+
+Compliant: remove the contrast entirely. State the important point directly.
+If emphasis on the secondary point is needed, place it elsewhere in the
+paragraph without the contrast frame:
+
+```text
+All aspects of the structure appeared null if not nullable. [...paragraph...]
+Alignment concerns could not cure this document.
+```
+
+Use a direct positive sentence. The only exception is when the contrast itself
+is the factual point the reader needs — when the distinction between X and Y
+is the information, not a rhetorical device for emphasis.
 
 ### Attribution
 
@@ -191,7 +225,12 @@ broken references, and citation residue. Repair the underlying source or claim.
 1. Read the text once for purpose and structure.
 2. Use internal notes to identify weak passages. Do not include those notes in
    the final documentation unless the user asks for an editorial report.
-3. Apply these transformations across the draft:
+3. Draft or rewrite in Markdown first, regardless of the final target format.
+   Markdown is the quality-control medium — it is readable, diffable, and easy
+   to verify against every check in this skill. Do not convert to the target
+   format (docx, pdf, pptx, or any non-Markdown format) until the Final Pass
+   is complete and clean.
+4. Apply these transformations across the draft:
    - tighten wordy but valid text
    - attribute interpretive claims when a source supports them
    - replace vague claims with concrete facts, steps, constraints, or explicit
@@ -200,26 +239,48 @@ broken references, and citation residue. Repair the underlying source or claim.
      or connect
    - remove unsupported significance claims, decorative contrast, and
      unverifiable fluff
+   - eradicate every forbidden pattern in all its rhetorical forms, not just
+     the exact surface phrasing listed in the Core Checks — paraphrases of
+     forbidden patterns are still failures
    - preserve text that is already clear, factual, and human-written
-4. Verify citations and links for claims that depend on external evidence when
+5. Verify citations and links for claims that depend on external evidence when
    browsing, local source files, or accessible references are available. If a
    source cannot be accessed, do not invent verification. Preserve plausible
    URLs, but flag high-risk claims for user verification.
-5. Normalize headings, lists, emphasis, tables, and code fences.
-6. Re-read the result for a human documentation voice: direct, grounded, and
+6. Normalize headings, lists, emphasis, tables, and code fences.
+7. Re-read the result for a human documentation voice: direct, grounded, and
    free of ornamental certainty.
+8. Run the Final Pass. Only after the Final Pass is clean, convert to the
+   target format if the target is not Markdown.
 
 ## Final Pass
 
-Before handing off documentation, confirm:
+Run this checklist after drafting is complete but before delivery or format
+conversion. Every item must pass. If any item fails, fix it in the Markdown
+draft and re-run the pass. Do not convert to the target format until the pass
+is clean.
 
-- no unsupported significance, legacy, or trend claims remain
-- no promotional phrasing remains unless quoted or explicitly attributed
-- no sentence remains only because it sounds polished or complete
-- no source says less than the prose claims it says
-- no unnecessary `not just X, but Y` contrast pattern remains
-- no purposeless references to the report, document, guide, or section remain
-- no U+2014 dash remains outside the narrow allowed cases
-- no placeholders, chatbot artifacts, or stale knowledge disclaimers remain
-- formatting serves the reader instead of advertising structure
-- known unknowns are stated plainly instead of filled with speculation
+1. **Significance** — no unsupported significance, legacy, or trend claims
+   remain
+2. **Promotional** — no promotional phrasing remains unless quoted or
+   explicitly attributed
+3. **Dead weight** — no sentence remains only because it sounds polished or
+   complete
+4. **Source fidelity** — no source says less than the prose claims it says
+5. **Diminish-to-elevate** — no contrast formula remains in any form: not the
+   listed patterns, not paraphrases of them, not any construction that elevates
+   Y by first diminishing X. Scan for `not just`, `more than`, `beyond`,
+   `went further`, `exceeded`, `was not limited to`, `not only`, and similar
+   rhetorical moves. If the underlying move survives under different words, the
+   check fails.
+6. **Fourth wall** — no purposeless references to the report, document, guide,
+   or section remain
+7. **Em dash** — no U+2014 dash remains outside the narrow allowed cases
+8. **Residue** — no placeholders, chatbot artifacts, or stale knowledge
+   disclaimers remain
+9. **Structure** — formatting serves the reader instead of advertising structure
+10. **Unknowns** — known unknowns are stated plainly instead of filled with
+    speculation
+11. **Format gate** — if the target format is not Markdown, confirm the
+    Markdown draft is clean before converting. Do not fix quality issues inside
+    the target format; fix them in Markdown and reconvert.
