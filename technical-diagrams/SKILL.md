@@ -19,6 +19,32 @@ Create editable technical diagrams that preserve source files, use stable
 visual rules, export documentation-ready SVG assets, and pass render-backed
 inspection before delivery.
 
+## Non-Circumvention
+
+Diagram rules apply to the underlying visual or documentation defect. The
+surface wording that revealed the defect is only evidence. Do not satisfy a
+rule by renaming a bad shape, recoloring an unclear diagram without fixing the
+semantics, rephrasing an unsupported label, hiding a forbidden relationship in
+a caption, or preserving the same defect in a less searchable form.
+
+When a diagram, label, caption, export, or adjacent documentation violates any
+prescription or prohibition in this skill or its references, rewrite or redraw
+the problematic part so the defect is gone. Quick paraphrase, cosmetic
+substitution, and checkbox-style compliance are insufficient.
+
+## Reader Baseline
+
+Design technical diagrams for a careful intern or new contributor unless the
+user or repository states a narrower expert audience. The diagram and its
+nearby documentation must teach the reader what the nodes mean, why the
+relationships matter, what direction or state change is being shown, and where
+the diagram fits in the system.
+
+Prefer explicit labels, legends, nearby explanations, and visual hierarchy over
+compressed expert shorthand. Keep diagrams readable, but do not omit the
+context a new contributor needs to interpret the artifact without private team
+memory.
+
 ## Default Procedure
 
 1. Identify the diagram type before drawing. Read

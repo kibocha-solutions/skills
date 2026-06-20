@@ -10,9 +10,41 @@ This repository supports the Sovereign Drafter persona for legal drafting tasks.
 
 Legal drafting tasks include elevating layman or rudimentary text into authoritative legal language, drafting constitutional provisions, commercial instruments, annexes, or any clause where sovereign authority and structural precision are required.
 
+## Maestro — Planning Protocol
+
+All agents follow the Maestro planning protocol for any substantial or multi-step task. This applies regardless of whether the `maestro` skill is explicitly loaded.
+
+**Before starting substantial work:**
+1. Check `.agents/brain/active/` in the project root for an existing session matching the current task (match by slug keywords).
+2. If a session exists, read its `tasks.md` and `implementation_plan.md` to resume correctly.
+3. If no session exists, create one under `.agents/brain/active/YYYY-MM-DD-HHMM-<slug>/` with `implementation_plan.md`, `tasks.md`, and `walkthrough.md`.
+
+**During execution:**
+- Mark tasks `[/]` when starting, `[x]` only when verifiably complete.
+- Update `walkthrough.md` as phases finish — do not wait until the end.
+- Never expand scope silently; document added tasks in a `## Added` section of `tasks.md`.
+
+**When a new instruction arrives and current tasks are all `[x]`:**
+- Finalize `walkthrough.md`, then move the session from `active/` to `archive/`.
+- Create a fresh session for the new task.
+
+For the full protocol — session states, goal thresholds, archival rules — read `maestro/SKILL.md` and its `references/` files when the maestro skill is available. When it is not available, follow the rules above as the baseline.
+
 ## Repo Rules
 
 This repository contains agent skills. Keep changes intentional, reviewable, and grounded in the current repository.
+
+### Rule Fidelity
+
+- Treat skill prescriptions and prohibitions as behavioral requirements, not
+  strings to route around. Do not satisfy a rule by changing surface wording,
+  renaming a pattern, swapping synonyms, narrowing a definition, or preserving
+  the same defect under a new form.
+- When a rule forbids a pattern, the cure is a rewrite that removes the
+  underlying defect. Quick paraphrase, cosmetic substitution, and
+  checkbox-style compliance are insufficient.
+- Apply this standard to every prescription and prohibition in a skill,
+  including examples and listed trigger phrases.
 
 ### Working Rules
 
@@ -32,6 +64,7 @@ This repository contains agent skills. Keep changes intentional, reviewable, and
 ### Continuity
 
 - Read this `AGENTS.md` before substantial work and check `handoffs/` when it exists.
+- Check `.agents/brain/active/` in the project root before starting any substantial task. If a brain session exists for the current work, resume from it rather than starting fresh.
 - Prefer the latest relevant handoff over older notes. Use only the details that matter to the current task.
 - Treat handoffs as continuity aids, not as permanent policy. If a handoff conflicts with this file or the user's latest instruction, follow the higher-priority source and note the conflict when it matters.
 - Create or update a handoff when work is about to move to a new chat, a major decision was made, a repo-structure change was completed, a migration phase pauses, or the next agent would otherwise need to reconstruct scattered context.

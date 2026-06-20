@@ -20,6 +20,33 @@ Produce documentation that is specific, verifiable, neutral, and easy to use.
 When revising existing text, treat suspicious patterns as quality risks due for
 improvement. Preserve the author's useful meaning.
 
+## Non-Circumvention
+
+Documentation rules apply to the underlying writing move. The surface phrase
+that revealed the defect is only evidence. Do not cure a violation by swapping
+synonyms, reordering clauses, narrowing the trigger phrase, changing
+punctuation, or preserving the same defect in a less searchable form.
+
+When a sentence violates any prescription or prohibition in this skill or its
+references, rewrite the problematic passage so the defect is gone. Quick
+paraphrase is insufficient. This applies to every rule in the skill, including
+specificity, economy, neutrality, unsupported analysis, attribution, structure,
+fourth-wall drift, em dash use, markup residue, and negative parallelism.
+
+## Reader Baseline
+
+For technical documentation, write for a careful intern or new contributor
+unless the user or repository states a narrower expert audience. Give enough
+context for that reader to understand the term, decision, prerequisite,
+constraint, and verification path without reconstructing intent from chat
+history, hidden planning files, or unstated team memory.
+
+This baseline applies to software, systems, Writerside documentation, API
+documentation, engineering guides, operations docs, security docs, and
+diagram-adjacent explanatory prose. Keep the writing concise, but do not omit
+the sentence that teaches the reader why a rule, field, command, state, edge,
+or acceptance check matters.
+
 ## Default Approach
 
 1. Identify the audience, document type, and reader task.

@@ -1,0 +1,24 @@
+{
+  "skill_name": "system-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We are designing identity tables for a PostgreSQL app. Help brainstorm the atomic user tables before orgs and permissions. Use boring standard names, show realistic row examples, and record what should later go into .agents/brain.",
+      "expected_output": "A chat-first identity design discussion that separates user identity, auth identities, credentials, authenticators, sessions, and adjacent logs/security concerns without prematurely writing migrations.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Review this ERD note for a shared lifecycle table. The responsibility says only 'product lifecycle history' and columns include subject_type, subject_id, actor_type, reason_code. Tell me how to repair the settled brainstorm record before documentation.",
+      "expected_output": "A system-design critique that identifies vague naming and shallow responsibility text, proposes a denser settled-note structure with datatypes/value/notes/example rows, and flags polymorphic references as a design risk.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "We need an activity diagram for account invitation and first login. Before drawing, help reason through the actors, states, traps, and where to store the accepted brainstorm so documentation and technical-diagrams can use it later.",
+      "expected_output": "A design workflow response that brainstorms in chat, uses standard recognizable activity/state names, identifies traps, records accepted notes under .agents/brain, and routes drawing to technical-diagrams only after the flow is settled.",
+      "files": []
+    }
+  ]
+}
+
