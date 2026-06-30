@@ -47,6 +47,42 @@ diagram-adjacent explanatory prose. Keep the writing concise, but do not omit
 the sentence that teaches the reader why a rule, field, command, state, edge,
 or acceptance check matters.
 
+## Subject Independence
+
+When a technical subject has its own durable contract, schema, state model,
+interface, lifecycle, or operational responsibility, prefer one focused page for
+that subject. Keep the page comprehensive enough to stand on its own: title,
+overview, responsibility, dependencies, required fields or parameters,
+constraints, examples, validation path, and useful edge cases. Cross-links may
+help navigation, but the reader should not need another page to understand the
+subject's basic meaning, rules, or safe use.
+
+Use overview pages for orientation, relationship summaries, and scope-level
+diagrams. Do not let an overview replace the focused subject pages when each
+subject has separate facts the reader must inspect or implement.
+
+For page-level diagrams, show the local context needed to understand the page:
+the subject, its direct dependencies, and the subjects that depend on it. Use
+broader diagrams for overview pages. Avoid duplicating full field, parameter,
+or state detail in overview diagrams when the focused pages define those facts.
+
+## Documentation Source Boundary
+
+Published documentation must stand on the durable documentation library and the
+durable product or code artifacts it names. In an application repository,
+`docs/` is the documentation source boundary. Hidden planning folders,
+scratchpads, agent memory, chat history, private work queues, and temporary
+design notes may guide drafting, but their paths and filenames must not appear
+in official documentation unless the user explicitly classifies that material
+as publishable documentation.
+
+When evidence comes from a temporary source outside `docs/`, transfer the
+verified fact into the page without citing the temporary path. If the reader
+needs a persistent source, cite a durable file in `docs/`, a code artifact,
+schema, migration, configuration file, generated asset, or an external
+standard. Do not publish references to `.agents/`, `.codex/`, local scratch
+folders, hidden workspaces, or chat-only instructions in documentation topics.
+
 ## Default Approach
 
 1. Identify the audience, document type, and reader task.
@@ -101,7 +137,9 @@ drafting:
    when the project needs reusable navigation sections; use snippet library
    topics for reusable content fragments.
 4. Gather local sources of truth first: source code, schemas, configs, tests,
-   tickets, existing docs, diagrams, and generated artifacts.
+   tickets, existing docs, diagrams, and generated artifacts. Hidden planning
+   material can inform drafting, but official documentation must not publish
+   hidden or temporary planning paths.
 5. If the repository contains `sources/reports/documentation-reference.md` or
    an equivalent documentation architecture report, read the relevant sections
    before creating or restructuring technical docs.
@@ -110,11 +148,19 @@ drafting:
    For Writerside-specific structure, markup, navigation, or rendering claims,
    consult the official Writerside documentation at
    `https://www.jetbrains.com/help/writerside/`.
-7. If the document needs production diagrams or SVG exports, route that work to
+7. For Writerside validation, run `wrs doctor` before claiming local
+   Writerside tooling is available. If `wrs`, Docker, or the Writerside builder
+   image is missing, use `references/install-writerside.md` to install or
+   repair the toolchain before building. After changing Writerside topics,
+   snippets, tree files, build profiles, or documentation assets, run
+   `wrs build <instance>` for every affected instance when Docker is reachable.
+   Treat a non-zero build status as failure, report the exact inspection errors,
+   and include the log path.
+8. If the document needs production diagrams or SVG exports, route that work to
    the `technical-diagrams` skill and embed only the final documentation asset.
-8. Draft with the general writing rules in this skill: concrete facts,
+9. Draft with the general writing rules in this skill: concrete facts,
    neutral language, no filler, and explicit unknowns.
-9. Validate path, classification, sources, required sections, links, commands,
+10. Validate path, classification, sources, required sections, links, commands,
    diagrams, and Writerside tree inclusion before handing off.
 
 ## Core Checks
@@ -203,6 +249,19 @@ Do not imply broad agreement from one or two sources.
 
 Keep headings, lists, emphasis, tables, and conclusions proportional to the
 reader task. Remove scaffolding that only makes the artifact look complete.
+
+Use paragraphs for instructions, notes, and explanatory guidance unless the
+reader must scan a discrete set of steps or choices. When a list is useful,
+introduce it with context so the reader knows what the items mean and how to
+use them. Avoid bare phrase lists. If Writerside documentation needs to present
+four or more short phrases or examples, prefer a Writerside component such as
+`<deflist>`, `<list>`, tabs, a table, or a column-style component supported by
+the project over a plain Markdown bullet list.
+
+Use `<deflist collapsible="true">` for FAQ-style material in Writerside topics.
+Each `<def>` title should be the question, and the answer should be a concise
+paragraph or two. Use `default-state="expanded"` only for the first or most
+urgent question when that improves scanability.
 
 ### Fourth Wall
 

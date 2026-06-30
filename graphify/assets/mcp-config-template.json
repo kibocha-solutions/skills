@@ -1,0 +1,72 @@
+{
+  "_comment": "Register code-review-graph as the global stdio MCP server. Install Graphify separately as a CLI/skill integration; current graphifyy releases do not expose graphify serve, graphify ping, or a documented --mcp flag.",
+  "_config_locations": [
+    "~/.codex/config.toml",
+    "~/.config/opencode/opencode.jsonc",
+    "~/.claude.json or Claude Code MCP settings",
+    "Provider-specific MCP settings for other MCP-compatible clients"
+  ],
+  "_path_prerequisites": [
+    "python3 --version or python --version must report a compatible Python where the tools run.",
+    "uv must resolve on PATH after installation; Linux/WSL/macOS commonly use ~/.local/bin.",
+    "pipx must resolve on PATH after installation; run pipx ensurepath and restart the agent host if needed.",
+    "graphify is installed from the graphifyy package, but the command is graphify.",
+    "Do not configure graphify as a global MCP server unless graphify --help on the target machine explicitly documents a supported MCP command or flag."
+  ],
+  "mcp": {
+    "servers": {
+      "enabled": [
+        {
+          "name": "code-review-graph",
+          "command": "code-review-graph",
+          "args": ["serve"],
+          "transport": "stdio",
+          "_description": "AST parser, call-graph builder, and blast-radius engine. Requires Python 3.10+ and a local SQLite DB initialised by 'code-review-graph init'.",
+          "_install": "pipx install code-review-graph",
+          "_verify": "code-review-graph serve --help"
+        }
+      ]
+    }
+  },
+  "_codex_toml": {
+    "code-review-graph": "[mcp_servers.code-review-graph]\ncommand = \"code-review-graph\"\nargs = [\"serve\"]\ntype = \"stdio\""
+  },
+  "_opencode_local_shape": {
+    "mcp": {
+      "code-review-graph": {
+        "type": "local",
+        "command": ["code-review-graph", "serve"],
+        "enabled": true
+      }
+    }
+  },
+  "_claude_code_cli": [
+    "claude mcp add code-review-graph -- code-review-graph serve"
+  ],
+  "_generic_provider_mapping": {
+    "code-review-graph": {
+      "name": "code-review-graph",
+      "command": "code-review-graph",
+      "args": ["serve"],
+      "transport": "stdio"
+    }
+  },
+  "_graphify_cli_integration": {
+    "install": "uv tool install graphifyy",
+    "verify": "graphify --version && graphify --help",
+    "agent_skill_install": "graphify install or graphify install --platform <provider>",
+    "common_commands": [
+      "graphify extract <path>",
+      "graphify update <path>",
+      "graphify query \"<question>\"",
+      "graphify path \"A\" \"B\"",
+      "graphify explain \"X\""
+    ]
+  },
+  "_troubleshooting": {
+    "provider_shape_error": "Do not assume mcp.servers.enabled is universal. Codex TOML, OpenCode JSON, Claude Code CLI, and other MCP clients use different surrounding shapes for the same local stdio command.",
+    "path_not_found": "Run 'uv tool update-shell' and 'pipx ensurepath', export HOME/.local/bin for the current shell on Linux/WSL/macOS, then restart the agent host. Native Windows must verify with where.exe in the environment that launches the provider.",
+    "graphify_mcp_error": "If a provider reports graphify serve failed, remove that MCP entry. Current graphifyy CLI help does not list graphify serve, graphify ping, or a documented --mcp flag.",
+    "code_review_graph_stale_db": "Run 'code-review-graph init' in the project root if the SQLite DB does not exist yet, or 'code-review-graph update' to sync after fresh commits."
+  }
+}
