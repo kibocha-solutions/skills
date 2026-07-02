@@ -1,0 +1,33 @@
+# .cgcignore
+# CGC discovers this file by walking from the indexed path to the git root.
+# Uses gitignore-style syntax. Directory-only patterns end with /.
+
+# Project-local graph state
+graphify/
+.code-review-graph/
+
+# Generated root instruction and editor config files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+QODER.md
+.cursorrules
+.windsurfrules
+.mcp.json
+.opencode.json
+.github/
+.idea/
+
+# Skill packages and agent tooling
+**/skills/
+.agents/skills/
+
+# Transient agent brain folders
+.agents/brain/active/
+.agents/brain/archive/
+
+# Assistant-platform scaffolding
+.claude/
+.gemini/
+.kiro/
+.qoder/

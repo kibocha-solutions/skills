@@ -1,0 +1,17 @@
+[
+  {
+    "name": "bitwarden-wsl-windows-openssh",
+    "prompt": "A user has Bitwarden Desktop SSH Agent enabled on Windows and has just installed WSL2. They removed npiperelay and socat. Explain how to configure Windows Git and WSL Git to use Windows OpenSSH for GitHub SSH authentication and SSH commit signing, including the aliases, core.sshCommand, gpg.ssh.program, and verification commands.",
+    "expected_behavior": "Routes to Bitwarden-on-WSL guidance, uses Windows OpenSSH from WSL, includes ssh.exe/ssh-add.exe aliases, core.sshCommand ssh.exe, Windows ssh-keygen.exe signing program, verification commands, and does not recommend npiperelay, socat, rbw, or a WSL SSH_AUTH_SOCK bridge."
+  },
+  {
+    "name": "onepassword-wsl-signing",
+    "prompt": "A user wants 1Password SSH Agent for GitHub authentication and signed commits from WSL2. Produce exact setup and verification steps without assuming the signer path if it is not present.",
+    "expected_behavior": "Routes to 1Password WSL and signing docs, uses Windows OpenSSH for authentication, tells the user to use the 1Password-provided WSL signer snippet/path, configures Git SSH signing keys and allowed signers, and verifies authentication plus signatures."
+  },
+  {
+    "name": "production-ssh-controls",
+    "prompt": "A team needs SSH access controls for production servers, deploy keys, break-glass access, and offboarding. Draft the procedure and mention which reference should be read first if GitHub clone authentication was already documented elsewhere.",
+    "expected_behavior": "Routes to securing SSH access, separates operator keys from deploy keys and service accounts, includes rotation/offboarding/emergency controls, and avoids repeating Git provider setup when the version-control SSH authentication guide should be referenced by title."
+  }
+]

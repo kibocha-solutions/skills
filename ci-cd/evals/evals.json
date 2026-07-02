@@ -42,6 +42,18 @@
       "prompt": "i already pushed this branch and two other engineers have pulled it. the history is ugly, but i still want one clean final result if possible. what is safe and what is not?",
       "expected_output": "Warns against silent history rewrite on a shared collaborative branch, distinguishes safe alternatives from unsafe rebases or force-pushes, and explains when explicit approval is required.",
       "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "refresh repo-health before we commit. make sure the next agent can understand the repo's commit style and signing expectations without creating a commit itself.",
+      "expected_output": "Requires at least two full commit records with show-signature, full dates, subject, and body in repo-health, rejects one-line git log as insufficient, and records the provider CLI and signing facts before any commit attempt.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "this repo is configured for sahil, not johnkibocha. set up the ssh path safely before pushing and do not generate any new keys.",
+      "expected_output": "Detects the non-default identity from repo-health and git config, requires a Windows SSH host alias such as git@sahil:owner/repo.git, refuses to push through git@github.com for the non-default identity, selects an existing key only, and asks the user for vault unlocks or private-key material.",
+      "files": []
     }
   ]
 }

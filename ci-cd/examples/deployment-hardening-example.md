@@ -14,20 +14,23 @@ than a list of principles.
 
 ## Recommended guidance shape
 
-1. Inspect the workflow files, required secrets, deploy triggers, and current
+1. Refresh or read repo health using at least two full commit records:
+   `git log --show-signature -2 --date=iso-strict --format=fuller`. Do not
+   infer repo commit style or signing expectations from a one-line log.
+2. Inspect the workflow files, required secrets, deploy triggers, and current
    environment gates.
-2. Reduce workflow permissions:
+3. Reduce workflow permissions:
    - set default `GITHUB_TOKEN` permissions narrowly;
    - expand only per job when needed.
-3. Replace long-lived cloud secrets with OIDC and short-lived credentials when
+4. Replace long-lived cloud secrets with OIDC and short-lived credentials when
    the target platform supports it.
-4. Pin third-party actions to full SHAs where feasible.
-5. Introduce a minimal staged release path:
+5. Pin third-party actions to full SHAs where feasible.
+6. Introduce a minimal staged release path:
    - build or package once;
    - deploy the same artifact to staging;
    - run smoke or verification checks;
    - gate production on those checks.
-6. Define rollback explicitly:
+7. Define rollback explicitly:
    - what artifact or release is rolled back;
    - what checks prove rollback success;
    - what data or migration constraints may prevent a full revert.

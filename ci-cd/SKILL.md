@@ -30,20 +30,44 @@ the agent itself performs — run a structured health pass and cache the results
 Do not re-parse the repo from scratch on every invocation; read the cache and
 validate only the fields that may have changed.
 
+Treat Git operations as authorization-sensitive by default. Any command that
+invokes `git`, provider CLIs such as `gh` or `glab`, remote authentication, or
+repo-local writes outside the active sandbox root should request elevated
+authorization before running. Do not first attempt the Git command in the
+sandbox and then retry after a predictable sandbox failure.
+
 **What to collect and cache** (see `references/repo-health-cache.md` for the
 full schema and staleness rules):
 
-- Recent commit pattern from `git log --oneline -20 --format="%h %s %an"` —
-  used to infer the project's commit style baseline.
+- Recent commit pattern from at least two full commit records, collected with
+  signature, full author and committer dates, subject, and body. Use
+  `git log --show-signature -2 --date=iso-strict --format=fuller` as the
+  minimum evidence set. A one-line log is not enough for repo health because
+  it hides bodies, dates, authorship details, and signature status that the
+  agent needs before it creates or amends commits.
 - User identity from `git config user.name` and `git config user.email` —
   required before any commit; halt if either is absent and ask the user to
   configure them first.
 - Remote connectivity — whether `git remote -v` shows a configured remote and
   whether `ssh -T git@<host>` returns a successful authentication handshake.
+- Provider CLI availability and authentication for the remote host. For GitHub,
+  record whether `gh` exists and whether `gh auth status` succeeds. For GitLab,
+  record whether `glab` exists and whether its auth status check succeeds.
+  Prefer the authenticated provider CLI for provider-native push, pull request,
+  and review operations when it is available and appropriate for the task.
 - Signing configuration from `git config gpg.format`, `git config user.signingkey`,
   and `git config gpg.ssh.allowedSignersFile` — the default assumption is that
   signing is expected; the absence of signing config triggers a pre-commit
   clarification prompt rather than a silent unsigned commit.
+- SSH and signing path evidence before any repair or setup. Inspect
+  `core.sshCommand`, `gpg.ssh.program`, `SSH_AUTH_SOCK`, available Windows
+  OpenSSH binaries, `op-ssh-sign-wsl.exe`, and relevant SSH config files. Do
+  not repair SSH from a single failing `ssh-add` result. Use the `ssh` skill
+  for SSH agent, host alias, key, and signing setup.
+- Default Git identity from the active repo-health cache. Treat
+  `identity.user_name` and `identity.user_email` as the default identity for
+  the repo. If the cache is absent, stale, or missing identity fields, refresh
+  it before deciding which SSH host, key, or signing path belongs to the repo.
 
 **Cache location:** `.agents/brain/git/repo-health.json` in the project root.
 When a snapshot becomes stale, archive it to `.agents/brain/git/archives/`
@@ -67,6 +91,8 @@ configuration made during the current session.
      merged-results style validation, and high-throughput branch controls.
    - `references/authoritative-sources.md` when a claim depends on an external
      standard or platform behavior and needs primary-source grounding.
+   - The `ssh` skill when the work requires SSH authentication, SSH signing,
+     SSH host aliases, password-manager SSH agents, or production SSH access.
    - `examples/` when the user would benefit from a concrete branch-cleanup or
      deployment-hardening pattern rather than abstract guidance alone.
 2. Inspect repo truth first:
@@ -115,6 +141,13 @@ configuration made during the current session.
   operational risks first and convenience issues second.
 - If branch protection, required checks, or permissions are absent, say so
   plainly and propose the narrowest safe guardrail that fits the repo.
+- For SSH key generation, password-manager SSH agents, host aliases, and SSH
+  signing setup, use the `ssh` skill. CI/CD work may collect and cache SSH
+  evidence, but the SSH skill owns configuration and repair procedures.
+- Treat `git@github.com:owner/repo.git` as belonging to the repo's default
+  cached identity. When the repo identity differs from that default, or the
+  user requests or strictly implies a different GitHub identity, use the `ssh`
+  skill to select or verify an SSH host alias before pushing.
 
 ## Commit Attempt Discipline
 
@@ -127,16 +160,14 @@ around the problem.
 
 **Before each attempt:**
 
-1. Read the cached signing config from `.agents/brain/git/repo-health.json`.
-   If signing is configured and expected, verify the key is accessible via
-   `ssh-add -l` before committing.
-   - If `ssh-add -l` succeeds: proceed to step 2.
-   - If `ssh-add -l` fails with a connection error: this means the relay is
-     not running, not that the key is unavailable. Do not halt. Attempt to
-     start the socat bridge immediately (see `references/ssh-signing-relay.md`
-     §Step 3 for the exact command), wait 2 seconds, then re-run `ssh-add -l`.
-     If it now lists keys, continue. Only if the relay cannot be started after
-     this repair attempt should you escalate.
+1. Read the cached signing config and identity from
+   `.agents/brain/git/repo-health.json`. If signing is configured and
+   expected, confirm the active SSH signing path from cached evidence before
+   repair. Use `references/ssh-signing-relay.md` as the CI/CD bridge and the
+   `ssh` skill for the provider-specific procedure.
+   - If the active SSH path exposes keys successfully: proceed to step 2.
+   - If the path is unclear: ask the user which agent owns the key before
+     changing sockets, aliases, signing config, or remotes.
    - If signing config is absent but was previously expected: ask the user
      whether this is intentional before proceeding. Record the answer
      (`signing_intentionally_disabled: true/false`) in the cache. The agent
@@ -147,24 +178,24 @@ around the problem.
 
 **On each failure, triage in this order before the next attempt:**
 
-1. **SSH agent reachability** — run `ssh-add -l`. If it returns a connection
-   error, attempt to start the socat relay (see `references/ssh-signing-relay.md`).
-   Do not stop at the diagnosis — actually execute the repair command, wait for
-   the socket to appear, and re-test before moving to step 2.
+1. **SSH agent reachability and identity path** — identify the active path from
+   repo-health, Git config, environment variables, and installed tools before
+   repair. Use the `ssh` skill procedure that matches the evidence.
 2. **Git signing configuration** — confirm `gpg.format`, `user.signingkey`, and
    (for SSH) `gpg.ssh.allowedSignersFile` are present and consistent. If
-   `allowedSignersFile` is absent, create it now following the cross-platform
-   procedure in `references/ssh-signing-relay.md` §allowedSignersFile.
-3. **Remote connectivity** — run `ssh -T git@<host>` to confirm the remote
-   accepts authentication before blaming push failures on signing.
+   `allowedSignersFile` is absent, create or refresh it through the matching
+   procedure in the `ssh` skill.
+3. **Remote connectivity and host alias** — inspect the remote URL before
+   testing. If the repo uses a non-default identity, test the configured alias
+   (`ssh -T git@alias`) and do not substitute `git@github.com`.
 4. **Everything else** — capture the exact error text, include it in the halt
    message, and ask the user to inspect it.
 
 **After 3 failed attempts:**
 
 - If the SSH agent was identified as the culprit at any point: halt and ask
-  the user to unlock and load their key in Bitwarden (or 1Password) on the
-  Windows side, then retry from scratch.
+  the user to unlock, approve, or load the key in the active agent path
+  identified from repo-health and config evidence, then retry from scratch.
 - If the SSH agent was not the culprit: halt with a full diagnostic summary
   (triage results from each of the 3 attempts) and do not speculate about the
   cause beyond what the evidence supports.
@@ -313,6 +344,13 @@ Provide:
 
 - Keep the subject line concise and imperative; the subject is not the place
   for tradeoffs, rationale, or extended context.
+- Keep commit and PR messages anchored to the core repo-relevant change. The
+  durable message should identify the feature, fix, refactor, documentation
+  update, workflow change, or operational improvement that future maintainers
+  will care about. Do not include unrelated workspace conditions, submodule
+  state, sandbox mechanics, local tooling trivia, or incidental punctuation and
+  cleanup details unless the user explicitly asks for those details to appear
+  in the message.
 - **Include a commit body. It is not optional.** Explain the intent of the
   change, any meaningful tradeoff, or the operational impact. Do not use the
   body to list files changed — the diff does that. Keep each line in the body
@@ -355,9 +393,9 @@ Provide:
   the normative guidance in this skill.
 - `references/repo-health-cache.md`: brain cache schema for repo health
   snapshots, staleness triggers, archive rules, and field definitions.
-- `references/ssh-signing-relay.md`: Bitwarden and 1Password SSH agent relay
-  setup for Windows and WSL2 using npiperelay and socat, including SSH config
-  patterns, verification steps, and failure-mode diagnostics.
+- `references/ssh-signing-relay.md`: SSH identity and signing path selection
+  for Bitwarden Desktop, 1Password, local keys, host aliases, verification
+  steps, and failure-mode diagnostics.
 - `references/pull-request-messages.md`: production-grade pull request
   description standards — required sections, title format, tone rules,
   formatting guidance, and prohibited patterns.

@@ -98,6 +98,13 @@ Examples:
 - `fix(actions): pin checkout action to commit SHA`
 - `docs(ci-cd): clarify fixup and autosquash workflow`
 
+The message must describe the durable repo-relevant result of the session, not
+the full path the agent took to get there. Mention the core feature, fix,
+refactor, documentation update, workflow change, or operational improvement.
+Do not include unrelated workspace state, submodule movement that is not the
+repo's actual change, sandbox or permission mechanics, local tool setup, or
+minor incidental edits unless the user explicitly asks for those details.
+
 ## Pull Request Expectations
 
 - Keep the PR aligned to one coherent goal.
@@ -126,6 +133,11 @@ When a later chat must resume Git work, record:
 ## Anti-Patterns
 
 - "wip", "misc fixes", or "address feedback" as final published commits.
+- Commit titles or bodies that read like session logs instead of repository
+  history.
+- Mentioning unrelated local state, submodule noise, sandbox behavior, or
+  incidental punctuation and formatting fixes in the final message unless the
+  user explicitly asks for that content.
 - Creating a new commit when the right action is to amend or autosquash into
   the existing change.
 - Rebasing or force-pushing a branch shared with others without approval.

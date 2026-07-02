@@ -9,6 +9,11 @@ Why this change matters, what risk it addresses, or what operator behavior it
 changes. Keep the body concise.
 ```
 
+Keep the title and body focused on the durable repo change. Do not mention
+unrelated workspace state, submodule noise, sandbox mechanics, local tooling,
+or incidental formatting and punctuation edits unless the user explicitly asks
+for those details in the commit message.
+
 Examples:
 
 ```text

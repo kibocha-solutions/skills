@@ -1,0 +1,33 @@
+# .code-review-graphignore
+# Patterns added here extend CRG's default ignore list.
+# Use <dir>/** to match at any depth inside monorepos.
+
+# Project-local graph state
+graphify/**
+.code-review-graph/**
+
+# Generated root instruction and editor config files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+QODER.md
+.cursorrules
+.windsurfrules
+.mcp.json
+.opencode.json
+.github/**
+.idea/**
+
+# Skill packages and agent tooling
+**/skills/**
+.agents/skills/**
+
+# Transient agent brain folders
+.agents/brain/active/**
+.agents/brain/archive/**
+
+# Assistant-platform scaffolding
+.claude/**
+.gemini/**
+.kiro/**
+.qoder/**

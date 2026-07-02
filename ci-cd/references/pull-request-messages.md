@@ -38,6 +38,11 @@ not for someone who has been following the branch since day one. The summary
 is the right place to surface the change's scope: whether it is a narrow
 targeted fix, a broad refactor, or the final leg of a multi-PR feature.
 
+Keep the summary scoped to the repository change under review. Do not include
+unrelated workspace conditions, submodule movement that is outside the PR's
+actual purpose, sandbox details, local tool setup, or minor incidental edits
+unless the user explicitly asks for those details in the PR message.
+
 ### Context and Motivation
 
 Explain why the change is being made. Link to the issue, ticket, or
@@ -194,6 +199,11 @@ A "What Changed" section that lists file names instead of decisions ("Updated
 `auth.py`, `session.py`, and `middleware.py`") tells the reviewer nothing
 they could not read from the file list in the diff view. Use this section
 to explain the reasoning, not to reproduce the manifest.
+
+A PR description that recounts the agent's local workflow, sandbox failures,
+provider authentication steps, or incidental cleanup distracts from the
+reviewable change. Keep operational notes only when they affect review,
+deployment, rollback, or the user explicitly asked for them.
 
 ---
 
