@@ -47,13 +47,20 @@ or any path outside the repo root).
 
 ## Operating Lifecycle
 
-### 1. Generated Tooling Inspection And Cleanup
+### 1. Mandatory Generated Tooling Inspection And Cleanup
 
-Before building or updating graph indexes, inspect generated agent, editor, MCP,
-and graph-tooling files across the repository. Do a full pass from the repo
-root instead of checking only a short list of known paths. Existing files are
-not exempt from review; a file that was already present can still be generated
+Before building, updating, or using graph indexes, and again after any graphify,
+CRG, or CGC command creates files, inspect generated agent, editor, MCP, and
+graph-tooling files across the repository. Do a full pass from the repo root
+instead of checking only a short list of known paths. Existing files are not
+exempt from review; a file that was already present can still be generated
 tooling that does no project work.
+
+The skill terms are not satisfied until the cleanup pass is complete. Generated
+graph tooling may remain only in `graphify/` or in the allowed `.agents/`
+layout. The allowed `.agents/` layout contains `.agents/brain/` and/or
+`.agents/skills/`; when `.agents/skills/` exists, it must contain
+`.agents/skills/documentation/SKILL.md`.
 
 Look for stale or generated material such as:
 
@@ -65,6 +72,9 @@ Look for stale or generated material such as:
 - assistant-generated instruction folders such as `.github/` when they contain
   graph-tooling or agent instruction scaffolding and do not contain
   project-owned GitHub workflows;
+- generated reports such as `CGC_REPORT.md`;
+- graph-tool ignore/config files such as `.code-review-graphignore` and
+  `.cgcignore` when they were created only for the graph run;
 - local editor metadata such as `.idea/` when it is not part of the project;
 - stale graph state outside the canonical `graphify/` directory, such as
   `.code-review-graph/` or `.codegraphcontext/`;
@@ -78,9 +88,13 @@ When the user has authorized cleanup:
 2. Inspect their contents or filenames enough to classify their role.
 3. Remove generated/non-project material that matches the cleanup authority.
 4. Preserve user-authored project material, durable documentation, source files,
-   GitHub workflows, and `.agents/brain/db_design/`.
+   project-owned GitHub workflows, `graphify/`, and the allowed `.agents/`
+   layout.
 5. Treat uncertain provenance as user-owned and report it instead of deleting
    it.
+6. Run a final repo-root scan and explicitly confirm that no generated
+   graphify/CRG/CGC scaffolding remains outside `graphify/` and the allowed
+   `.agents/` layout before reporting the skill complete.
 
 Do not restrict cleanup to `.claude/`, `.gemini/`, `.kiro/`, and `.qoder/`.
 Those folders are examples, not the full cleanup scope.
@@ -128,9 +142,10 @@ Select the appropriate tool for each query using the routing logic in
 
 ## Index Exclusion Rules
 
-Both tools must exclude the following paths from indexing. These patterns are
-defined in `.code-review-graphignore` (for CRG) and `.cgcignore` (for CGC) at
-the repo root.
+Both tools must exclude the following paths from indexing. For this skills
+repository, these patterns live in the committed root ignore files. For other
+target repositories, prefer tool-local configuration under `graphify/` unless
+the user explicitly asks to install durable root-level ignore files.
 
 **Excluded (generated, transient, or non-project):**
 
@@ -170,8 +185,11 @@ represents user-authored design decisions that benefit from graph indexing.
 
 ## Repo File Requirements
 
-The following files must exist in the repo root with the contents described
-in the subsections below. Create or update them during setup.
+For this skills repository, the following files must exist in the repo root
+with the contents described in the subsections below. In another target
+repository, create or update these root files only when the user explicitly
+asks for durable graph-tool activation. Otherwise treat newly created copies as
+generated setup scaffolding and remove them during the mandatory cleanup pass.
 
 ### `.gitignore`
 
