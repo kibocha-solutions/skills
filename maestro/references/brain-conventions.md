@@ -13,7 +13,8 @@ The brain always lives at the **project workspace root**:
 └── .agents/
     ├── brain/
     │   ├── active/
-    │   └── archive/
+    │   ├── archive/
+    │   └── handoffs/   ← in-progress-work continuity notes, see below
     └── skills/        ← skills live here in repos that bundle them
 ```
 
@@ -106,6 +107,22 @@ mv .agents/brain/active/<slug> .agents/brain/archive/<slug>
 
 ---
 
+## Handoffs
+
+`.agents/brain/handoffs/` holds continuity notes for work moving to a new
+chat session — a different, narrower purpose than a session folder. Where a
+session captures the full plan and execution record for one task, a handoff
+is a short note: what's in flight, what decision was just made, what the
+next agent needs to know before continuing. Named the same way as sessions
+(`YYYY-MM-DD-HHMM-<slug>.md`), but a single file, not a folder.
+
+Create one when work is about to move to a new chat, a major decision was
+made, a repo-structure change was completed, or the next agent would
+otherwise have to reconstruct scattered context. Don't create one for every
+small edit, and don't treat a handoff as permanent policy — if it conflicts
+with `AGENTS.md` or the user's latest instruction, the higher-priority
+source wins.
+
 ## Gitignore Considerations
 
 Do **not** gitignore `.agents/brain/`. The entire brain is project history.
@@ -117,6 +134,32 @@ Example `.gitignore` entry if needed:
 # Reproducible artifacts in brain meta — regenerate with scripts/fetch-data.sh
 .agents/brain/**/meta/raw-data/
 ```
+
+---
+
+## Client-Facing Exports
+
+Do not solve "clients shouldn't see agent tooling" by excluding `.agents/`
+from version control — that breaks cross-agent continuity for everyone
+working in the repo, and the underlying concern (code being judged as
+lower-quality merely for having visible AI-assistance markers, independent
+of actual quality) is real but solvable without giving up the tooling.
+
+Instead, mark agent-facing directories `export-ignore` in `.gitattributes`
+at the project root:
+
+```gitattributes
+.agents/ export-ignore
+.claude/ export-ignore
+```
+
+This strips them from anything produced by `git archive` (a release
+tarball, a zip export) while leaving them fully committed and functional in
+the working repo. It does not help if a client is given direct access to
+the live repository (added as a collaborator, repo transferred) — that
+requires a separate clean delivery branch with these directories removed
+and history squashed before handoff, which is a repo-specific decision, not
+a default.
 
 ---
 

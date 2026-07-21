@@ -10,6 +10,7 @@ Maestro is the agent planning and execution protocol. It gives every complex tas
 Read `references/brain-conventions.md` for the full directory specification.
 Read `references/session-lifecycle.md` for the session state machine.
 Read `references/goal-protocol.md` for goal activation, threshold monitoring, and archival logic.
+Read `references/memory-conventions.md` for what belongs in `.agents/MEMORY.md`, what doesn't, and when to write to it.
 
 ---
 
@@ -17,12 +18,19 @@ Read `references/goal-protocol.md` for goal activation, threshold monitoring, an
 
 At the start of any substantial task, before writing a single line of code or making any file change:
 
-1. Check whether `.agents/brain/active/` contains a session for this task.
+1. Sweep `.agents/MEMORY.md` and any linked topic files in `.agents/memory/`,
+   plus the most recent relevant entry in `.agents/brain/handoffs/` if one exists, to get
+   acquainted with durable project knowledge and any in-flight continuity
+   notes. Do this whenever asked explicitly (e.g. "check memory," "what do
+   you know about this repo") and, where applicable, before any substantial
+   or multi-step task even without being asked.
+2. Check whether `.agents/brain/active/` contains a session for this task.
    - Match by slug (keywords from the task description).
    - If a match exists, read its `implementation_plan.md` and `tasks.md` to resume.
-2. If no matching session exists, create one now. See §2.
+3. If no matching session exists, create one now. See §2.
 
-This step is mandatory. An agent that skips it risks duplicating work or overwriting a prior plan.
+This step is mandatory. An agent that skips it risks duplicating work,
+overwriting a prior plan, or re-deriving knowledge that was already recorded.
 
 ---
 
@@ -152,8 +160,14 @@ Sessions are archived when a **new plan is issued** and the **prior session's ta
 The lifecycle is:
 1. User gives a new instruction or the next phase of work begins.
 2. Agent checks the current active session's `tasks.md`.
-3. If all tasks are `[x]` (no `[ ]` or `[/]` remaining), finalize the walkthrough, then move the session folder from `active/` to `archive/`.
-4. Create a new session for the next phase.
+3. Before archiving, decide whether anything from this session is durable
+   knowledge that the next agent — possibly in a different session, possibly
+   a different tool entirely — would otherwise have to re-derive or ask for
+   again. If so, add or update an entry in `.agents/MEMORY.md` per
+   `references/memory-conventions.md`; an archived session folder is a
+   historical record, not something future agents browse by default.
+4. If all tasks are `[x]` (no `[ ]` or `[/]` remaining), finalize the walkthrough, then move the session folder from `active/` to `archive/`.
+5. Create a new session for the next phase.
 
 If tasks remain incomplete when a new instruction arrives, do **not** archive. Instead, flag the incomplete work to the user and ask whether to continue, defer, or abandon it.
 

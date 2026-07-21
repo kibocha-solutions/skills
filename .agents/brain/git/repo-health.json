@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-07-01T05:17:35Z",
+  "branch": "main",
+  "identity": {
+    "user_name": "JohnKibocha",
+    "user_email": "johnkibocha@outlook.com"
+  },
+  "commit_pattern": {
+    "sample": [
+      "3f772c3 feat(graphify, ci-cd): add graphify skill and expand ci-cd discipline JohnKibocha",
+      "0d6e187 feat(maestro): add Maestro planning and session tracking skill JohnKibocha",
+      "8f830af feat(legalese): add graded Authority Register JohnKibocha",
+      "43f9f7a chore(repo): consolidate skill governance and sources JohnKibocha",
+      "e78ed90 feat(skills): add cross-domain agent skills JohnKibocha",
+      "6f5bfa1 feat(documentation): expand technical documentation guidance JohnKibocha",
+      "07d325f feat(technical-diagrams): add Draw.io diagram skill JohnKibocha",
+      "3ddeeea feat(documentation): add Writerside documentation skill JohnKibocha",
+      "55ac09c chore(repo): bootstrap skills repository scaffold JohnKibocha"
+    ],
+    "inferred_convention": "conventional-commits"
+  },
+  "remote": {
+    "configured": true,
+    "name": "origin",
+    "url": "git@github.com:kibocha-solutions/skills.git",
+    "auth_handshake_ok": true
+  },
+  "signing": {
+    "gpg_format": "ssh",
+    "signing_key": "C:/Users/codelf/.ssh/SshSigningKey.pub",
+    "allowed_signers_file": "/home/codelf/.ssh/allowed_signers",
+    "signing_expected": true,
+    "signing_intentionally_disabled": false
+  },
+  "stale": false
+}

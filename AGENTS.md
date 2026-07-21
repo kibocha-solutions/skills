@@ -15,9 +15,14 @@ Legal drafting tasks include elevating layman or rudimentary text into authorita
 All agents follow the Maestro planning protocol for any substantial or multi-step task. This applies regardless of whether the `maestro` skill is explicitly loaded.
 
 **Before starting substantial work:**
-1. Check `.agents/brain/active/` in the project root for an existing session matching the current task (match by slug keywords).
-2. If a session exists, read its `tasks.md` and `implementation_plan.md` to resume correctly.
-3. If no session exists, create one under `.agents/brain/active/YYYY-MM-DD-HHMM-<slug>/` with `implementation_plan.md`, `tasks.md`, and `walkthrough.md`.
+1. Sweep `.agents/MEMORY.md`, its linked topic files in `.agents/memory/`,
+   and the latest relevant `.agents/brain/handoffs/` entry to get acquainted with durable
+   project knowledge. Do this whenever asked explicitly (e.g. "check
+   memory," "what do you know about this repo") and, where applicable,
+   before any substantial or multi-step task even without being asked.
+2. Check `.agents/brain/active/` in the project root for an existing session matching the current task (match by slug keywords).
+3. If a session exists, read its `tasks.md` and `implementation_plan.md` to resume correctly.
+4. If no session exists, create one under `.agents/brain/active/YYYY-MM-DD-HHMM-<slug>/` with `implementation_plan.md`, `tasks.md`, and `walkthrough.md`.
 
 **During execution:**
 - Mark tasks `[/]` when starting, `[x]` only when verifiably complete.
@@ -65,6 +70,22 @@ This repository contains agent skills. Keep changes intentional, reviewable, and
 - Do not commit secrets, client-confidential content, internal URLs, or private strategy.
 - Prefer Writerside-compatible documentation conventions for docs-facing artifacts unless a task explicitly asks for another format.
 
+### Agentic File Placement
+
+- All agent-generated or agent-specific project files — planning sessions,
+  handoffs, memory, and tool-local scratch/config directories (`.claude/`,
+  `.codex/`, `.gemini/`, `.copilot/`, or any future equivalent) — live under
+  `.agents/` at the project root, not scattered at the top level.
+- If an agent encounters such a file or directory outside `.agents/` (a
+  stray `.claude/`, a top-level `handoffs/`, or anything of the same kind),
+  move it under `.agents/` rather than leaving it in place, deleting it, or
+  inventing a new location. This keeps the convention self-enforcing as new
+  tools or file categories appear, without needing a new rule each time.
+- Exception: each tool's own native entrypoint file (`AGENTS.md`,
+  `CLAUDE.md`, `GEMINI.md`, `copilot-instructions.md`) stays exactly where
+  that tool requires it — usually the project root — never under `.agents/`.
+  Moving these breaks tool discovery entirely; see the `bootstrap` skill.
+
 ### Edit Permission
 
 - Unless the user explicitly asks for a file update, assume counsel is expected before modification.
@@ -75,7 +96,7 @@ This repository contains agent skills. Keep changes intentional, reviewable, and
 
 ### Continuity
 
-- Read this `AGENTS.md` before substantial work and check `handoffs/` when it exists.
+- Read this `AGENTS.md` before substantial work and check `.agents/brain/handoffs/` when it exists.
 - Check `.agents/brain/active/` in the project root before starting any substantial task. If a brain session exists for the current work, resume from it rather than starting fresh.
 - Prefer the latest relevant handoff over older notes. Use only the details that matter to the current task.
 - Treat handoffs as continuity aids, not as permanent policy. If a handoff conflicts with this file or the user's latest instruction, follow the higher-priority source and note the conflict when it matters.
@@ -162,7 +183,7 @@ example. For anything in this tier:
 - The same floor applies to subagents: a spawned or background agent that
   hits a tier-1 or tier-2 trigger halts and reports up. It does not act, and
   it does not invent its own resolution.
-- Record what triggered the stop — one line in a `handoffs/` entry or
+- Record what triggered the stop — one line in a `.agents/brain/handoffs/` entry or
   equivalent log — since these stops often happen while nobody is watching
   live.
 
