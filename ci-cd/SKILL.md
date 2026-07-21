@@ -325,38 +325,63 @@ Provide:
 - Use Conventional Commits for final commit titles: `type(scope): summary`.
   Match the existing repo commit style only where it does not conflict with
   this format; when there is a conflict, Conventional Commits takes precedence.
-- **Scope is the specific unit of change — the skill, module, component, or
+- **Scope is a single unit of change — the skill, module, component, or
   package — not a broad repo-level area.** In a skills repository, scope is
   the skill name. In an application, scope is the affected package or layer.
-  When a single commit spans multiple units, list them:
-  `feat(graphify, ci-cd): ...`. Avoid generic scopes like `repo`, `skills`,
-  or `misc` that carry no useful signal about where the change lives.
+  Multiple scopes in one commit title are banned. This has no exception for
+  commits whose diff spans several units — that is common and expected, not
+  a signal to split the commit or compound the scope.
+- **Choosing the scope is a relevance judgment about the message, not a
+  measurement of the diff.** When one commit message is requested, that
+  commit covers everything currently being committed, however many logical
+  strands the diff actually contains — do not propose splitting into
+  multiple commits just because the work wasn't monotonic; every file still
+  gets committed together regardless of what the title names. Pick the
+  scope, and the title, by asking: of everything in this diff, what is the
+  one thing a maintainer with no session context, reading this years from
+  now, needs to know happened? That is the predominant change — scope to it
+  alone. A scope spanning genuinely unrelated ground (true repo-level
+  infrastructure with no single skill at the center) is the one case where
+  `repo` is correct; that is not the same thing as a commit that merely
+  touched several skills while doing one predominant thing. Avoid other
+  generic scopes like `skills` or `misc` that carry no useful signal about
+  where the change lives.
 
   Examples from this repo's convention:
   - `feat(graphify): add 4-stage MCP orchestration lifecycle` — new skill added
   - `fix(ci-cd): tighten relay startup triage in commit discipline` — targeted
     fix to a specific part of an existing skill
-  - `feat(graphify, ci-cd): add graphify skill and expand ci-cd discipline` — one
-    commit that ships a new skill alongside meaningful updates to another
+  - `feat(bootstrap): add cross-tool skills-repo link bootstrap` — the
+    predominant change is bootstrap, even though the same commit also hardens
+    an unrelated `AGENTS.md` rule and tightens `ci-cd` in passing
   - `chore(repo): bootstrap skills repository scaffold` — the rare case where
     the change truly is repo-level infrastructure (scaffolding, CI, `.gitignore`)
     and no single skill is the primary unit of change
 
 - Keep the subject line concise and imperative; the subject is not the place
   for tradeoffs, rationale, or extended context.
-- Keep commit and PR messages anchored to the core repo-relevant change. The
-  durable message should identify the feature, fix, refactor, documentation
-  update, workflow change, or operational improvement that future maintainers
-  will care about. Do not include unrelated workspace conditions, submodule
-  state, sandbox mechanics, local tooling trivia, or incidental punctuation and
-  cleanup details unless the user explicitly asks for those details to appear
-  in the message.
-- **Include a commit body. It is not optional.** Explain the intent of the
-  change, any meaningful tradeoff, or the operational impact. Do not use the
-  body to list files changed — the diff does that. Keep each line in the body
-  at or below 72 characters. Tone and prose standards from the documentation
-  skill apply here; do not use inflated language, circular phrasing, or
-  unnecessary filler.
+- **Include a commit body. It is not optional.** Describe the predominant
+  change's useful work — what it does, not how the work unfolded — in 72
+  words or fewer, total. This is a lossy compression by design: a commit
+  message is not `docs/`, and secondary or unrelated work swept into the
+  same commit is expected to go unmentioned even though every file involved
+  is still committed. If a secondary change is worth a pointer at all, name
+  it in exactly one closing sentence, highly compressed (e.g. "Also added X
+  and refined Y.") — never an itemized list, never its own paragraph, and
+  never a reason to split the commit. Do not use the body to list files
+  changed — the diff does that — or to narrate process, sandbox mechanics,
+  workspace conditions, or how the work unfolded. Tone and prose standards
+  from the documentation skill apply here; do not use inflated language,
+  circular phrasing, or unnecessary filler.
+- This discipline governs the one commit that becomes the durable record —
+  whether it is the only commit made for the work, or the result of
+  `rebase -i --autosquash` collapsing an exploratory branch. It does not
+  constrain intermediate or fixup commits made while work is still in
+  progress (see Autonomous History Cleanup below), and it does not apply to
+  pull request descriptions, which aggregate however many commits are
+  heading into merge-readiness and are allowed more length, more formatting,
+  and more context under the separate standard in
+  `references/pull-request-messages.md`.
 - If several commits were required locally, prefer `--fixup` plus
   `rebase -i --autosquash` over leaving behind a trail of repair commits.
 - If a cleanup is distinct enough to isolate, create a short-lived topic branch
