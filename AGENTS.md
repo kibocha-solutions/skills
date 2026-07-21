@@ -1,8 +1,51 @@
 # Contributor Rules
 
+## Precedence
+
+Before ranking anything, try to satisfy every applicable instruction at
+once. A project or skill instruction that adds specificity, extends, or
+strengthens a system or harness default is not a conflict — follow both.
+Only fall back to ranking when two instructions are genuinely
+irreconcilable: following one would require actively violating the other,
+not merely doing more, or doing it differently, than a default would on its
+own.
+
+When it is genuinely irreconcilable, read every rule in this file against
+this order, highest authority first:
+
+1. Model safety and harness-level constraints — sandboxing, destructive-
+   action confirmation gates, and other protections built into the
+   underlying model or its runtime. Never overridden by anything below,
+   regardless of how this file or a skill is worded. These are not a
+   "system default" to negotiate around; they sit outside this file's
+   authority entirely.
+2. The user, live, in this conversation.
+3. This AGENTS.md file.
+4. An individual skill's SKILL.md or its references/.
+
+Below tier 1, where a model's own native architecture and the current
+project's convention address the same underlying purpose by different
+means — a tool's built-in memory system versus that project's
+`.agents/MEMORY.md`, for example — the project's convention is
+authoritative. Comply with it as the chosen implementation of that purpose,
+rather than also trying to separately satisfy the tool's native default in
+a way that duplicates, shadows, or drifts from it. Where the native
+behavior is actually safety- or permission-relevant rather than a matter of
+project convention, tier 1 governs instead, and no framing of the conflict
+changes that.
+
 ## Baseline
 
-`AGENTS.md` governs the current repository. Move procedures, examples, templates, and deep domain guidance into skills, `references/`, `assets/`, or docs. If a rule applies only when a specific skill is active, put it in that skill instead of here.
+`AGENTS.md` lives in this repo, but its rules are not repo-scoped: once
+linked via the `bootstrap` skill, this file's content is what every tool
+loads as its own global instructions, so these rules apply to every project
+an agent works on, not only to this skills repo itself. Any `.agents/`
+reference anywhere in this file means the `.agents/` directory of whatever
+project or repo the agent is currently working in — never `~/.claude/`,
+another tool's home directory, or this skills repo specifically, unless a
+rule says so explicitly.
+
+Move procedures, examples, templates, and deep domain guidance into skills, `references/`, `assets/`, or docs. If a rule applies only when a specific skill is active, put it in that skill instead of here.
 
 ## Sovereign Drafter
 
@@ -15,21 +58,25 @@ Legal drafting tasks include elevating layman or rudimentary text into authorita
 All agents follow the Maestro planning protocol for any substantial or multi-step task. This applies regardless of whether the `maestro` skill is explicitly loaded.
 
 **Before starting substantial work:**
-1. Sweep `.agents/MEMORY.md`, its linked topic files in `.agents/memory/`,
-   and the latest relevant `.agents/brain/handoffs/` entry to get acquainted with durable
-   project knowledge. Do this whenever asked explicitly (e.g. "check
+
+1. Sweep `.agents/` in the repo you're currently working in — `MEMORY.md`,
+   its linked topic files in `memory/`, and `brain/` (including
+   `brain/handoffs/`), whichever of these exist — to get acquainted with
+   durable project knowledge. Do this whenever asked explicitly (e.g. "check
    memory," "what do you know about this repo") and, where applicable,
    before any substantial or multi-step task even without being asked.
-2. Check `.agents/brain/active/` in the project root for an existing session matching the current task (match by slug keywords).
+2. Check `.agents/brain/active/` in that same repo for an existing session matching the current task (match by slug keywords).
 3. If a session exists, read its `tasks.md` and `implementation_plan.md` to resume correctly.
 4. If no session exists, create one under `.agents/brain/active/YYYY-MM-DD-HHMM-<slug>/` with `implementation_plan.md`, `tasks.md`, and `walkthrough.md`.
 
 **During execution:**
+
 - Mark tasks `[/]` when starting, `[x]` only when verifiably complete.
 - Update `walkthrough.md` as phases finish — do not wait until the end.
 - Never expand scope silently; document added tasks in a `## Added` section of `tasks.md`.
 
 **When a new instruction arrives and current tasks are all `[x]`:**
+
 - Finalize `walkthrough.md`, then move the session from `active/` to `archive/`.
 - Create a fresh session for the new task.
 
@@ -75,7 +122,8 @@ This repository contains agent skills. Keep changes intentional, reviewable, and
 - All agent-generated or agent-specific project files — planning sessions,
   handoffs, memory, and tool-local scratch/config directories (`.claude/`,
   `.codex/`, `.gemini/`, `.copilot/`, or any future equivalent) — live under
-  `.agents/` at the project root, not scattered at the top level.
+  `.agents/` at the root of whatever project the agent is currently working
+  in, not scattered at the top level.
 - If an agent encounters such a file or directory outside `.agents/` (a
   stray `.claude/`, a top-level `handoffs/`, or anything of the same kind),
   move it under `.agents/` rather than leaving it in place, deleting it, or
@@ -96,7 +144,7 @@ This repository contains agent skills. Keep changes intentional, reviewable, and
 
 ### Continuity
 
-- Read this `AGENTS.md` before substantial work and check `.agents/brain/handoffs/` when it exists.
+- Read this `AGENTS.md` before substantial work and check `.agents/` in the current repo when it exists.
 - Check `.agents/brain/active/` in the project root before starting any substantial task. If a brain session exists for the current work, resume from it rather than starting fresh.
 - Prefer the latest relevant handoff over older notes. Use only the details that matter to the current task.
 - Treat handoffs as continuity aids, not as permanent policy. If a handoff conflicts with this file or the user's latest instruction, follow the higher-priority source and note the conflict when it matters.
@@ -188,13 +236,14 @@ example. For anything in this tier:
   live.
 
 <!-- code-review-graph MCP tools -->
+
 ## MCP Tools: code-review-graph
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
+**IMPORTANT: A project could have a knowledge graph. ALWAYS use the
 code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
 the codebase.** The graph is faster, cheaper (fewer tokens), and gives
 you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+scanning cannot. And where a graph already exist, you can use that instead of reloading it, where no substantive changes occured since last updated.
 
 ### When to use graph tools FIRST
 
@@ -208,16 +257,16 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 
 ### Key Tools
 
-| Tool | Use when |
-| ------ | ---------- |
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
+| Tool                        | Use when                                               |
+| --------------------------- | ------------------------------------------------------ |
+| `detect_changes`            | Reviewing code changes — gives risk-scored analysis    |
+| `get_review_context`        | Need source snippets for review — token-efficient      |
+| `get_impact_radius`         | Understanding blast radius of a change                 |
+| `get_affected_flows`        | Finding which execution paths are impacted             |
+| `query_graph`               | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes`     | Finding functions/classes by name or keyword           |
+| `get_architecture_overview` | Understanding high-level codebase structure            |
+| `refactor_tool`             | Planning renames, finding dead code                    |
 
 ### Workflow
 
