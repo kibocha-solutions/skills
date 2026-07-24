@@ -8,6 +8,8 @@ narratives.
 
 - Product UI, screenshots or generated assets, support issues, analytics,
   release notes, API examples, admin settings, and existing help content.
+  For web UI screenshots, follow `references/screenshot-standards.md` for
+  standard desktop/tablet/mobile viewport sizes.
 - Diataxis for document type separation: https://diataxis.fr/
 
 ## Default Paths

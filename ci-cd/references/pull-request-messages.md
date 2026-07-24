@@ -89,6 +89,27 @@ screenshot of the relevant state before and after. A recording is preferable
 when the change involves interactive behaviour such as animations, transitions,
 or form flows. Text descriptions of visual changes are not a substitute.
 
+For web pages and web apps, capture screenshots at the standard desktop,
+tablet, and mobile (iPhone 15 Pro Max) viewport sizes defined in the
+`documentation` skill's `references/screenshot-standards.md`, especially when
+the PR is demonstrating or arguing for responsive behaviour. A change scoped
+to one form factor only needs that size, stated explicitly. Label each image
+with its breakpoint and viewport size.
+
+---
+
+## Reference Boundary
+
+This standard applies with equal force to GitHub/GitLab issues, not only PR
+descriptions. See `SKILL.md`'s Reference Boundary rule: never name, link, or
+otherwise point to agentic, planning, scaffolding, or internal-process files
+(`AGENTS.md`, `design.md`, `implementation-plan.md`, and the like), a skill by
+name, or any instruction source outside the repo's own code and the current
+conversation — regardless of where the file lives. Transfer the verified fact
+into the PR or issue text instead of citing where it came from. Renaming the
+file, describing it obliquely, or paraphrasing its content while still
+crediting it as the source does not satisfy this rule.
+
 ---
 
 ## Title Format
@@ -204,6 +225,12 @@ A PR description that recounts the agent's local workflow, sandbox failures,
 provider authentication steps, or incidental cleanup distracts from the
 reviewable change. Keep operational notes only when they affect review,
 deployment, rollback, or the user explicitly asked for them.
+
+A "What Changed" section that says "per `design.md`, this PR..." or "as the
+`ci-cd` skill requires..." violates the Reference Boundary above even though
+it reads as normal engineering prose. State the fact the source supported —
+"this uses cursor-based pagination to avoid the prior O(n²) scan" — without
+naming where that fact came from.
 
 ---
 

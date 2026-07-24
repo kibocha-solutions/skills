@@ -16,8 +16,9 @@ and `.agents/brain/handoffs/` (in-progress-work continuity).
     ├── memory/         # one file per topic
     │   └── <slug>.md
     └── brain/
-        ├── active/
-        ├── archive/
+        ├── sessions/
+        │   ├── active/
+        │   └── archive/
         └── handoffs/
 ```
 
@@ -31,7 +32,7 @@ Copilot, or a human — can read them regardless of which tool wrote them.
 
 | Mechanism | Scope | Lifespan |
 |---|---|---|
-| `.agents/brain/active/<session>/` | One task or session | Archived when the task completes; not re-read by default afterward |
+| `.agents/brain/sessions/active/<session>/` | One task or session | Archived when the task completes; not re-read by default afterward |
 | `.agents/brain/handoffs/` | Continuity of *in-progress* work across a session boundary | Superseded by the next handoff; not a knowledge base |
 | `.agents/MEMORY.md` + `.agents/memory/` | Durable facts, decisions, and preferences that outlive any one session | Persists until stale or wrong, then corrected |
 
@@ -49,9 +50,9 @@ re-ask for it, or re-make the same mistake before getting corrected again.
   creates two sources of truth that can drift apart.
 - Anything derivable by reading the current code, repo structure, or git
   history.
-- Session-scoped detail that belongs in a `brain/active/<session>/` folder
-  instead — implementation notes, in-progress task state, research specific
-  to one piece of work.
+- Session-scoped detail that belongs in a `brain/sessions/active/<session>/`
+  folder instead — implementation notes, in-progress task state, research
+  specific to one piece of work.
 - Secrets, credentials, internal URLs, or client-confidential content — the
   same rule `AGENTS.md`'s Working Rules already states for commits applies
   here, and matters more since this gets written *during* work rather than

@@ -5,7 +5,7 @@ description: Plan, track, and execute complex multi-session tasks. Use this skil
 
 # Maestro
 
-Maestro is the agent planning and execution protocol. It gives every complex task a persistent home — a session folder in `.agents/brain/active/` — and keeps the agent oriented across restarts, scope changes, and long execution runs.
+Maestro is the agent planning and execution protocol. It gives every complex task a persistent home — a session folder in `.agents/brain/sessions/active/` — and keeps the agent oriented across restarts, scope changes, and long execution runs.
 
 Read `references/brain-conventions.md` for the full directory specification.
 Read `references/session-lifecycle.md` for the session state machine.
@@ -24,7 +24,7 @@ At the start of any substantial task, before writing a single line of code or ma
    notes. Do this whenever asked explicitly (e.g. "check memory," "what do
    you know about this repo") and, where applicable, before any substantial
    or multi-step task even without being asked.
-2. Check whether `.agents/brain/active/` contains a session for this task.
+2. Check whether `.agents/brain/sessions/active/` contains a session for this task.
    - Match by slug (keywords from the task description).
    - If a match exists, read its `implementation_plan.md` and `tasks.md` to resume.
 3. If no matching session exists, create one now. See §2.
@@ -44,7 +44,7 @@ Name the session folder using the format: `YYYY-MM-DD-HHMM-<slug>`
   - Good: `2026-06-21-0900-api-auth-implementation`
   - Bad: `2026-06-20-2242-task` (too vague)
 
-Create this structure inside `.agents/brain/active/<session-slug>/`:
+Create this structure inside `.agents/brain/sessions/active/<session-slug>/`:
 
 ```
 <session-slug>/

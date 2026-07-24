@@ -53,7 +53,7 @@ Every Maestro session passes through defined states. Knowing the current state t
 **What it means:** The session folder has been created but planning has not yet begun.
 
 **What the agent does:**
-- Creates `.agents/brain/active/<slug>/` and all required files (empty stubs are fine).
+- Creates `.agents/brain/sessions/active/<slug>/` and all required files (empty stubs are fine).
 - Populates `meta/` with any context already available (prior research, user-provided files, relevant references).
 - Writes an initial `tasks.md` with a `## Phase 0: Research` section if research is needed.
 - Transitions to PLANNING as soon as the agent begins drafting the plan.
@@ -151,7 +151,7 @@ Archival is **event-triggered**, not time-triggered or completion-triggered.
 ```bash
 # Finalize walkthrough
 # Confirm all tasks are [x]
-mv .agents/brain/active/<slug> .agents/brain/archive/<slug>
+mv .agents/brain/sessions/active/<slug> .agents/brain/sessions/archive/<slug>
 # Create new session for new task
 ```
 

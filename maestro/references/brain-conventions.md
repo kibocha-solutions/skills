@@ -12,8 +12,9 @@ The brain always lives at the **project workspace root**:
 <project-root>/
 └── .agents/
     ├── brain/
-    │   ├── active/
-    │   ├── archive/
+    │   ├── session/
+    │   │   ├── active/
+    │   │   └── archive/
     │   └── handoffs/   ← in-progress-work continuity notes, see below
     └── skills/        ← skills live here in repos that bundle them
 ```
@@ -53,7 +54,7 @@ YYYY-MM-DD-HHMM-<slug>
 ## Session Structure
 
 ```
-.agents/brain/active/<session-slug>/
+.agents/brain/sessions/active/<session-slug>/
 ├── meta/                    # Supporting content
 │   ├── research-notes.md    # Research gathered before planning
 │   ├── context.md           # Domain context, constraints, decisions
@@ -91,8 +92,8 @@ Optional goal specification. See `references/goal-protocol.md` for the format an
 
 | State | Location | Meaning |
 |---|---|---|
-| `active/` | `.agents/brain/active/<slug>/` | Work is in progress or paused |
-| `archive/` | `.agents/brain/archive/<slug>/` | Session is complete and frozen |
+| `active/` | `.agents/brain/sessions/active/<slug>/` | Work is in progress or paused |
+| `archive/` | `.agents/brain/sessions/archive/<slug>/` | Session is complete and frozen |
 
 An archived session is **never modified**. It is a historical record.
 
@@ -102,7 +103,7 @@ When archiving:
 3. Move (do not copy) the session folder from `active/` to `archive/`.
 
 ```bash
-mv .agents/brain/active/<slug> .agents/brain/archive/<slug>
+mv .agents/brain/sessions/active/<slug> .agents/brain/sessions/archive/<slug>
 ```
 
 ---
@@ -181,14 +182,14 @@ To find a prior session:
 
 ```bash
 # List all active sessions
-ls .agents/brain/active/
+ls .agents/brain/sessions/active/
 
 # List all archived sessions
-ls .agents/brain/archive/
+ls .agents/brain/sessions/archive/
 
 # Search for a topic across all session plans
-grep -r "jwt" .agents/brain/ --include="implementation_plan.md" -l
+grep -r "jwt" .agents/brain/sessions/ --include="implementation_plan.md" -l
 
 # Find the most recent session
-ls -t .agents/brain/active/ | head -1
+ls -t .agents/brain/sessions/active/ | head -1
 ```

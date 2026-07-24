@@ -12,7 +12,8 @@ rules for the repo health snapshot used by the ci-cd skill.
   .agents/
     brain/
       git/
-        repo-health.json       ← current active snapshot
+        repo-health.json          ← current active snapshot
+        branch-ancestry.json      ← durable, append-only branch-creation log
         archives/
           YYYY-MM-DD-HHMM-repo-health.json   ← stale snapshots
 ```
@@ -22,6 +23,10 @@ The `.agents/` tree is project-local. It is not committed (list it in
 snapshots that have been superseded; the agent writes a new archive entry
 before overwriting the active file, so the history of health state is
 recoverable if needed.
+
+`branch-ancestry.json` is not a snapshot and does not follow the
+archive-and-replace lifecycle described above — see Branch Ancestry Log below.
+It only ever grows.
 
 ---
 
@@ -80,6 +85,12 @@ recoverable if needed.
     "allowed_signers_file": "path or null",
     "signing_expected": true,
     "signing_intentionally_disabled": false
+  },
+  "branch_ancestry": {
+    "current": "name of the branch at capture time",
+    "trunk": "main | master | other resolved trunk name",
+    "chain": ["main", "dev", "feat/db"],
+    "chain_source": "log | reflog | fork-point | upstream-tracking | user-confirmed | unknown"
   },
   "stale": false
 }
@@ -153,6 +164,94 @@ repo-write commands should be treated as needing elevated authorization at the
 start of the operation. Do not spend an attempt on a sandboxed Git command
 when the operation is predictably blocked by sandbox boundaries.
 
+**`branch_ancestry`** — a lightweight, disposable cache of the *derived*
+chain for the current branch, kept only for fast reads. It follows the same
+staleness lifecycle as the rest of this snapshot (invalidated on branch
+switch, like every other field here). It is not the source of truth: the
+durable record lives in `branch-ancestry.json` (see Branch Ancestry Log
+below), and this field is always recomputed from that log, never the other
+way around. `chain_source: "log"` means the chain came directly from existing
+log entries with no fresh discovery needed.
+
+---
+
+## Branch Ancestry Log
+
+`branch-ancestry.json` is a separate, append-only file recording when each
+branch was created and what its parent was — a durable trace ("last month we
+branched to `dev`, last week further to `feat/db`"), not a point-in-time
+snapshot. It is never archived, overwritten, or pruned; entries are only ever
+added.
+
+### Schema — `branch-ancestry.json`
+
+```json
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "branch": "dev",
+      "parent": "main",
+      "recorded_at": "ISO-8601 timestamp",
+      "source": "agent-created | discovered-reflog | discovered-fork-point | discovered-upstream-tracking | user-confirmed"
+    }
+  ]
+}
+```
+
+### Rules
+
+- **Append on creation.** When the agent creates a new branch, add an entry
+  immediately: `branch`, its `parent`, the current timestamp, and
+  `source: "agent-created"`.
+- **Backfill on first encounter.** When the agent starts work on a
+  pre-existing branch that has no entry yet, resolve its parent using the
+  discovery order in `SKILL.md`'s Branch Ancestry Discovery section (reflog,
+  upstream tracking, `git merge-base --fork-point`, or asking the user), then
+  append an entry recording however it was resolved. This is how history gets
+  backfilled for branches that predate this log.
+- **Never edit or delete a past entry.** Even after a branch is deleted or
+  merged, its entry stays — it is a historical record of what happened, not
+  live branch state. Do not "clean up" entries for branches that no longer
+  exist.
+- **Branch name reuse is a known rough edge.** If a branch name is deleted and
+  later recreated, append a new entry rather than overwriting the old one;
+  `recorded_at` ordering is what disambiguates the two epochs. This is not
+  fully solved — avoid reusing branch names where practical instead of relying
+  on the log to disambiguate perfectly.
+- **Deriving the live chain.** To get the current chain for a branch, walk
+  the log from that branch's most recent entry, follow `parent` pointers
+  through each parent's most recent entry, until reaching a branch with no
+  entry (trunk). This derived result is what gets cached in
+  `repo-health.json`'s `branch_ancestry` field.
+
+### Commands Supporting Discovery
+
+```bash
+# Current branch
+git branch --show-current
+
+# Resolve trunk name
+git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null   # strip "origin/" prefix
+# fall back to checking for local `main` then `master` if the above is unset
+
+# Reflog evidence of where a branch was created from (local-creation only)
+git reflog show <branch> | grep -i "branch: Created from"
+
+# Upstream/tracking branch
+git rev-parse --abbrev-ref --symbolic-full-name <branch>@{upstream} 2>/dev/null
+
+# Fork-point against a candidate ancestor (requires the candidate's reflog;
+# fails inconclusively on a fresh clone or after `git gc` — treat failure as
+# "unresolved," not "no parent")
+git merge-base --fork-point <candidate-branch> <branch>
+```
+
+If none of these resolve unambiguously, or two candidates are equally
+plausible, stop and ask the user to confirm the chain rather than guessing.
+Cache whatever is resolved — including a user-confirmed answer — as a new log
+entry so it does not need to be re-derived later.
+
 ---
 
 ## Commands to Populate Each Field
@@ -208,6 +307,12 @@ occur during the active session:
 - The `user.name` or `user.email` config is modified.
 - The agent explicitly requests a cache refresh (e.g. after the user reports
   that their SSH agent is now loaded).
+- A new branch is created off the current one, extending the chain.
+
+These triggers apply to `repo-health.json`, including its derived
+`branch_ancestry` field. `branch-ancestry.json` itself is exempt from this
+entire lifecycle — it is never marked stale, archived, or replaced; it only
+gains new entries over time.
 
 A stale snapshot is **never deleted** — it is moved to `archives/` before
 the replacement is written. Use the `captured_at` timestamp in the filename:

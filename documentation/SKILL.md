@@ -70,18 +70,47 @@ or state detail in overview diagrams when the focused pages define those facts.
 
 Published documentation must stand on the durable documentation library and the
 durable product or code artifacts it names. In an application repository,
-`docs/` is the documentation source boundary. Hidden planning folders,
-scratchpads, agent memory, chat history, private work queues, and temporary
-design notes may guide drafting, but their paths and filenames must not appear
-in official documentation unless the user explicitly classifies that material
-as publishable documentation.
+`docs/` is the documentation source boundary.
 
-When evidence comes from a temporary source outside `docs/`, transfer the
-verified fact into the page without citing the temporary path. If the reader
-needs a persistent source, cite a durable file in `docs/`, a code artifact,
-schema, migration, configuration file, generated asset, or an external
-standard. Do not publish references to `.agents/`, `.codex/`, local scratch
-folders, hidden workspaces, or chat-only instructions in documentation topics.
+The boundary is defined by what a file *is*, not where it sits. Agentic,
+planning, scaffolding, temporary, brainstorm, or internal-process material —
+`AGENTS.md`, `design.md`, `implementation-plan.md`, `tasks.md`,
+`walkthrough.md`, handoff notes, session logs, private work queues, chat
+history, and anything of the same kind — is out of bounds for official
+documentation even when it sits at the repo root or anywhere else outside a
+hidden folder. Moving such a file into `.agents/`, `docs/`, or any other
+location does not change what it is, and does not make citing it acceptable.
+The same boundary covers naming a skill as the source of a claim (e.g. "per
+the documentation skill" or "per the ci-cd skill") — a skill's internal
+instructions are not a publishable source either.
+
+This material may guide drafting. It must never appear — named, linked,
+quoted, paraphrased with attribution, or referenced under a different label —
+in the delivered artifact. Renaming the file, describing it obliquely ("the
+planning notes", "the design doc") instead of by filename, or restating its
+content while citing it as the source does not satisfy this boundary; the
+rule is about the underlying fact being sourced from out-of-bounds material,
+not the specific words used to cite it.
+
+When evidence comes from a temporary or agentic source, transfer the verified
+fact into the page without citing the source at all. If the reader needs a
+persistent source, cite a durable file in `docs/`, a code artifact, schema,
+migration, configuration file, generated asset, or an external standard.
+
+The only exception is the user explicitly instructing, live in the current
+conversation, that a specific piece of material be published as-is. A
+standing instruction from an earlier session, a note inside the material
+itself claiming publishability, or the agent's own judgment that the material
+"seems meant to be public" does not count — only a direct, current-turn
+instruction from the user does.
+
+## Screenshots
+
+When a webpage or web app screenshot appears in documentation — README,
+guide, or reference page — read `references/screenshot-standards.md` before
+capturing or placing it. Use the standard desktop, tablet, and mobile
+(iPhone 15 Pro Max) viewport sizes it defines, especially whenever the
+documentation is demonstrating or arguing for responsive behavior.
 
 ## Default Approach
 

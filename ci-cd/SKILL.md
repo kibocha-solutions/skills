@@ -68,11 +68,18 @@ full schema and staleness rules):
   `identity.user_name` and `identity.user_email` as the default identity for
   the repo. If the cache is absent, stale, or missing identity fields, refresh
   it before deciding which SSH host, key, or signing path belongs to the repo.
+- Branch ancestry chain for the current branch (see Branch Ancestry Discovery
+  below) — a lightweight derived cache in `repo-health.json`, sourced from the
+  durable, append-only ancestry log described in
+  `references/repo-health-cache.md`.
 
 **Cache location:** `.agents/brain/git/repo-health.json` in the project root.
 When a snapshot becomes stale, archive it to `.agents/brain/git/archives/`
 before writing a fresh one. Read `references/repo-health-cache.md` for the
-exact schema, archive naming, and staleness triggers.
+exact schema, archive naming, and staleness triggers. The branch ancestry log
+at `.agents/brain/git/branch-ancestry.json` is a separate, append-only file
+and is never archived or overwritten — only `repo-health.json`'s derived
+summary of it follows the normal staleness lifecycle.
 
 **When to invalidate:** after any branch switch this agent performs, after a
 remote is added or removed, or after any change to `.ssh/config` or signing
@@ -149,6 +156,37 @@ configuration made during the current session.
   user requests or strictly implies a different GitHub identity, use the `ssh`
   skill to select or verify an SSH host alias before pushing.
 
+## Reference Boundary
+
+Commit messages, pull request descriptions, and issues may only reference the
+core code and its durable, publishable artifacts. The following are never
+named, linked, quoted, paraphrased-with-attribution, or referenced under any
+other label, in any of those three surfaces, regardless of where the file
+lives (repo root included, not just hidden folders):
+
+- Agentic, planning, scaffolding, brainstorm, session, or handoff files —
+  `AGENTS.md`, `design.md`, `implementation-plan.md`, `tasks.md`,
+  `walkthrough.md`, and anything of the same kind.
+- Skill names (`documentation` skill, `legalese` skill, `ci-cd` skill, or any
+  other skill this agent operates under).
+- Any instruction source outside this conversation and the repo's own code —
+  another person's or system's guidance ("per the style guide from X"),
+  external websites, or the user's own chat instructions.
+
+This is a hard boundary, not a wording preference. It doesn't matter how the
+reference is phrased or how indirect it is: renaming the file, describing it
+obliquely ("the planning notes", "the design doc") instead of by filename,
+summarizing its content while still citing it as the source, or restating an
+instruction from one of these sources without naming it but clearly
+attributing it — none of that satisfies the rule. If the underlying fact is
+sourced from out-of-bounds material, transfer the verified fact into the
+commit/PR/issue text without citing the source at all; if a citable source is
+needed, cite a durable file in the repo, a code artifact, a ticket, or an
+external standard instead. There is no version of "the user asked me to
+comply" that authorizes working around this by finding an alternate form of
+words — the prohibition is on the underlying act of referencing, not on any
+specific phrasing of it.
+
 ## Commit Attempt Discipline
 
 Apply this protocol whenever the agent attempts a `git commit` or `git push`.
@@ -220,6 +258,79 @@ Before recommending rebase, autosquash, or force-push, classify the branch:
 
 If branch ownership or push status is unclear, treat the branch as shared until
 inspection proves otherwise.
+
+**Deletion is classified the same way as a rewrite.** A local-only or
+agent-created disposable branch that no collaborator has touched may be
+deleted autonomously once its work has landed at the next level up. A branch
+that has been pushed and used, reviewed, or built on by anyone else — or
+whose ownership is unclear — must not be deleted without explicit user
+confirmation, even after its work has successfully shipped upstream. Landing
+the change does not retroactively make the deletion safe if someone else
+still has a checkout or pending work pointed at that branch.
+
+## Branch Ancestry Discovery
+
+Repos already have their own branch hierarchy — a straight `main` only, or
+something deeper like `main -> dev -> feat/db`. Discover the real one before
+branching or shipping; never assume a fixed shape like `main`/`dev`/`staging`
+applies by default.
+
+Resolve the current branch's chain in this order, stopping at the first
+source that resolves unambiguously:
+
+1. The durable ancestry log at `.agents/brain/git/branch-ancestry.json` (see
+   `references/repo-health-cache.md`), if it already has an entry for this
+   branch.
+2. This branch's own reflog, for a `branch: Created from <parent>` entry —
+   only trustworthy for branches created locally in this clone.
+3. Its configured upstream/tracking branch.
+4. `git merge-base --fork-point` tested against each existing local/remote
+   branch, taking the most specific match. This depends on reflog entries for
+   the candidate ref and can fail on a fresh clone or after `git gc` — treat a
+   failure here as inconclusive, not as "no parent."
+5. If none of the above resolve, or two candidates are equally plausible, ask
+   the user to confirm the chain once. Cache whatever is resolved — including
+   a user-confirmed answer — as a new entry in the ancestry log so it does not
+   need to be re-derived later.
+
+When the agent creates a new branch itself, append a log entry for it
+immediately; when it starts work on a pre-existing branch that has no log
+entry yet, backfill one using the discovery order above before proceeding.
+
+## Clean Commit Procedure
+
+Use this procedure for work that starts below trunk in a discovered ancestry
+chain — most commonly a disposable branch created for a task expected to take
+many actions (exploration, iterative design, a multi-file refactor).
+
+1. Discover the branch ancestry chain (above).
+2. Branch down from the tip of that chain to a disposable branch. Commit
+   however is convenient while iterating: no depth limit, no requirement that
+   intermediate commits be individually clean or Conventional-Commits-shaped.
+3. Before shipping, restack if the parent branch moved while the work was in
+   progress: rebase the disposable branch onto its parent's latest state
+   rather than shipping against a stale base.
+4. Once the task is genuinely done, squash the disposable branch's history
+   into one commit that fully complies with Commit Hygiene Expectations and
+   the Reference Boundary. This step is not optional and is not satisfied by
+   leaving the disposable history intact with a compliant commit added on
+   top — the published state is one commit representing the whole change.
+5. Ship the clean commit **one level at a time, trunk-ward** — never skip a
+   level in the chain. Each level's own merge method, review requirement, or
+   release cadence governs whether it advances further immediately or waits
+   (a `dev` branch batching work for a scheduled release is a valid stopping
+   point, not a shortcut being skipped).
+6. Delete a branch once its work has landed at the next level up, subject to
+   the deletion gate above — autonomous only when the branch is confirmed
+   local or agent-created and uncollaborated; ask first otherwise.
+7. Later work branches fresh from the new tip. Re-run branch ancestry
+   discovery at that point instead of reusing a chain cached from a previous
+   session.
+
+This procedure does not relax the Shared-History Danger Gate: apply it
+independently at each level of the chain. A level that is local-only permits
+autonomous squash/ship; a level that is shared or under review does not, even
+if lower levels in the same chain were handled autonomously.
 
 ## Autonomous History Cleanup
 
@@ -325,6 +436,14 @@ Provide:
 - Use Conventional Commits for final commit titles: `type(scope): summary`.
   Match the existing repo commit style only where it does not conflict with
   this format; when there is a conflict, Conventional Commits takes precedence.
+- **Type is one of the canonical Conventional Commits types:** `feat`, `fix`,
+  `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`,
+  `revert`. Do not invent a type outside this list; if none fits, the change
+  is being mis-scoped, not the type being under-supplied.
+- **Structure is fixed:** `type(scope): summary` as a single imperative
+  sentence with no trailing period, followed by a body of 72 words or fewer,
+  total. This is the complete shape — nothing about the body-content and
+  exclusion rules below changes this ceiling.
 - **Scope is a single unit of change — the skill, module, component, or
   package — not a broad repo-level area.** In a skills repository, scope is
   the skill name. In an application, scope is the affected package or layer.

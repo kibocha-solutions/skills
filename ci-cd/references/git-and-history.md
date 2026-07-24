@@ -64,11 +64,24 @@ Use a short-lived topic branch or worktree when:
 
 Recommended pattern:
 
-1. Branch from the intended base.
+1. Branch from the intended base — discover the repo's real branch ancestry
+   chain first (see `SKILL.md`'s Branch Ancestry Discovery) rather than
+   assuming a fixed hierarchy.
 2. Commit freely while iterating.
 3. Autosquash to the final useful commit.
-4. Merge or fast-forward the cleaned result back to the target branch.
-5. Delete the temporary branch when no longer needed.
+4. Merge or fast-forward the cleaned result back to the target branch, one
+   level of the chain at a time.
+5. Delete the temporary branch when no longer needed, unless it has
+   collaborators — deleting a branch other people have pushed to, reviewed,
+   or built on requires explicit user confirmation even after its work has
+   landed, per `SKILL.md`'s Shared-History Danger Gate.
+
+This branch-out permission is not conditional on the task turning out risky —
+see `SKILL.md`'s Branch Ancestry Discovery and Clean Commit Procedure. Any
+task expected to take many actions may start on a disposable branch up front,
+with no depth limit on intermediate commits, as long as it is squashed to one
+compliant commit and shipped one chain level at a time before merge or
+handoff.
 
 ## Autonomous Cleanup Default
 
@@ -84,13 +97,18 @@ user confirmation.
 
 ## Commit Message Format
 
-Use Conventional Commits:
+Use Conventional Commits. Type is one of the canonical types: `feat`, `fix`,
+`docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
 ```text
 type(scope): summary
 
 Optional body that explains why, tradeoffs, or operational impact.
 ```
+
+The summary is a single imperative sentence. The body, when present, is 72
+words or fewer, total — see `SKILL.md`'s Commit Hygiene Expectations for the
+full rule.
 
 Examples:
 
@@ -135,6 +153,11 @@ When a later chat must resume Git work, record:
 - "wip", "misc fixes", or "address feedback" as final published commits.
 - Commit titles or bodies that read like session logs instead of repository
   history.
+- Naming, linking, or otherwise pointing to `AGENTS.md`, `design.md`,
+  `implementation-plan.md`, a skill (e.g. "per the ci-cd skill"), or any other
+  agentic/planning/scaffolding file in a commit message — see the Reference
+  Boundary rule in `SKILL.md`. Renaming the file or describing it obliquely
+  ("the planning notes") instead of citing it by name does not cure this.
 - Mentioning unrelated local state, submodule noise, sandbox behavior, or
   incidental punctuation and formatting fixes in the final message unless the
   user explicitly asks for that content.
