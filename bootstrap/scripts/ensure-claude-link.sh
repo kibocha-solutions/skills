@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# bootstrap: ensure ~/.claude/CLAUDE.md imports the shared AGENTS.md.
-# Claude Code never reads AGENTS.md natively; this is the pointer it needs.
+# bootstrap: ensure CLAUDE.md aligns shared AGENTS.md rules non-destructively.
 set -euo pipefail
 cat >/dev/null || true
 
@@ -8,11 +7,31 @@ dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "$dir/lib.sh"
 
-target="$HOME/.claude/CLAUDE.md"
-import_line="@skills/AGENTS.md"
+source_agents="$(cd "$dir/../.." && pwd)/AGENTS.md"
+if [ ! -f "$source_agents" ]; then
+  source_agents="$HOME/.claude/skills/AGENTS.md"
+fi
 
-result="$(ensure_import_line "$target" "$import_line")"
-if [ "$result" = "changed" ]; then
-  echo "bootstrap: added '$import_line' to $target (was missing)"
+targets=("$HOME/.claude/CLAUDE.md")
+if [ -d "/mnt/c/Users/codelf/.claude" ]; then
+  targets+=("/mnt/c/Users/codelf/.claude/CLAUDE.md")
+fi
+
+changed=0
+for target in "${targets[@]}"; do
+  res="$(align_agent_rules "$target" "$source_agents")"
+  if [ "$res" = "changed" ]; then
+    changed=1
+  fi
+done
+
+if [ "$changed" -eq 1 ]; then
+  MSG="bootstrap: aligned shared rules in CLAUDE.md"
+  MSG="$MSG" python3 -c '
+import json, os
+print(json.dumps({"systemMessage": os.environ.get("MSG", ""), "suppressOutput": False}))
+' 2>/dev/null || echo '{"suppressOutput": true}'
+else
+  echo '{"suppressOutput": true}'
 fi
 exit 0

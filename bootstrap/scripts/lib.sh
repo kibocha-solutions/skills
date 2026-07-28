@@ -1,18 +1,70 @@
 #!/usr/bin/env bash
-# Shared helper for the bootstrap link-check scripts.
-# ensure_import_line <target-file> <import-line>
-# Prepends import-line (plus a blank line) to target if not already present.
+# Shared helper for the bootstrap alignment scripts.
+# align_agent_rules <target-file> <source-agents-file>
+# Safely embeds or updates the shared AGENTS.md rules inside target-file using
+# HTML comment delimiters, preserving any existing custom user instructions.
 # Prints "changed" or "unchanged" to stdout; never fails the caller.
-ensure_import_line() {
-  local target="$1" import_line="$2"
-  mkdir -p "$(dirname "$target")"
-  touch "$target"
 
-  if grep -qxF "$import_line" "$target" 2>/dev/null; then
+align_agent_rules() {
+  local target="$1" source="$2"
+  if [ ! -f "$source" ]; then
     echo "unchanged"
     return 0
   fi
 
-  { echo "$import_line"; echo; cat "$target"; } > "$target.tmp" && mv "$target.tmp" "$target"
-  echo "changed"
+  mkdir -p "$(dirname "$target")"
+  touch "$target"
+
+  local start_marker="<!-- BEGIN SHARED SKILLS RULES -->"
+  local end_marker="<!-- END SHARED SKILLS RULES -->"
+
+  # Remove legacy import pointer line if present
+  if grep -qxF "@skills/AGENTS.md" "$target" 2>/dev/null; then
+    sed -i '/^@skills\/AGENTS\.md$/d' "$target"
+  fi
+
+  local rules_content
+  rules_content="$start_marker"$'\n'"$(cat "$source")"$'\n'"$end_marker"
+
+  local tmp_file
+  tmp_file="$(mktemp)"
+
+  if grep -qF "$start_marker" "$target" 2>/dev/null && grep -qF "$end_marker" "$target" 2>/dev/null; then
+    # Replace existing block between start_marker and end_marker
+    python3 -c '
+import sys
+target, source_file, start_m, end_m = sys.argv[1:]
+with open(source_file, "r", encoding="utf-8") as f:
+    shared_rules = f.read()
+
+replacement = f"{start_m}\n{shared_rules}\n{end_m}"
+
+with open(target, "r", encoding="utf-8") as f:
+    content = f.read()
+
+import re
+pattern = re.escape(start_m) + r".*?" + re.escape(end_m)
+new_content = re.sub(pattern, lambda m: replacement, content, flags=re.DOTALL)
+
+with open(sys.argv[5], "w", encoding="utf-8") as f:
+    f.write(new_content)
+' "$target" "$source" "$start_marker" "$end_marker" "$tmp_file"
+  else
+    # Append block to end of file
+    cp "$target" "$tmp_file"
+    if [ -s "$tmp_file" ] && [ "$(tail -c 1 "$tmp_file" | wc -l)" -eq 0 ]; then
+      echo "" >> "$tmp_file"
+    fi
+    echo "$rules_content" >> "$tmp_file"
+  fi
+
+  if cmp -s "$target" "$tmp_file"; then
+    rm -f "$tmp_file"
+    echo "unchanged"
+    return 0
+  else
+    mv "$tmp_file" "$target"
+    echo "changed"
+    return 0
+  fi
 }

@@ -1,26 +1,41 @@
 #!/usr/bin/env bash
-# bootstrap: ensure ~/.codex/AGENTS.md is a symlink to the shared AGENTS.md.
-# Codex reads AGENTS.md natively -- no import syntax needed, just point it at
-# the shared file. If a real (non-symlink) file already exists with content,
-# back it up once before replacing it, so nothing is silently lost.
+# bootstrap: ensure AGENTS.md aligns shared AGENTS.md rules non-destructively for Codex CLI.
 set -euo pipefail
 cat >/dev/null || true
 
-target="$HOME/.codex/AGENTS.md"
-link_value="skills/AGENTS.md"
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+source "$dir/lib.sh"
 
-if [ -L "$target" ] && [ "$(readlink "$target")" = "$link_value" ]; then
-  exit 0
+source_agents="$(cd "$dir/../.." && pwd)/AGENTS.md"
+if [ ! -f "$source_agents" ]; then
+  source_agents="$HOME/.codex/skills/AGENTS.md"
 fi
 
-mkdir -p "$(dirname "$target")"
-
-if [ -e "$target" ] && [ ! -L "$target" ] && [ -s "$target" ]; then
-  backup="$target.pre-bootstrap.$(date +%Y%m%d%H%M%S)"
-  cp "$target" "$backup"
-  echo "bootstrap: existing $target had content; backed up to $backup" >&2
+targets=("$HOME/.codex/AGENTS.md")
+if [ -d "/mnt/c/Users/codelf/.codex" ]; then
+  targets+=("/mnt/c/Users/codelf/.codex/AGENTS.md")
 fi
 
-ln -sf "$link_value" "$target"
-echo "bootstrap: linked $target -> $link_value"
+changed=0
+for target in "${targets[@]}"; do
+  # If target is a symlink, remove the symlink so we can maintain a real file
+  if [ -L "$target" ]; then
+    rm -f "$target"
+  fi
+  res="$(align_agent_rules "$target" "$source_agents")"
+  if [ "$res" = "changed" ]; then
+    changed=1
+  fi
+done
+
+if [ "$changed" -eq 1 ]; then
+  MSG="bootstrap: aligned shared rules in AGENTS.md (Codex)"
+  MSG="$MSG" python3 -c '
+import json, os
+print(json.dumps({"systemMessage": os.environ.get("MSG", ""), "suppressOutput": False}))
+' 2>/dev/null || echo '{"suppressOutput": true}'
+else
+  echo '{"suppressOutput": true}'
+fi
 exit 0

@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# bootstrap: ensure ~/.gemini/GEMINI.md imports the shared AGENTS.md (Gemini CLI hook).
-# Gemini CLI defaults to GEMINI.md and does not read AGENTS.md on its own;
-# this is the pointer it needs.
-# Contract: must print ONLY JSON on stdout. Logs go to stderr. Never blocks.
+# bootstrap: ensure GEMINI.md aligns shared AGENTS.md rules non-destructively.
 set -euo pipefail
 cat >/dev/null || true
 
@@ -10,13 +7,26 @@ dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "$dir/lib.sh"
 
-target="$HOME/.gemini/GEMINI.md"
-import_line="@skills/AGENTS.md"
+source_agents="$(cd "$dir/../.." && pwd)/AGENTS.md"
+if [ ! -f "$source_agents" ]; then
+  source_agents="$HOME/.gemini/skills/AGENTS.md"
+fi
 
-result="$(ensure_import_line "$target" "$import_line")" || result="unchanged"
+targets=("$HOME/.gemini/GEMINI.md")
+if [ -d "/mnt/c/Users/codelf/.gemini" ]; then
+  targets+=("/mnt/c/Users/codelf/.gemini/GEMINI.md")
+fi
 
-if [ "$result" = "changed" ]; then
-  MSG="bootstrap: added '$import_line' to $target (was missing)"
+changed=0
+for target in "${targets[@]}"; do
+  res="$(align_agent_rules "$target" "$source_agents")"
+  if [ "$res" = "changed" ]; then
+    changed=1
+  fi
+done
+
+if [ "$changed" -eq 1 ]; then
+  MSG="bootstrap: aligned shared rules in GEMINI.md"
   MSG="$MSG" python3 -c '
 import json, os
 print(json.dumps({"systemMessage": os.environ.get("MSG", ""), "suppressOutput": False}))
