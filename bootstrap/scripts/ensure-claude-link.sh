@@ -12,10 +12,7 @@ if [ ! -f "$source_agents" ]; then
   source_agents="$HOME/.claude/skills/AGENTS.md"
 fi
 
-targets=("$HOME/.claude/CLAUDE.md")
-if [ -d "/mnt/c/Users/codelf/.claude" ]; then
-  targets+=("/mnt/c/Users/codelf/.claude/CLAUDE.md")
-fi
+mapfile -t targets < <(get_target_paths ".claude" "CLAUDE.md")
 
 changed=0
 for target in "${targets[@]}"; do

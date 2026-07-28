@@ -12,10 +12,7 @@ if [ ! -f "$source_agents" ]; then
   source_agents="$HOME/.gemini/skills/AGENTS.md"
 fi
 
-targets=("$HOME/.gemini/GEMINI.md")
-if [ -d "/mnt/c/Users/codelf/.gemini" ]; then
-  targets+=("/mnt/c/Users/codelf/.gemini/GEMINI.md")
-fi
+mapfile -t targets < <(get_target_paths ".gemini" "GEMINI.md")
 
 changed=0
 for target in "${targets[@]}"; do

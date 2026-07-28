@@ -5,6 +5,28 @@
 # HTML comment delimiters, preserving any existing custom user instructions.
 # Prints "changed" or "unchanged" to stdout; never fails the caller.
 
+get_target_paths() {
+  local tool="$1"      # e.g., ".claude"
+  local filename="$2"  # e.g., "CLAUDE.md"
+  local paths=("$HOME/$tool/$filename")
+
+  # Detect WSL / Windows Host User Profile dynamically without hardcoding usernames
+  if [ -d "/mnt/c/Users" ]; then
+    local win_user=""
+    if command -v cmd.exe >/dev/null 2>&1; then
+      win_user="$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')"
+    fi
+    if [ -z "$win_user" ] && [ -n "${USER:-}" ]; then
+      win_user="$USER"
+    fi
+    if [ -n "$win_user" ] && [ -d "/mnt/c/Users/$win_user/$tool" ]; then
+      paths+=("/mnt/c/Users/$win_user/$tool/$filename")
+    fi
+  fi
+
+  printf "%s\n" "${paths[@]}"
+}
+
 align_agent_rules() {
   local target="$1" source="$2"
   if [ ! -f "$source" ]; then
