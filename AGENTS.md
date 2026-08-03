@@ -158,13 +158,15 @@ This repository contains agent skills. Keep changes intentional, reviewable, and
 - Ask for approval before network downloads, global installs, system package changes, or changes outside the workspace.
 - Record any installed tool or dependency when it affects reproducibility.
 - Exception: the `bootstrap` skill's linking checks (run manually or via a
-  registered `SessionStart` hook) are pre-authorized to append a single
-  import line to a tool's own global memory file (e.g. `~/.claude/CLAUDE.md`,
-  `~/.gemini/GEMINI.md`, `~/.copilot/copilot-instructions.md`) or create an
-  equivalent symlink (e.g. `~/.codex/AGENTS.md`) when that link is missing.
-  This narrow, additive, self-owned edit is exempt from the "ask before
-  changes outside the workspace" rule above. It always notifies when it
-  fires — see `bootstrap/SKILL.md`.
+  registered `SessionStart` hook) are pre-authorized to non-destructively
+  embed this file's contents into a tool's own global memory file (e.g.
+  `~/.claude/CLAUDE.md`, `~/.gemini/GEMINI.md`, `~/.codex/AGENTS.md`,
+  `~/.copilot/copilot-instructions.md`) between `<!-- BEGIN SHARED SKILLS
+  RULES -->` / `<!-- END SHARED SKILLS RULES -->` markers, and to mirror this
+  repo's skill folders into that tool's `skills/` directory, when either is
+  missing or stale. This narrow, additive, self-owned edit is exempt from the
+  "ask before changes outside the workspace" rule above. It always notifies
+  when it fires — see `bootstrap/SKILL.md`.
 
 ### Writerside Validation
 

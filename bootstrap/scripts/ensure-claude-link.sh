@@ -7,7 +7,8 @@ dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "$dir/lib.sh"
 
-source_agents="$(cd "$dir/../.." && pwd)/AGENTS.md"
+repo_root="$(cd "$dir/../.." && pwd)"
+source_agents="$repo_root/AGENTS.md"
 if [ ! -f "$source_agents" ]; then
   source_agents="$HOME/.claude/skills/AGENTS.md"
 fi
@@ -20,10 +21,14 @@ for target in "${targets[@]}"; do
   if [ "$res" = "changed" ]; then
     changed=1
   fi
+  res="$(mirror_skills "$(dirname "$target")/skills" "$repo_root")"
+  if [ "$res" = "changed" ]; then
+    changed=1
+  fi
 done
 
 if [ "$changed" -eq 1 ]; then
-  MSG="bootstrap: aligned shared rules in CLAUDE.md"
+  MSG="bootstrap: aligned shared rules and skills in CLAUDE.md"
   MSG="$MSG" python3 -c '
 import json, os
 print(json.dumps({"systemMessage": os.environ.get("MSG", ""), "suppressOutput": False}))

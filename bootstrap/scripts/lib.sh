@@ -55,7 +55,7 @@ align_agent_rules() {
     # Replace existing block between start_marker and end_marker
     python3 -c '
 import sys
-target, source_file, start_m, end_m = sys.argv[1:]
+target, source_file, start_m, end_m, tmp_file = sys.argv[1:]
 with open(source_file, "r", encoding="utf-8") as f:
     shared_rules = f.read()
 
@@ -88,5 +88,36 @@ with open(sys.argv[5], "w", encoding="utf-8") as f:
     mv "$tmp_file" "$target"
     echo "changed"
     return 0
+  fi
+}
+
+# mirror_skills <target-skills-dir> <repo-root>
+# Mirrors every top-level skill (any directory with a SKILL.md) from the
+# skills repo into target-skills-dir, overwriting each skill by name so repo
+# updates propagate on the next run. Anything already in target-skills-dir
+# that isn't a skill folder name from this repo (e.g. a tool's own bundled
+# skills) is left untouched. Prints "changed" or "unchanged"; never fails the
+# caller.
+mirror_skills() {
+  local target_base="$1" repo_root="$2"
+  command -v rsync >/dev/null 2>&1 || { echo "unchanged"; return 0; }
+  mkdir -p "$target_base"
+
+  local changed=0 skill_dir skill_name target out
+  for skill_dir in "$repo_root"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    [ -f "$skill_dir/SKILL.md" ] || continue
+    target="$target_base/$skill_name"
+    mkdir -p "$target"
+    out="$(rsync -a --delete --checksum --itemize-changes "$skill_dir" "$target/")"
+    if [ -n "$out" ]; then
+      changed=1
+    fi
+  done
+
+  if [ "$changed" -eq 1 ]; then
+    echo "changed"
+  else
+    echo "unchanged"
   fi
 }

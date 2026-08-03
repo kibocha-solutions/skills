@@ -22,6 +22,14 @@ Rather than using import pointers (`@skills/AGENTS.md`) or symlinks—or overwri
 - Pre-existing custom user instructions outside the block are fully preserved.
 - Legacy import pointers are safely cleaned up.
 
+Each `ensure-*-link.sh` script also mirrors this repo's skill folders (anything
+with a top-level `SKILL.md`) into `<tool-home>/skills/`, using the shared
+`mirror_skills` helper in `lib.sh`. Every skill is overwritten by name on each
+run — so a `git pull` in this repo propagates to every tool's mirror the next
+time bootstrap runs — while anything already in `<tool-home>/skills/` that
+doesn't match a skill name from this repo is left alone (e.g. Codex CLI's own
+bundled skills under `~/.codex/skills/.system/`).
+
 ### Environment & Platform Resolution
 
 - **Native Linux & macOS**: Target paths resolve dynamically to `$HOME/.<tool>/<filename>`.
@@ -46,6 +54,33 @@ bash ~/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh
 ```
 
 Each script is idempotent and reports only when changes are made.
+
+## Gemini Antigravity Builtin Skills Mirror
+
+Google Antigravity (`~/.gemini/antigravity/`) is a separate product from
+Gemini CLI. It ships its own default skills in
+`~/.gemini/antigravity/builtin/skills/` (e.g. `agy-customizations`,
+`antigravity_guide`, `permissioned-github`) rather than reading `~/.gemini/skills/`.
+
+`ensure-gemini-builtin-skills.sh` mirrors every skill folder in this repo
+(anything with a top-level `SKILL.md`) into that directory, overwriting each
+skill by name on every run so `git pull` changes in this repo propagate the
+next time it runs. It never touches Antigravity's own native skills, since
+none of them share a name with a skill in this repo. It no-ops silently if
+`~/.gemini/antigravity/builtin/skills/` doesn't exist (Antigravity not
+installed).
+
+```bash
+bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-builtin-skills.sh
+```
+
+Note: `~/.gemini/antigravity/builtin/.checksum` sits alongside this
+directory and appears to be an integrity check written at install time.
+Mirroring skills into `builtin/skills/` will make the on-disk contents no
+longer match that checksum. Whether Antigravity enforces this at runtime is
+unconfirmed — the app binary wasn't available to inspect. If Antigravity
+ever reports corruption or resets its builtin skills after this runs, that
+checksum is the likely cause.
 
 ## Automated Alignment
 
