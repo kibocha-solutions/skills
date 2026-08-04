@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# bootstrap: ensure AGENTS.md aligns shared AGENTS.md rules non-destructively for Codex CLI.
+# bootstrap: ensure AGENTS.md aligns shared AGENTS.md rules non-destructively
+# for Codex CLI, and ensure ~/.codex/skills/ is a git sparse checkout
+# tracking this repo's remote (not a local rsync copy) — see lib.sh's
+# sync_skills_from_git.
 set -euo pipefail
 cat >/dev/null || true
 
@@ -8,10 +11,9 @@ dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$dir/lib.sh"
 
 repo_root="$(cd "$dir/../.." && pwd)"
-source_agents="$repo_root/AGENTS.md"
-if [ ! -f "$source_agents" ]; then
-  source_agents="$HOME/.codex/skills/AGENTS.md"
-fi
+
+remote_url="$(git -C "$repo_root" remote get-url origin 2>/dev/null || true)"
+[ -n "$remote_url" ] || remote_url="git@github.com:kibocha-solutions/skills.git"
 
 mapfile -t targets < <(get_target_paths ".codex" "AGENTS.md")
 
@@ -21,14 +23,26 @@ for target in "${targets[@]}"; do
   if [ -L "$target" ]; then
     rm -f "$target"
   fi
-  res="$(align_agent_rules "$target" "$source_agents")"
+
+  skills_dir="$(dirname "$target")/skills"
+
+  # Codex ships its own bundled skills under skills/.system/ —
+  # sync_skills_from_git only ever manages paths it tracks (this repo's
+  # skill directories plus AGENTS.md), so .system/ is left untouched.
+  res="$(sync_skills_from_git "$skills_dir" "$remote_url" "main" "$repo_root")"
   if [ "$res" = "changed" ]; then
     changed=1
   fi
-  # Codex ships its own bundled skills under skills/.system/ — mirror_skills
-  # only ever touches per-skill subfolders named after this repo's skills, so
-  # .system is never written to.
-  res="$(mirror_skills "$(dirname "$target")/skills" "$repo_root")"
+
+  source_agents="$skills_dir/AGENTS.md"
+  if [ ! -f "$source_agents" ]; then
+    source_agents="$repo_root/AGENTS.md"
+  fi
+  if [ ! -f "$source_agents" ]; then
+    source_agents="$HOME/.codex/skills/AGENTS.md"
+  fi
+
+  res="$(align_agent_rules "$target" "$source_agents")"
   if [ "$res" = "changed" ]; then
     changed=1
   fi

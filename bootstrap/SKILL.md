@@ -21,14 +21,42 @@ Rather than using import pointers (`@skills/AGENTS.md`) or symlinks—or overwri
 - Embedded block markers (`<!-- BEGIN SHARED SKILLS RULES -->` and `<!-- END SHARED SKILLS RULES -->`) delineate the shared rules block.
 - Pre-existing custom user instructions outside the block are fully preserved.
 - Legacy import pointers are safely cleaned up.
+- The block is located by the *first* start marker and the *last* end marker, not a naive non-greedy regex span — needed because the rules content itself legitimately quotes these exact marker strings as documentation (this section, for one), which would otherwise fool a `.*?`-style match into stopping at that literal mention instead of the real closing marker.
 
-Each `ensure-*-link.sh` script also mirrors this repo's skill folders (anything
+Each `ensure-*-link.sh` script also syncs this repo's skill folders (anything
 with a top-level `SKILL.md`) into `<tool-home>/skills/`, using the shared
-`mirror_skills` helper in `lib.sh`. Every skill is overwritten by name on each
-run — so a `git pull` in this repo propagates to every tool's mirror the next
-time bootstrap runs — while anything already in `<tool-home>/skills/` that
-doesn't match a skill name from this repo is left alone (e.g. Codex CLI's own
-bundled skills under `~/.codex/skills/.system/`).
+`sync_skills_from_git` helper in `lib.sh`. **This is a real git working
+copy, not a file copy**: each `<tool-home>/skills/` is `git init`'d in place
+and tracks this repo's actual remote (`git remote get-url origin`, resolved
+from the local checkout the bootstrap scripts run from, falling back to
+`git@github.com:kibocha-solutions/skills.git`), branch `main`. Every run does
+`fetch` + re-apply sparse-checkout + `reset --hard origin/main`, so each
+tool's copy always exactly matches what's actually pushed to the remote —
+never a possibly-uncommitted or stale local working-tree state, and a skill
+removed from the repo is automatically removed from every tool's copy too
+(sparse-checkout re-application drops paths that fall out of the pattern
+set).
+
+The sparse-checkout uses **non-cone mode** with an explicit pattern per
+skill directory plus `AGENTS.md` — cone mode was tried first and rejected,
+since cone mode always includes every root-level file regardless of the
+directory pattern list (`README.md`, `LICENSE.txt`, `.gitignore`,
+`migration-log.md`, and this repo's two code-review-graph ignore files would
+all have leaked into every tool's `skills/` folder). Non-cone mode checks
+out exactly what's listed and nothing else — no `sources/`, no `docs/`, no
+repo-root clutter in any tool's skills directory.
+
+Because `git init` is used in place rather than `git clone` (which refuses
+a non-empty directory), this works even when `<tool-home>/skills/` already
+has unrelated content sitting in it — a tool's own bundled/native skills —
+since git only ever manages paths in its own tracked tree and leaves
+untracked neighbors alone (e.g. Codex CLI's own bundled skills under
+`~/.codex/skills/.system/`, or Antigravity's native skills — see below). On
+the first run against a directory that isn't a git repo yet (i.e. was
+previously populated by the old rsync-based mirror), any existing top-level
+entry whose name matches a known skill folder in the local checkout is
+removed first, so the initial checkout has no stale collisions to contend
+with; anything whose name doesn't match a known skill is left untouched.
 
 ### Environment & Platform Resolution
 
@@ -52,6 +80,7 @@ bash ~/.claude/skills/bootstrap/scripts/ensure-claude-link.sh
 bash ~/.codex/skills/bootstrap/scripts/ensure-codex-link.sh
 bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-link.sh
 bash ~/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh
+bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-builtin-skills.sh
 ```
 
 Each script is idempotent and reports only when changes are made.
@@ -74,11 +103,12 @@ the CLI location). It ships its own default skills in
   block markers `ensure-gemini-link.sh` uses for the CLI location) — this is
   a *separate* copy from `~/.gemini/GEMINI.md`, not a symlink, since the two
   products read different files.
-- Mirrors every skill folder in this repo (anything with a top-level
-  `SKILL.md`) into `~/.gemini/antigravity/builtin/skills/`, overwriting each
-  skill by name on every run so `git pull` changes in this repo propagate
-  the next time it runs. It never touches Antigravity's own native skills,
-  since none of them share a name with a skill in this repo.
+- Syncs every skill folder in this repo (anything with a top-level
+  `SKILL.md`) into `~/.gemini/antigravity/builtin/skills/` via
+  `sync_skills_from_git` (see above — a real git sparse checkout tracking
+  the remote, not a file copy). It never touches Antigravity's own native
+  skills (`agy-customizations`, `antigravity_guide`, `permissioned-github`),
+  since git only manages paths in its own tracked tree.
 
 It no-ops silently if `~/.gemini/antigravity/builtin/` doesn't exist
 (Antigravity not installed).

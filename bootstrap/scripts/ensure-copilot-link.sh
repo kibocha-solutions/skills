@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# bootstrap: ensure copilot-instructions.md aligns shared AGENTS.md rules non-destructively.
+# bootstrap: ensure copilot-instructions.md aligns shared AGENTS.md rules
+# non-destructively, and ensure ~/.copilot/skills/ is a git sparse checkout
+# tracking this repo's remote (not a local rsync copy) — see lib.sh's
+# sync_skills_from_git.
 set -euo pipefail
 cat >/dev/null || true
 
@@ -8,20 +11,30 @@ dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$dir/lib.sh"
 
 repo_root="$(cd "$dir/../.." && pwd)"
-source_agents="$repo_root/AGENTS.md"
-if [ ! -f "$source_agents" ]; then
-  source_agents="$HOME/.copilot/skills/AGENTS.md"
-fi
+
+remote_url="$(git -C "$repo_root" remote get-url origin 2>/dev/null || true)"
+[ -n "$remote_url" ] || remote_url="git@github.com:kibocha-solutions/skills.git"
 
 mapfile -t targets < <(get_target_paths ".copilot" "copilot-instructions.md")
 
 changed=0
 for target in "${targets[@]}"; do
-  res="$(align_agent_rules "$target" "$source_agents")"
+  skills_dir="$(dirname "$target")/skills"
+
+  res="$(sync_skills_from_git "$skills_dir" "$remote_url" "main" "$repo_root")"
   if [ "$res" = "changed" ]; then
     changed=1
   fi
-  res="$(mirror_skills "$(dirname "$target")/skills" "$repo_root")"
+
+  source_agents="$skills_dir/AGENTS.md"
+  if [ ! -f "$source_agents" ]; then
+    source_agents="$repo_root/AGENTS.md"
+  fi
+  if [ ! -f "$source_agents" ]; then
+    source_agents="$HOME/.copilot/skills/AGENTS.md"
+  fi
+
+  res="$(align_agent_rules "$target" "$source_agents")"
   if [ "$res" = "changed" ]; then
     changed=1
   fi

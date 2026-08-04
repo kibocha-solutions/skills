@@ -52,7 +52,13 @@ align_agent_rules() {
   tmp_file="$(mktemp)"
 
   if grep -qF "$start_marker" "$target" 2>/dev/null && grep -qF "$end_marker" "$target" 2>/dev/null; then
-    # Replace existing block between start_marker and end_marker
+    # Replace existing block between start_marker and end_marker. Uses the
+    # FIRST start-marker index and the LAST end-marker index (not a regex
+    # .*? span) because the rules content itself can legitimately quote
+    # these exact marker strings as documentation (e.g. AGENTS.md's own
+    # Tooling and Dependencies section does) — a non-greedy regex match
+    # would stop at that literal mention instead of the real closing
+    # marker, truncating everything after it and making this non-idempotent.
     python3 -c '
 import sys
 target, source_file, start_m, end_m, tmp_file = sys.argv[1:]
@@ -64,9 +70,12 @@ replacement = f"{start_m}\n{shared_rules}\n{end_m}"
 with open(target, "r", encoding="utf-8") as f:
     content = f.read()
 
-import re
-pattern = re.escape(start_m) + r".*?" + re.escape(end_m)
-new_content = re.sub(pattern, lambda m: replacement, content, flags=re.DOTALL)
+start_idx = content.find(start_m)
+end_idx = content.rfind(end_m)
+if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+    new_content = content[:start_idx] + replacement + content[end_idx + len(end_m):]
+else:
+    new_content = content
 
 with open(sys.argv[5], "w", encoding="utf-8") as f:
     f.write(new_content)
@@ -91,31 +100,82 @@ with open(sys.argv[5], "w", encoding="utf-8") as f:
   fi
 }
 
-# mirror_skills <target-skills-dir> <repo-root>
-# Mirrors every top-level skill (any directory with a SKILL.md) from the
-# skills repo into target-skills-dir, overwriting each skill by name so repo
-# updates propagate on the next run. Anything already in target-skills-dir
-# that isn't a skill folder name from this repo (e.g. a tool's own bundled
-# skills) is left untouched. Prints "changed" or "unchanged"; never fails the
-# caller.
-mirror_skills() {
-  local target_base="$1" repo_root="$2"
-  command -v rsync >/dev/null 2>&1 || { echo "unchanged"; return 0; }
-  mkdir -p "$target_base"
+# sync_skills_from_git <target-dir> <remote-url> [branch] [local-repo-root]
+# Makes target-dir a sparse, partial git working copy tracking
+# origin/<branch> (default: main) of remote-url, materializing only
+# AGENTS.md plus top-level directories that contain a SKILL.md — no other
+# repo-root files (README.md, migration-log.md, docs/, sources/, etc.) are
+# checked out. Every run does `fetch` + sparse-checkout re-apply +
+# `reset --hard origin/<branch>`, so target-dir always exactly matches the
+# remote — no local drift, no merge conflicts possible, and a skill removed
+# from the repo is automatically removed from target-dir too (sparse-checkout
+# re-application drops paths that fall out of the pattern set).
+#
+# Uses `git init` in place rather than `git clone`, specifically so this
+# works when target-dir already has unrelated content sitting alongside
+# where the skills belong (e.g. a tool's own bundled/native skills) — `git
+# clone` refuses a non-empty directory, `git init` does not, and git only
+# ever manages paths in its own tracked tree, leaving untracked neighbors
+# alone.
+#
+# If target-dir isn't a git repo yet and local-repo-root is given, first
+# removes any existing top-level entry whose name matches a skill folder in
+# local-repo-root (i.e. leftover content from the old rsync-based mirror)
+# so the initial checkout has no stale collisions to contend with. Anything
+# whose name doesn't match a known skill (a tool's own native content) is
+# left untouched.
+#
+# Prints "changed" or "unchanged" to stdout; never fails the caller.
+sync_skills_from_git() {
+  local target="$1" remote="$2" branch="${3:-main}" local_repo_root="${4:-}"
 
-  local changed=0 skill_dir skill_name target out
-  for skill_dir in "$repo_root"/*/; do
-    skill_name="$(basename "$skill_dir")"
-    [ -f "$skill_dir/SKILL.md" ] || continue
-    target="$target_base/$skill_name"
-    mkdir -p "$target"
-    out="$(rsync -a --delete --checksum --itemize-changes "$skill_dir" "$target/")"
-    if [ -n "$out" ]; then
-      changed=1
+  command -v git >/dev/null 2>&1 || { echo "unchanged"; return 0; }
+  mkdir -p "$target"
+
+  local before=""
+  if [ -d "$target/.git" ]; then
+    before="$(git -C "$target" rev-parse HEAD 2>/dev/null || echo "")"
+  else
+    if [ -n "$local_repo_root" ] && [ -d "$local_repo_root" ]; then
+      local skill_dir skill_name
+      for skill_dir in "$local_repo_root"/*/; do
+        [ -f "$skill_dir/SKILL.md" ] || continue
+        skill_name="$(basename "$skill_dir")"
+        [ -e "$target/$skill_name" ] && rm -rf "$target/$skill_name"
+      done
+      [ -f "$target/AGENTS.md" ] && [ ! -L "$target/AGENTS.md" ] && rm -f "$target/AGENTS.md"
     fi
-  done
+    git -C "$target" init --quiet >/dev/null 2>&1
+    git -C "$target" remote add origin "$remote" >/dev/null 2>&1 \
+      || git -C "$target" remote set-url origin "$remote" >/dev/null 2>&1
+    # Non-cone mode: cone mode always includes root-level files regardless
+    # of the directory pattern list (README.md, LICENSE.txt, .gitignore,
+    # etc. would leak through). Non-cone gives exact, explicit-only paths.
+    git -C "$target" sparse-checkout init --no-cone >/dev/null 2>&1
+  fi
 
-  if [ "$changed" -eq 1 ]; then
+  git -C "$target" fetch --quiet --filter=blob:none origin "$branch" 2>/dev/null \
+    || { echo "unchanged"; return 0; }
+
+  local skill_dirs pattern_args=("/AGENTS.md")
+  skill_dirs="$(git -C "$target" ls-tree -r --name-only "origin/$branch" \
+    | grep '/SKILL\.md$' \
+    | sed 's#/SKILL\.md$##' \
+    | cut -d/ -f1 \
+    | sort -u)"
+  local d
+  while IFS= read -r d; do
+    [ -n "$d" ] && pattern_args+=("/$d/")
+  done <<< "$skill_dirs"
+
+  git -C "$target" sparse-checkout set --no-cone "${pattern_args[@]}" >/dev/null 2>&1
+  git -C "$target" checkout --quiet -B "$branch" "origin/$branch" >/dev/null 2>&1
+  git -C "$target" reset --quiet --hard "origin/$branch" >/dev/null 2>&1
+
+  local after
+  after="$(git -C "$target" rev-parse HEAD 2>/dev/null || echo "")"
+
+  if [ "$before" != "$after" ]; then
     echo "changed"
   else
     echo "unchanged"
