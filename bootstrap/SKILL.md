@@ -37,10 +37,11 @@ bundled skills under `~/.codex/skills/.system/`).
 
 | Tool | Target Global Instruction File | Rule Integration Method |
 |---|---|---|
-| Claude Code | `CLAUDE.md` | Non-destructive block alignment |
-| Codex CLI | `AGENTS.md` | Non-destructive block alignment |
-| Gemini CLI | `GEMINI.md` | Non-destructive block alignment |
-| GitHub Copilot CLI | `copilot-instructions.md` | Non-destructive block alignment |
+| Claude Code | `~/.claude/CLAUDE.md` | Non-destructive block alignment |
+| Codex CLI | `~/.codex/AGENTS.md` | Non-destructive block alignment |
+| Gemini CLI | `~/.gemini/GEMINI.md` | Non-destructive block alignment |
+| Gemini Antigravity | `~/.gemini/antigravity/builtin/GEMINI.md` | Non-destructive block alignment (separate product from Gemini CLI, separate file — see below) |
+| GitHub Copilot CLI | `~/.copilot/copilot-instructions.md` | Non-destructive block alignment |
 
 ## Running the Bootstrap Verification & Alignment
 
@@ -55,20 +56,32 @@ bash ~/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh
 
 Each script is idempotent and reports only when changes are made.
 
-## Gemini Antigravity Builtin Skills Mirror
+## Gemini Antigravity Builtin Rules & Skills Mirror
 
 Google Antigravity (`~/.gemini/antigravity/`) is a separate product from
-Gemini CLI. It ships its own default skills in
+Gemini CLI. It does not read `~/.gemini/GEMINI.md` or `~/.gemini/skills/` —
+confirmed directly on-disk (Antigravity has never picked up rules placed at
+the CLI location). It ships its own default skills in
 `~/.gemini/antigravity/builtin/skills/` (e.g. `agy-customizations`,
-`antigravity_guide`, `permissioned-github`) rather than reading `~/.gemini/skills/`.
+`antigravity_guide`, `permissioned-github`), and reads its own rules file at
+`~/.gemini/antigravity/builtin/GEMINI.md`.
 
-`ensure-gemini-builtin-skills.sh` mirrors every skill folder in this repo
-(anything with a top-level `SKILL.md`) into that directory, overwriting each
-skill by name on every run so `git pull` changes in this repo propagate the
-next time it runs. It never touches Antigravity's own native skills, since
-none of them share a name with a skill in this repo. It no-ops silently if
-`~/.gemini/antigravity/builtin/skills/` doesn't exist (Antigravity not
-installed).
+`ensure-gemini-builtin-skills.sh` handles both, targeting
+`~/.gemini/antigravity/builtin/` directly:
+
+- Aligns `~/.gemini/antigravity/builtin/GEMINI.md` with this repo's
+  `AGENTS.md` non-destructively (same `align_agent_rules` mechanism and
+  block markers `ensure-gemini-link.sh` uses for the CLI location) — this is
+  a *separate* copy from `~/.gemini/GEMINI.md`, not a symlink, since the two
+  products read different files.
+- Mirrors every skill folder in this repo (anything with a top-level
+  `SKILL.md`) into `~/.gemini/antigravity/builtin/skills/`, overwriting each
+  skill by name on every run so `git pull` changes in this repo propagate
+  the next time it runs. It never touches Antigravity's own native skills,
+  since none of them share a name with a skill in this repo.
+
+It no-ops silently if `~/.gemini/antigravity/builtin/` doesn't exist
+(Antigravity not installed).
 
 ```bash
 bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-builtin-skills.sh
