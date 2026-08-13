@@ -93,6 +93,12 @@ All agents follow the Maestro planning protocol for any substantial or multi-ste
 - Mark tasks `[/]` when starting, `[x]` only when verifiably complete.
 - Update `walkthrough.md` as phases finish — do not wait until the end.
 - Never expand scope silently; document added tasks in a `## Added` section of `tasks.md`.
+- Before drafting a document, instrument, or config shape whose correct
+  structure took real effort to work out (not just look up), check
+  `.agents/MEMORY.md` and `.agents/memory/` in the current repo for a
+  previously recorded convention before re-deriving it. Record a newly
+  discovered one there when it would otherwise cost the next agent the same
+  effort to rediscover.
 
 **When a new instruction arrives and current tasks are all `[x]`:**
 

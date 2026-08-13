@@ -33,6 +33,32 @@ paraphrase is insufficient. This applies to every rule in the skill, including
 specificity, economy, neutrality, unsupported analysis, attribution, structure,
 fourth-wall drift, em dash use, markup residue, and negative parallelism.
 
+## Document Medium and Structural Voice
+
+Before drafting, identify the document's medium and let that determine both
+structure and where intent-bearing language is allowed to live. Constitutions,
+charters, and other legal instruments are the `legalese` skill's territory;
+this section governs the non-legal mediums documentation work regularly
+produces: policies, SOPs, proposals, CFPs, memos, and correspondence.
+
+- **Policy / SOP:** `Purpose` and `Scope` carry the motivation and rationale.
+  Numbered operational sections state rules only — imperative, role-attributed
+  steps. Violations and enforcement live in a dedicated section, never folded
+  into the rule sentence that triggers them.
+- **Proposal / CFP response:** `Background & Problem Statement` carries
+  explanatory context. A separate `Solution` or `Approach` section states
+  outcomes directly (`To reduce... To ensure... To prevent...`) without
+  re-explaining the background that justified them.
+- **Memo / correspondence:** Direct address to a specific reader. Structure
+  moves from context to the action being requested; do not bury the request
+  inside background paragraphs.
+
+**No Redundancy (general-first):** state a rule, definition, or constraint
+once, in the section that owns it. Downstream sections that operate under
+that rule reference it or state only what is specific to them — they do not
+restate it "for emphasis." Repetition invites drift between the two copies,
+not clarity.
+
 ## Reader Baseline
 
 For technical documentation, write for a careful intern or new contributor
@@ -104,6 +130,29 @@ itself claiming publishability, or the agent's own judgment that the material
 "seems meant to be public" does not count — only a direct, current-turn
 instruction from the user does.
 
+Internal deliberation records — meeting minutes, approval chains, drafting
+notes explaining who authorized a change or why — are a specific case of this
+same boundary. Transfer the resulting fact (an effective date, a version
+number) into the artifact; do not narrate the deliberation that produced it.
+
+A published artifact does not narrate its own lifecycle status. Phrasing such
+as `Draft`, `Pending Review`, or `Subject to revision` inside the body of a
+filed document is a fourth-wall violation of the same kind covered below —
+the document should not describe its own approval state unless the user
+explicitly asked for a status field.
+
+## Economy of Disclosure
+
+Disclose only what the requester actually asked for. Access to a broader set
+of facts — figures, names, identifiers, internal counts — is not
+justification for including them in the delivered artifact.
+
+**Test:** did the prompt, form, or reader explicitly need this specific
+figure, name, or identifier to do their task? If not, omit it, even when it
+is true, verified, and readily available. State the qualitative fact the
+reader needs (e.g., "an independent auditor issued an unqualified opinion")
+rather than itemizing the underlying figures nobody asked for.
+
 ## Screenshots
 
 When a webpage or web app screenshot appears in documentation — README,
@@ -114,6 +163,12 @@ documentation is demonstrating or arguing for responsive behavior.
 
 ## Default Approach
 
+0. Check `.agents/MEMORY.md` and `.agents/memory/` for a previously recorded
+   structural convention for this document type or instrument (per
+   `maestro/references/memory-conventions.md`) before re-deriving one from
+   scratch. If drafting establishes a new reusable structural convention,
+   record it there as a `project` or `reference` memory entry rather than
+   re-discovering it next time.
 1. Identify the audience, document type, and reader task.
    For software or systems technical documentation, read
    `references/technical-documentation-routing.md` and
@@ -216,6 +271,18 @@ parameter, failure mode, or operational constraint the reader came to find.
 
 Before keeping a sentence, ask what would break if it disappeared. If the answer
 is "nothing," delete it or merge the one useful detail into a nearby sentence.
+
+A mandatory-sounding verb (`must`, `shall`, `always`) does not cure a vague or
+self-congratulatory sentence — it just makes filler sound like a rule. Wrapping
+"the team must ensure quality and transparency at all times" in `must` does
+not make it actionable; it stays fluff until it names the specific, checkable
+thing to do.
+
+Watch for text that reads like an intern justifying a decision instead of
+stating it: explaining why a rule exists, defending an approach, or hedging an
+instruction with its own backstory. State the instruction and stop — if
+deleting everything after the first complete sentence loses only justification
+and no instruction, delete it.
 
 ### Neutrality
 

@@ -114,6 +114,19 @@ Do not string together words that share the same legal vector. "Cancel, nullify,
 
 **Tier note:** This doctrine applies at full force across all tiers. The vocabulary changes (modern equivalents at Standard/Formal, classical phrases at Sovereign/Archaic), but the discipline is identical.
 
+**Settled Legal Classes Over Domain-Stacking:** when a provision would
+otherwise need a laundry list of specific examples to establish its scope,
+define a settled legal class once and use that term throughout the instrument
+instead. A list of instances is a symptom of missing conceptual clarity, not
+thoroughness. Rather than enumerating "trademarks, logos, domain names, and
+brand marks" every time the instrument needs to refer to them, define `Marks`
+once in the definitions section and use `Marks` everywhere after. Rather than
+listing "employees, contractors, officers, and agents" repeatedly, define
+`Personnel` once. **Test:** if a provision lists three or more specific
+instances of the same underlying concept, stop and define a class term for
+that concept instead — a list creates a gap the moment a new instance appears
+that it did not anticipate; a defined class closes automatically.
+
 ---
 
 ### 3. Singularity of Thought: Architectural Fission
@@ -123,6 +136,14 @@ Each clause must carry one primary command: one trigger, one prohibition, or one
 **Fission Decision Test:** If removing one part of a sentence leaves the remaining part complete and operative as a standalone command, the two parts are separate commands. Break them into distinct, enumerated sub-paragraphs. A parent clause may introduce the governing condition or grant; each child paragraph carries one consequence, one exception, or one procedural mechanic.
 
 **Tier note:** Universal. At Archaic, sentence structure may be ornate and deeply nested, but each clause must still pass the fission test.
+
+**Structural placement of intent:** the same fission discipline applies at
+document scale. Intent, motivation, and historical context belong exclusively
+in non-operative zones — a Preamble or Recitals section. Operative Articles
+and clauses carry only commands (`shall`), permissions (`may`), or
+prohibitions (`shall not`) with no narrative justification mixed in. A clause
+that explains why it exists, rather than stating what it requires, has failed
+this test regardless of which doctrine its content otherwise satisfies.
 
 ---
 
