@@ -4,6 +4,7 @@
     "~/.codex/config.toml",
     "~/.config/opencode/opencode.jsonc",
     "~/.claude.json or Claude Code MCP settings",
+    "~/.gemini/antigravity/mcp_config.json for Google Antigravity (top-level, sibling to builtin/ — not inside builtin/, not antigravity-cli/)",
     "Provider-specific MCP settings for other MCP-compatible clients"
   ],
   "_path_prerequisites": [
@@ -13,41 +14,43 @@
     "graphify is installed from the graphifyy package, but the command is graphify.",
     "Do not configure graphify as a global MCP server unless graphify --help on the target machine explicitly documents a supported MCP command or flag."
   ],
+  "_command_shape_note": "Invoke through uvx, not the bare pipx shim. A bare command:'code-review-graph' entry has repeatedly failed to resolve reliably from MCP client subprocesses on this workstation; command:'uvx' args:['code-review-graph','serve'] is the verified working shape (see .agents/memory/gemini-antigravity-mcp-registration.md in the skills repo). codegraphcontext's 'cgc' shim does not need this treatment.",
   "mcp": {
     "servers": {
       "enabled": [
         {
           "name": "code-review-graph",
-          "command": "code-review-graph",
-          "args": ["serve"],
+          "command": "uvx",
+          "args": ["code-review-graph", "serve"],
+          "cwd": "<repo-root>",
           "transport": "stdio",
           "_description": "AST parser, call-graph builder, and blast-radius engine. Requires Python 3.10+ and a local SQLite DB initialised by 'code-review-graph init'.",
-          "_install": "pipx install code-review-graph",
-          "_verify": "code-review-graph serve --help"
+          "_install": "uv tool install code-review-graph",
+          "_verify": "uvx code-review-graph serve --help"
         }
       ]
     }
   },
   "_codex_toml": {
-    "code-review-graph": "[mcp_servers.code-review-graph]\ncommand = \"code-review-graph\"\nargs = [\"serve\"]\ntype = \"stdio\""
+    "code-review-graph": "[mcp_servers.code-review-graph]\ncommand = \"uvx\"\nargs = [\"code-review-graph\", \"serve\"]\ncwd = \"<repo-root>\"\ntype = \"stdio\""
   },
   "_opencode_local_shape": {
     "mcp": {
       "code-review-graph": {
         "type": "local",
-        "command": ["code-review-graph", "serve"],
+        "command": ["uvx", "code-review-graph", "serve"],
         "enabled": true
       }
     }
   },
   "_claude_code_cli": [
-    "claude mcp add code-review-graph -- code-review-graph serve"
+    "claude mcp add code-review-graph -- uvx code-review-graph serve"
   ],
   "_generic_provider_mapping": {
     "code-review-graph": {
       "name": "code-review-graph",
-      "command": "code-review-graph",
-      "args": ["serve"],
+      "command": "uvx",
+      "args": ["code-review-graph", "serve"],
       "transport": "stdio"
     }
   },

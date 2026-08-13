@@ -7,3 +7,4 @@ what belongs here, what doesn't, and how to add an entry.
 
 - [Skills Repo Deployment Workflow](memory/skills-repo-deployment-workflow.md) — rsync mirror topology (not git clones); standard change → commit/amend → push → re-run bootstrap sequence
 - [Commit & Destructive-Action Discipline](memory/commit-and-destructive-action-discipline.md) — single-scope 72-word commit rule; enumerate-before-batch-action across repos
+- [Gemini Antigravity MCP Registration](memory/gemini-antigravity-mcp-registration.md) — verified working config path and `uvx` command shape for `code-review-graph`

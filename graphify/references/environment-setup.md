@@ -30,14 +30,19 @@ which pipx || true
 
 ## 2. Install Graph Tools
 
-Install CodeGraphContext using `uv` and code-review-graph using `pipx`:
+Install both tools with `uv tool install`, not `pipx`. A `pipx`-installed
+`code-review-graph` shim has repeatedly failed to resolve reliably when
+invoked bare from MCP client subprocesses; registering it as `uvx
+code-review-graph serve` instead is the verified working shape — see
+`assets/mcp-config-template.json` and
+`.agents/memory/gemini-antigravity-mcp-registration.md` in the skills repo.
 
 ```bash
 # Install CodeGraphContext
 uv tool install codegraphcontext
 
 # Install code-review-graph
-pipx install code-review-graph
+uv tool install code-review-graph
 ```
 
 Refresh the shell paths:
