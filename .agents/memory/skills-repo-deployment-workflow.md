@@ -6,18 +6,22 @@ type: project
 
 This repo (`git@github.com:kibocha-solutions/skills.git`) is the single
 working copy. Each tool's `skills/` directory (`~/.claude/skills`,
-`~/.codex/skills`, `~/.gemini/skills`, `~/.copilot/skills`) is **not** a
-separate `git clone` — it's a plain-file mirror that the `bootstrap` skill's
-`ensure-*-link.sh` scripts populate directly from this working copy via the
-shared `mirror_skills` helper in `bootstrap/scripts/lib.sh` (an `rsync
---delete --checksum` per skill folder, overwriting by name). There is nothing
-to `git pull` in those locations — re-running the tool's `ensure-*-link.sh`
-(or letting its `SessionStart` hook fire) is what refreshes them. Google
-Antigravity is a separate case: it has its own default skills at
+`~/.codex/skills`, `~/.gemini/skills`, `~/.copilot/skills`) is a real git
+working copy tracking this repo's remote — `git init`'d in place with a
+non-cone sparse-checkout (every skill folder plus `AGENTS.md`, nothing else
+at repo root), not a plain-file `rsync` mirror. The `bootstrap` skill's
+`ensure-*-link.sh` scripts populate it via the shared `sync_skills_from_git`
+helper in `bootstrap/scripts/lib.sh`: every run does `fetch` + sparse-checkout
+re-apply + `reset --hard origin/main`, so it always exactly matches what's
+pushed to the remote, and a skill removed from this repo is automatically
+removed from every tool's copy too. There is nothing to `git pull` manually
+in those locations — re-running the tool's `ensure-*-link.sh` (or letting its
+`SessionStart` hook fire) is what refreshes them. Google Antigravity is a
+separate case: it has its own default skills at
 `~/.gemini/antigravity/builtin/skills/`, distinct from Gemini CLI's
 `~/.gemini/skills/`, kept in sync by the dedicated
-`ensure-gemini-builtin-skills.sh` script using the same `mirror_skills`
-helper — see `bootstrap/SKILL.md`.
+`ensure-gemini-builtin-skills.sh` script using the same
+`sync_skills_from_git` helper — see `bootstrap/SKILL.md`.
 
 `AGENTS.md` at the repo root is the single source of truth for behavioral
 rules across all four tools. Each tool's own global memory file
