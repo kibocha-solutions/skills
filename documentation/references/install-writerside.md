@@ -3,6 +3,9 @@
 Use this reference when Writerside validation is required but the `wrs` command,
 Docker, or the Writerside builder image is unavailable.
 
+Read `../../system-init/SKILL.md` before installing Docker, the builder image,
+or the wrapper. Apply the universal installation gate.
+
 ## Expected Tooling
 
 - Docker is installed and reachable from the current shell.

@@ -1,220 +1,89 @@
 ---
 name: graphify
-description: >
-  Activate this skill whenever the user asks about codebase architecture,
-  code-impact analysis, blast-radius mapping, inheritance or dependency chains,
-  or compliance / regulatory documentation mapping (e.g., "what changes if I
-  touch X?", "show me who calls this module", "does the new code satisfy the
-  UN compliance PDF?", "map the architecture of the auth layer"). This skill
-  integrates CodeGraphContext (CGC) and code-review-graph (CRG) to support
-  codebase-impact and architectural analysis. Trigger proactively whenever the
-  query requires structural code understanding.
+description: Map codebase architecture, dependencies, callers, execution flows, change impact, test coverage, and compliance relationships with CodeGraphContext and code-review-graph. Use for architecture questions, blast-radius analysis, dependency tracing, structural code review, or mapping requirements to implementation.
 ---
 
-# Code Intelligence Integration
+# Graphify
 
-Graphify integrates CodeGraphContext (CGC) and code-review-graph (CRG) to
-support codebase-impact and architectural analysis.
+## 1. Establish scope
 
-## Complementary Roles
+1. Identify the repository root.
+2. Identify the requested symbol, change, subsystem, requirement, or document.
+3. Keep generated graph state under `.agents/code-graphs/`.
+4. Keep generated graph state out of version control.
+5. Do not create or replace root instruction files, editor settings, or MCP configuration unless the user requests persistent setup.
 
-| Tool | Focus Area | Key Specialty & Strengths |
-|---|---|---|
-| **code-review-graph (CRG)** | **Change Staging & Impact Analysis** | AST parsing, change detection, blast-radius mapping, callers/callees, affected execution flows, and code reviews. |
-| **CodeGraphContext (CGC)** | **Codebase Intelligence & Query Engine** | Semantic code search, dead code detection, cyclomatic complexity profiling, and custom Cypher graph querying. |
+## 2. Check available graph tools
 
----
+1. Check for callable CodeGraphContext and code-review-graph tools.
+2. Use the existing graph before filesystem search when it covers the repository.
+3. Check graph freshness before relying on results.
+4. Update the graph when the available tool supports an in-scope update.
+5. Follow [environment setup](references/environment-setup.md) only when a required tool is unavailable.
+6. Follow [recovery](references/recovery-runbook.md) when a configured tool fails.
+7. Read `../system-init/SKILL.md` before installing a missing graph tool.
 
-## Graph Storage Layout
+## 3. Route the query
 
-All graph state for this repo lives under a single repo-local directory:
+Use [tool routing](references/tool-routing-guide.md).
 
-```
-graphify/
-graphify/cgc/
-graphify/crg/
-```
+1. Use code-review-graph for change detection, impact radius, callers, callees, affected flows, and test relationships.
+2. Use CodeGraphContext for semantic search, complexity, dead-code analysis, reports, and custom graph queries.
+3. Use both tools when the question combines discovery with impact analysis.
+4. Use `rg` and direct file reads only for gaps not covered by the graph.
 
-`graphify/` is generated output, excluded from Git (see `.gitignore`). Never
-commit graph databases, caches, generated reports, sockets, or lock files from
-either tool.
+## 4. Inspect changes
 
-When operating inside this repo, prefer repo-local graph state over any
-home-directory graph state (`~/.codegraphcontext`, `~/.code-review-graph`,
-or any path outside the repo root).
+1. Detect the changed files and symbols.
+2. Retrieve review context for the changed symbols.
+3. Map upstream callers and downstream dependencies.
+4. Map affected execution flows.
+5. Locate tests for the affected symbols and flows.
+6. Read the exact source and test passages needed to verify graph results.
 
----
+## 5. Inspect architecture
 
-## Operating Lifecycle
+1. Generate or retrieve the architecture overview.
+2. Identify subsystem, module, and service boundaries.
+3. Trace imports, calls, inheritance, data flow, and integration edges.
+4. Identify cycles, dead code, and high-complexity nodes when relevant.
+5. Verify important relationships against source files.
 
-### 1. Mandatory Generated Tooling Inspection And Cleanup
+## 6. Map compliance or documentation
 
-Before building, updating, or using graph indexes, and again after any graphify,
-CRG, or CGC command creates files, inspect generated agent, editor, MCP, and
-graph-tooling files across the repository. Do a full pass from the repo root
-instead of checking only a short list of known paths. Existing files are not
-exempt from review; a file that was already present can still be generated
-tooling that does no project work.
+1. Read the controlling requirement or source document in full.
+2. Split the source into individually testable requirements.
+3. Map each requirement to implementing symbols, configuration, tests, and evidence.
+4. Mark each mapping as verified, missing, conflicting, or not applicable.
+5. Keep proposals, interpretations, and controlling requirements distinct.
+6. Cite the source passage and implementation location for each conclusion.
 
-The skill terms are not satisfied until the cleanup pass is complete. Generated
-graph tooling may remain only in `graphify/` or in the allowed `.agents/`
-layout. The allowed `.agents/` layout contains `.agents/brain/` and/or
-`.agents/skills/`; when `.agents/skills/` exists, it must contain
-`.agents/skills/documentation/SKILL.md`.
+## 7. Stage implementation work
 
-Look for stale or generated material such as:
+1. Follow [feature staging](examples/feature-staging-example.md).
+2. Locate established patterns before writing code.
+3. Identify affected interfaces, schemas, tests, and documentation.
+4. Record the intended change and verification path in the active plan.
+5. Implement only within the user's authorized scope.
+6. Refresh the graph after substantive code changes.
+7. Re-run impact and test queries against the final state.
 
-- root instruction duplicates: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`,
-  `QODER.md`, `.cursorrules`, `.windsurfrules`;
-- MCP and agent-client configs: `.mcp.json`, `.opencode.json`, `mcp.json`,
-  `opencode.json`;
-- assistant-platform folders: `.claude/`, `.gemini/`, `.kiro/`, `.qoder/`;
-- assistant-generated instruction folders such as `.github/` when they contain
-  graph-tooling or agent instruction scaffolding and do not contain
-  project-owned GitHub workflows;
-- generated reports such as `CGC_REPORT.md`;
-- graph-tool ignore/config files such as `.code-review-graphignore` and
-  `.cgcignore` when they were created only for the graph run;
-- local editor metadata such as `.idea/` when it is not part of the project;
-- stale graph state outside the canonical `graphify/` directory, such as
-  `.code-review-graph/` or `.codegraphcontext/`;
-- any affiliated generated file elsewhere in the repo that points agents to
-  obsolete graph paths, overrides current repo instructions, or duplicates
-  platform-specific instructions.
+## 8. Manage repository graph state
 
-When the user has authorized cleanup:
+1. Follow [repository activation](references/repository-activation.md) when persistent local graph state is requested.
+2. Store CRG state in `.agents/code-graphs/crg/`.
+3. Store CGC state in `.agents/code-graphs/cgc/`.
+4. Ignore `.agents/code-graphs/` in version control.
+5. Inspect generated files after each initialization or update command.
+6. Move generated agent, editor, MCP, report, lock, socket, and database files into the permitted state directory when supported.
+7. Remove generated scaffolding outside the permitted state directory only when the user has authorized cleanup.
+8. Preserve project-owned files and uncertain material.
 
-1. List candidate files and folders from the repo root.
-2. Inspect their contents or filenames enough to classify their role.
-3. Remove generated/non-project material that matches the cleanup authority.
-4. Preserve user-authored project material, durable documentation, source files,
-   project-owned GitHub workflows, `graphify/`, and the allowed `.agents/`
-   layout.
-5. Treat uncertain provenance as user-owned and report it instead of deleting
-   it.
-6. Run a final repo-root scan and explicitly confirm that no generated
-   graphify/CRG/CGC scaffolding remains outside `graphify/` and the allowed
-   `.agents/` layout before reporting the skill complete.
+## 9. Report results
 
-Do not restrict cleanup to `.claude/`, `.gemini/`, `.kiro/`, and `.qoder/`.
-Those folders are examples, not the full cleanup scope.
-
-### 2. Verification
-
-Before querying the codebase or running analysis, verify that both MCP servers
-are reachable. Probe availability using the procedures in
-[environment-setup.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/environment-setup.md).
-If either tool fails the availability check, follow the recovery instructions.
-
-### 3. Synchronization
-
-Sync the repository indexes before answering the user's prompt:
-
-- Update CRG:
-  ```bash
-  code-review-graph update --repo . --data-dir graphify/crg
-  ```
-- Update CGC:
-  ```bash
-  cgc update --quiet
-  ```
-  CGC stores its database at the path configured in `FALKORDB_PATH` (or the
-  equivalent `KUZUDB_PATH` / `LADYBUGDB_PATH`) inside
-  `~/.codegraphcontext/.env`. To redirect a single command to the project-local
-  path, pass the global `--path` flag:
-  ```bash
-  cgc --path graphify/cgc index .
-  cgc --path graphify/cgc update --quiet
-  ```
-
-### 4. Staging and Implementation Workflow
-
-When designing or implementing a new feature, follow the self-inquiry and
-documentation-first staging workflow documented in
-[feature-staging-example.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/examples/feature-staging-example.md).
-
-### 5. Tool Routing
-
-Select the appropriate tool for each query using the routing logic in
-[tool-routing-guide.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/tool-routing-guide.md).
-
----
-
-## Index Exclusion Rules
-
-Both tools must exclude the following paths from indexing. For this skills
-repository, these patterns live in the committed root ignore files. For other
-target repositories, prefer tool-local configuration under `graphify/` unless
-the user explicitly asks to install durable root-level ignore files.
-
-**Excluded (generated, transient, or non-project):**
-
-```
-graphify/
-.code-review-graph/
-AGENTS.md
-CLAUDE.md
-GEMINI.md
-QODER.md
-.cursorrules
-.windsurfrules
-.mcp.json
-.opencode.json
-.github/
-.idea/
-**/skills/
-.agents/skills/
-.agents/brain/active/
-.agents/brain/archive/
-.claude/
-.gemini/
-.kiro/
-.qoder/
-```
-
-**Preserved (durable project-owned design material):**
-
-```
-.agents/brain/db_design/
-```
-
-Do not add `.agents/brain/db_design/` to any ignore file. Its content
-represents user-authored design decisions that benefit from graph indexing.
-
----
-
-## Repo File Requirements
-
-For this skills repository, the following files must exist in the repo root
-with the contents described in the subsections below. In another target
-repository, create or update these root files only when the user explicitly
-asks for durable graph-tool activation. Otherwise treat newly created copies as
-generated setup scaffolding and remove them during the mandatory cleanup pass.
-
-### `.gitignore`
-
-Must include `graphify/` so generated graph state is never committed.
-
-### `.code-review-graphignore`
-
-Controls CRG indexing. Uses glob patterns; `<dir>/**` matches at any depth.
-See [repository-activation.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/repository-activation.md)
-for the required contents.
-
-### `.cgcignore`
-
-Controls CGC indexing. Uses gitignore-style syntax. CGC discovers this file
-by walking up from the indexed path to the git root, so placing it at the repo
-root ensures it applies to all invocations.
-See [repository-activation.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/repository-activation.md)
-for the required contents.
-
----
-
-## Reference Documents
-
-*   [environment-setup.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/environment-setup.md): Installing and setting up the environment from zero.
-*   [repository-activation.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/repository-activation.md): Activating both graph tools in a local repository.
-*   [tool-routing-guide.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/tool-routing-guide.md): Choosing the right tool for specific query types.
-*   [recovery-runbook.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/references/recovery-runbook.md): Detailed troubleshooting steps for common installation and runtime errors.
-*   [feature-staging-example.md](file:///home/codelf/workspace/kibocha-solutions/skills/graphify/examples/feature-staging-example.md): Walkthrough of a feature staging workflow.
+1. Lead with the verified answer.
+2. Name the affected symbols, files, flows, and tests.
+3. Separate graph-derived findings from source-verified findings.
+4. State graph freshness and tool gaps.
+5. State unresolved risks without presenting them as settled facts.
+6. Do not commit generated reports or graph state.

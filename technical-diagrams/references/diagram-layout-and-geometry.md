@@ -1,58 +1,34 @@
-# Diagram Layout And Geometry
+# Diagram Layout and Geometry
 
-Use this reference to place diagram elements and evaluate rendered geometry.
+## Procedure
 
-## Defaults
+1. Set the canvas size and margins.
+2. Select one grid increment.
+3. Select standard node widths, heights, corner radii, and spacing.
+4. Place the primary path first.
+5. Place boundaries and containers around completed internal groups.
+6. Place secondary paths.
+7. Route connectors.
+8. Align nodes to the grid.
+9. Equalize spacing within repeated groups.
+10. Resize nodes to fit final labels.
+11. Check overview density.
+12. Check detail-scale alignment and collisions.
 
-Use project geometry assets first. If none exist, use
-`assets/default-geometry.json`.
+## Geometry rules
 
-Baseline defaults:
+- Use consistent dimensions for nodes with the same role.
+- Use larger dimensions only for additional content or hierarchy.
+- Keep connector labels clear of nodes and other connectors.
+- Keep arrowheads outside node interiors.
+- Avoid connector crossings.
+- Use explicit waypoints when automatic routing produces ambiguity.
+- Keep loops and exception paths outside the main path.
+- Keep page edges clear of labels and arrowheads.
+- Remove unintended empty regions.
 
-- page margin: 48 px minimum
-- component spacing: 72 px minimum
-- preferred component spacing: 120 px
-- container padding: 32 px minimum
-- edge stroke width: 2 px minimum
-- edge label offset: 8 to 16 px
-- edge label padding: 4 to 8 px
-- line crossing: forbidden unless unavoidable and explained
-- boundary collision: forbidden
+## Density limits
 
-## Layout Rules
-
-- Align related nodes into rows, columns, lanes, zones, or clusters.
-- Keep spacing consistent inside a semantic group.
-- Use larger containers for boundaries, not decorative frames.
-- Keep labels close to the edge or object they describe.
-- Give long labels more width instead of shrinking text below readability.
-- Keep page bounds generous enough for export and documentation embedding.
-
-## Diagram-Specific Geometry
-
-- C4 context: center the system of interest, place users and external systems
-  around it, and label relationships.
-- C4 container: use a system boundary and group containers by runtime or
-  responsibility.
-- Deployment: use zones, environments, networks, or regions as layout anchors.
-- Sequence: keep participants aligned horizontally and time flowing downward.
-- Activity: keep the main path readable; allow branches to spread sideways.
-- Data flow: place trust boundaries visibly and keep data labels traceable.
-- ERD: align entities into dependency clusters and keep cardinality labels near
-  relationship ends.
-- Permission: separate principals, roles/scopes, and resources into readable
-  layers or zones.
-
-## Geometry QA
-
-Before delivery, inspect the rendered image for:
-
-- page margins
-- node overlap
-- label overlap
-- edge crossings
-- invalid edge termination
-- cramped groups
-- clipped text
-- unreadable density
-- unintended visual hierarchy
+- Split the diagram when labels become unreadable at normal documentation width.
+- Split the diagram when one canvas contains multiple unrelated reading directions.
+- Split the diagram when boundaries obscure rather than clarify ownership.

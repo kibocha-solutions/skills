@@ -1,75 +1,18 @@
 {
-  "_comment": "Register code-review-graph as the global stdio MCP server. Install Graphify separately as a CLI/skill integration; current graphifyy releases do not expose graphify serve, graphify ping, or a documented --mcp flag.",
-  "_config_locations": [
-    "~/.codex/config.toml",
-    "~/.config/opencode/opencode.jsonc",
-    "~/.claude.json or Claude Code MCP settings",
-    "~/.gemini/antigravity/mcp_config.json for Google Antigravity (top-level, sibling to builtin/ — not inside builtin/, not antigravity-cli/)",
-    "Provider-specific MCP settings for other MCP-compatible clients"
-  ],
-  "_path_prerequisites": [
-    "python3 --version or python --version must report a compatible Python where the tools run.",
-    "uv must resolve on PATH after installation; Linux/WSL/macOS commonly use ~/.local/bin.",
-    "pipx must resolve on PATH after installation; run pipx ensurepath and restart the agent host if needed.",
-    "graphify is installed from the graphifyy package, but the command is graphify.",
-    "Do not configure graphify as a global MCP server unless graphify --help on the target machine explicitly documents a supported MCP command or flag."
-  ],
-  "_command_shape_note": "Invoke through uvx, not the bare pipx shim. A bare command:'code-review-graph' entry has repeatedly failed to resolve reliably from MCP client subprocesses on this workstation; command:'uvx' args:['code-review-graph','serve'] is the verified working shape (see .agents/memory/gemini-antigravity-mcp-registration.md in the skills repo). codegraphcontext's 'cgc' shim does not need this treatment.",
   "mcp": {
     "servers": {
-      "enabled": [
-        {
-          "name": "code-review-graph",
-          "command": "uvx",
-          "args": ["code-review-graph", "serve"],
-          "cwd": "<repo-root>",
-          "transport": "stdio",
-          "_description": "AST parser, call-graph builder, and blast-radius engine. Requires Python 3.10+ and a local SQLite DB initialised by 'code-review-graph init'.",
-          "_install": "uv tool install code-review-graph",
-          "_verify": "uvx code-review-graph serve --help"
-        }
-      ]
-    }
-  },
-  "_codex_toml": {
-    "code-review-graph": "[mcp_servers.code-review-graph]\ncommand = \"uvx\"\nargs = [\"code-review-graph\", \"serve\"]\ncwd = \"<repo-root>\"\ntype = \"stdio\""
-  },
-  "_opencode_local_shape": {
-    "mcp": {
       "code-review-graph": {
-        "type": "local",
-        "command": ["uvx", "code-review-graph", "serve"],
-        "enabled": true
+        "command": "code-review-graph",
+        "args": ["serve"],
+        "cwd": "<repo-root>",
+        "transport": "stdio"
+      },
+      "codegraphcontext": {
+        "command": "cgc",
+        "args": ["mcp", "start"],
+        "cwd": "<repo-root>",
+        "transport": "stdio"
       }
     }
-  },
-  "_claude_code_cli": [
-    "claude mcp add code-review-graph -- uvx code-review-graph serve"
-  ],
-  "_generic_provider_mapping": {
-    "code-review-graph": {
-      "name": "code-review-graph",
-      "command": "uvx",
-      "args": ["code-review-graph", "serve"],
-      "transport": "stdio"
-    }
-  },
-  "_graphify_cli_integration": {
-    "install": "uv tool install graphifyy",
-    "verify": "graphify --version && graphify --help",
-    "agent_skill_install": "graphify install or graphify install --platform <provider>",
-    "common_commands": [
-      "graphify extract <path>",
-      "graphify update <path>",
-      "graphify query \"<question>\"",
-      "graphify path \"A\" \"B\"",
-      "graphify explain \"X\""
-    ]
-  },
-  "_troubleshooting": {
-    "provider_shape_error": "Do not assume mcp.servers.enabled is universal. Codex TOML, OpenCode JSON, Claude Code CLI, and other MCP clients use different surrounding shapes for the same local stdio command.",
-    "path_not_found": "Run 'uv tool update-shell' and 'pipx ensurepath', export HOME/.local/bin for the current shell on Linux/WSL/macOS, then restart the agent host. Native Windows must verify with where.exe in the environment that launches the provider.",
-    "graphify_mcp_error": "If a provider reports graphify serve failed, remove that MCP entry. Current graphifyy CLI help does not list graphify serve, graphify ping, or a documented --mcp flag.",
-    "code_review_graph_stale_db": "Run 'code-review-graph init' in the project root if the SQLite DB does not exist yet, or 'code-review-graph update' to sync after fresh commits."
   }
 }

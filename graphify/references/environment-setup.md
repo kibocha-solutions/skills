@@ -1,65 +1,42 @@
 # Environment Setup
 
-Setting up a new environment from zero requires installing Python, `uv`, `pipx`, CodeGraphContext, and `code-review-graph`.
-
-## 1. Verify Prerequisites
-
-Run these commands to verify the system has Python and package managers:
+## 1. Check prerequisites
 
 ```bash
 python3 --version
-which uv || true
-which pipx || true
+command -v uv
+command -v cgc
+command -v code-review-graph
 ```
 
-### Install `uv` (if missing)
-- Linux, WSL, or macOS:
-  `curl -LsSf https://astral.sh/uv/install.sh | sh`
-- Windows PowerShell:
-  `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+## 2. Apply the installation gate
 
-### Install `pipx` (if missing)
-- Ubuntu/Debian:
-  `sudo apt update && sudo apt install -y pipx && pipx ensurepath`
-- macOS:
-  `brew install pipx && pipx ensurepath`
-- Windows:
-  `scoop install pipx` or `py -m pip install --user pipx && py -m pipx ensurepath`
+1. Report each missing command.
+2. Name the proposed installation method and target location.
+3. Read `../../system-init/SKILL.md`.
+4. Install a qualifying dependency under the universal installation rule.
+5. Stop and ask the user to run the exact command when privilege blocks it.
+6. Do not pipe remote content into a shell.
 
----
+## 3. Install
 
-## 2. Install Graph Tools
-
-Install both tools with `uv tool install`, not `pipx`. A `pipx`-installed
-`code-review-graph` shim has repeatedly failed to resolve reliably when
-invoked bare from MCP client subprocesses; registering it as `uvx
-code-review-graph serve` instead is the verified working shape — see
-`assets/mcp-config-template.json` and
-`.agents/memory/gemini-antigravity-mcp-registration.md` in the skills repo.
+Use the verified installation method and scope.
 
 ```bash
-# Install CodeGraphContext
 uv tool install codegraphcontext
-
-# Install code-review-graph
 uv tool install code-review-graph
 ```
 
-Refresh the shell paths:
-```bash
-uv tool update-shell
-export PATH="$HOME/.local/bin:$PATH"
-```
-
----
-
-## 3. Verify Installations
-
-Run diagnostic commands to ensure both tools are successfully installed:
+## 4. Verify executables
 
 ```bash
 cgc doctor
 code-review-graph serve --help
 ```
 
-If both commands return successful status, the environment is ready for repository activation.
+## 5. Verify storage
+
+1. Create `.agents/code-graphs/` in the target repository when persistent graph state is authorized.
+2. Add `.agents/code-graphs/` to the repository ignore rules.
+3. Do not write graph state into the skill package directory.
+4. Do not change home-directory configuration unless the user explicitly requests it.

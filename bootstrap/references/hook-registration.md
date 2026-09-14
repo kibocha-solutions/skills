@@ -1,102 +1,99 @@
-# Registering the SessionStart link-check hook per tool
+# SessionStart Hook Registration
 
-Each tool discovers this repo's `AGENTS.md` at a different native location.
-Once pulled into `<tool-home>/skills/AGENTS.md`, none of the four tools load
-it automatically — that path is one directory too deep for any of their
-native memory-file discovery rules. A `SessionStart` hook that calls the
-matching `ensure-*-link.sh` script closes that gap without depending on
-anyone remembering to run `/bootstrap` by hand.
+## Preconditions
 
-Registration is a one-time, per-machine step — it lives in each tool's own
-settings file, not in this repo, so pulling a new version of this repo never
-touches it.
+1. Read the target tool's current hook documentation.
+2. Inspect the existing settings file.
+3. Preserve unrelated hooks and settings.
+4. Register only the matching bootstrap script.
+5. Validate the final JSON or shell file.
+6. Start a new session and verify one real hook execution.
 
-## Claude Code — `~/.claude/settings.json`
+## Claude Code
 
-Add a hook entry under `hooks.SessionStart`. If a `SessionStart` array
-already exists (e.g. from another integration), add this as another object
-inside its `hooks` list rather than replacing the array.
+Target: `~/.claude/settings.json`
+
+Merge this object into `hooks.SessionStart`:
 
 ```json
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/skills/bootstrap/scripts/ensure-claude-link.sh\"",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "matcher": "",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "bash \"$HOME/.claude/skills/bootstrap/scripts/ensure-claude-link.sh\"",
+      "timeout": 10
+    }
+  ]
 }
 ```
 
-## Codex CLI — `~/.codex/hooks.json`
+Do not replace existing `SessionStart` entries.
 
-Same shape as Claude Code. Merge into the existing `SessionStart` hooks list
-if one is already present.
+## Codex CLI
+
+Target: `~/.codex/hooks.json`
+
+Merge this object into `hooks.SessionStart`:
 
 ```json
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/ensure-codex-link.sh\"",
-            "timeout": 10,
-            "statusMessage": "Checking AGENTS.md link"
-          }
-        ]
-      }
-    ]
-  }
+  "matcher": "startup|resume",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/ensure-codex-link.sh\"",
+      "timeout": 10,
+      "statusMessage": "Checking AGENTS.md link"
+    }
+  ]
 }
 ```
 
-## Gemini CLI — `~/.gemini/settings.json` + `~/.gemini/hooks/`
+Do not replace existing `SessionStart` entries.
 
-Gemini CLI hooks must be shell scripts that print only JSON to stdout
-(`{"systemMessage": "...", "suppressOutput": false}` or
-`{"suppressOutput": true}`); `ensure-gemini-link.sh` already does this.
-Gemini resolves the `command` path relative to `~/.gemini/`, not to the
-script's own location, so the registered command is just the relative path:
+## Gemini CLI
+
+Targets:
+
+- `~/.gemini/settings.json`
+- `~/.gemini/hooks/`
+
+Merge this object into `hooks.SessionStart`:
 
 ```json
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash skills/bootstrap/scripts/ensure-gemini-link.sh",
-            "name": "bootstrap: AGENTS.md link check",
-            "timeout": 10000
-          }
-        ]
-      }
-    ]
-  }
+  "matcher": "",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "bash skills/bootstrap/scripts/ensure-gemini-link.sh",
+      "name": "bootstrap: AGENTS.md link check",
+      "timeout": 10000
+    }
+  ]
 }
 ```
 
-Note the timeout unit: Gemini CLI takes milliseconds here, not seconds.
+Requirements:
 
-## GitHub Copilot CLI — `~/.copilot/hooks/*.json`
+- Keep the command path relative to `~/.gemini/`.
+- Use milliseconds for `timeout`.
+- Keep hook stdout valid JSON.
 
-Copilot CLI uses a different schema from the other three: `version`,
-`hooks.sessionStart`, `bash`/`powershell` instead of `command`, `timeoutSec`
-instead of `timeout`, and no `matcher` field. Any `.json` file dropped in
-`~/.copilot/hooks/` is picked up — one dedicated file per concern is fine.
+## GitHub Copilot CLI
+
+Target: `~/.copilot/hooks/bootstrap.json`
+
+Use the current Copilot hook schema. Confirm these fields against the installed client before writing:
+
+- `version`
+- `hooks.sessionStart`
+- `type`
+- `bash` or `powershell`
+- `timeoutSec`
+
+Example:
 
 ```json
 {
@@ -113,11 +110,14 @@ instead of `timeout`, and no `matcher` field. Any `.json` file dropped in
 }
 ```
 
-Schema confirmed against GitHub's own Copilot CLI hooks documentation. What's
-still unverified: this repo had no pre-existing Copilot hook in place to
-confirm execution against (unlike the other three tools, where an existing
-`code-review-graph` hook proved the schema by example), and Copilot CLI
-itself wasn't available to run in this environment. Treat this one as
-schema-correct but execution-unconfirmed until it's been seen firing in a
-real Copilot CLI session. The `copilot-instructions.md` pointer itself needs
-no hook at all — Copilot reads that file natively on every session.
+Do not claim execution verification until a Copilot session runs the hook.
+
+## Final checks
+
+- [ ] Existing hooks remain.
+- [ ] JSON parses.
+- [ ] Script path resolves.
+- [ ] Script is executable.
+- [ ] Timeout uses the target tool's unit.
+- [ ] Hook output matches the target schema.
+- [ ] A new session executed the hook.

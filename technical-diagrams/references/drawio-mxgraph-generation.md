@@ -1,69 +1,46 @@
 # Draw.io mxGraph Generation
 
-Use this reference when authoring or editing `.drawio` source files.
+## Procedure
 
-## Source Rule
+1. Start from an existing project source or `assets/mxgraph-templates/system-context.drawio`.
+2. Preserve the `mxfile`, `diagram`, `mxGraphModel`, `root`, and base cells.
+3. Assign a unique, stable `id` to every `mxCell`.
+4. Create vertex cells with `vertex="1"` and a valid parent.
+5. Create edge cells with `edge="1"`, valid `source` and `target` identifiers, and relative geometry.
+6. Store visible labels in `value`.
+7. Encode XML-sensitive characters.
+8. Store geometry in `mxGeometry`.
+9. Use explicit waypoints for controlled routes.
+10. Keep semantic style properties consistent by role.
+11. Parse the final XML.
+12. Run `scripts/check-diagram-bundle.py`.
+13. Open the final source in diagrams.net when available.
+14. Render and inspect the final export.
 
-Use Draw.io diagrams.net mxGraph XML as the editable source of truth for
-production technical diagrams. Store the source as `.drawio`. Do not use
-Mermaid. Do not hand-edit SVG as the maintenance source.
+## Cell requirements
 
-## Stable IDs
+### Vertex
 
-Use stable semantic IDs for nodes and edges where Draw.io permits it:
+- Unique identifier
+- Parent identifier
+- Editable label
+- Semantic style
+- Position and dimensions
 
-```text
-node:public_api
-node:document_store
-edge:user_submits_document
-edge:api_writes_metadata
+### Edge
+
+- Unique identifier
+- Parent identifier
+- Source identifier
+- Target identifier
+- Connector style
+- Relative geometry
+- Label and waypoints when required
+
+## Validation command
+
+```bash
+python3 technical-diagrams/scripts/check-diagram-bundle.py \
+  path/to/diagram.drawio \
+  --export path/to/diagram.svg
 ```
-
-If Draw.io tooling requires opaque internal IDs, preserve semantic identifiers
-in labels, metadata, or custom properties where feasible.
-
-## Source Structure
-
-- Keep one diagram per source file unless the user requests multiple pages.
-- Keep node labels concise and relationship labels meaningful.
-- Use containers for system, trust, environment, or ownership boundaries.
-- Use edge styles consistently. Prefer orthogonal routing for architecture,
-  deployment, data-flow, and permission diagrams.
-- Attach edges to node boundaries or ports. Do not leave edges floating or
-  buried inside nodes.
-- Use shape selection semantically: cylinder for data stores, actor/person for
-  humans, container/group shapes for boundaries, rectangles for components.
-
-## Style Discipline
-
-Build style strings from palette, geometry, and style token assets. Do not
-invent one-off saturated fills, random borders, or inconsistent fonts.
-
-Minimum style expectations:
-
-- pale fill colors for large node backgrounds
-- stronger borders or headers for color identity
-- dark readable text
-- 2 px edge strokes by default
-- consistent rounded corners by semantic role
-- no heavy shadows unless the project style requires them
-
-## Common Failures
-
-Fix these in source before handoff:
-
-- duplicate IDs
-- invalid edge source or target
-- orphaned nodes
-- clipped labels
-- labels detached from relationships
-- edges crossing through nodes
-- arrows stopping before a target or extending inside a target
-- nodes outside page bounds
-- inconsistent style strings for equivalent objects
-
-## Export Doctrine
-
-Regenerate exports from `.drawio`. If SVG disagrees with source, the source
-wins. Do not patch generated SVG unless the user explicitly accepts a one-off
-asset that may drift.

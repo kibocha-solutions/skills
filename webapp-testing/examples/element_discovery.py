@@ -1,40 +1,29 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
 from playwright.sync_api import sync_playwright
 
-# Example: Discovering buttons and other elements on a page
 
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
-    page = browser.new_page()
+parser = argparse.ArgumentParser()
+parser.add_argument("url")
+parser.add_argument("screenshot", type=Path)
+args = parser.parse_args()
 
-    # Navigate to page and wait for it to fully load
-    page.goto('http://localhost:5173')
-    page.wait_for_load_state('networkidle')
+with sync_playwright() as playwright:
+    browser = playwright.chromium.launch(headless=True)
+    try:
+        page = browser.new_page(viewport={"width": 1440, "height": 900})
+        page.goto(args.url, wait_until="domcontentloaded")
+        page.locator("body").wait_for(state="visible")
 
-    # Discover all buttons on the page
-    buttons = page.locator('button').all()
-    print(f"Found {len(buttons)} buttons:")
-    for i, button in enumerate(buttons):
-        text = button.inner_text() if button.is_visible() else "[hidden]"
-        print(f"  [{i}] {text}")
+        for selector in ("button", "a[href]", "input", "textarea", "select"):
+            locator = page.locator(selector)
+            print(f"{selector}: {locator.count()}")
 
-    # Discover links
-    links = page.locator('a[href]').all()
-    print(f"\nFound {len(links)} links:")
-    for link in links[:5]:  # Show first 5
-        text = link.inner_text().strip()
-        href = link.get_attribute('href')
-        print(f"  - {text} -> {href}")
-
-    # Discover input fields
-    inputs = page.locator('input, textarea, select').all()
-    print(f"\nFound {len(inputs)} input fields:")
-    for input_elem in inputs:
-        name = input_elem.get_attribute('name') or input_elem.get_attribute('id') or "[unnamed]"
-        input_type = input_elem.get_attribute('type') or 'text'
-        print(f"  - {name} ({input_type})")
-
-    # Take screenshot for visual reference
-    page.screenshot(path='/tmp/page_discovery.png', full_page=True)
-    print("\nScreenshot saved to /tmp/page_discovery.png")
-
-    browser.close()
+        args.screenshot.parent.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(args.screenshot), full_page=True)
+    finally:
+        browser.close()

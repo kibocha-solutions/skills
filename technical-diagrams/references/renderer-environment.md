@@ -1,71 +1,31 @@
 # Renderer Environment
 
-Use this reference when Draw.io rendering tools are missing or fail. Production
-diagram work requires an actual Draw.io-compatible render/export path; do not
-give up after the first missing command.
+## Procedure
 
-## Required Capabilities
+1. Check the project for a documented diagram command.
+2. Check the repository for container, CI, Make, task-runner, or package scripts.
+3. Check for `drawio-cli`, `drawio`, `diagrams.net`, or `diagramsnet`.
+4. Check for `xvfb-run` when the renderer requires a display.
+5. Use the project renderer when present.
+6. Otherwise run `scripts/render-drawio.sh`.
+7. Record the exact source, output, command, and result.
+8. Confirm the output modification time follows the source modification time.
+9. Inspect the rendered output.
 
-A production environment needs:
+## Permission boundary
 
-- a Draw.io-compatible exporter, preferably the official diagrams.net desktop
-  CLI command `drawio`
-- headless display support, usually `xvfb` on Linux
-- SVG preview support such as `rsvg-convert` for inspecting exported SVGs
+- Read `../../system-init/SKILL.md` before downloading or installing a missing
+  renderer.
+- Apply the universal installation gate.
+- Stop and ask the user to run the exact command when privilege blocks it.
+- Do not alter Electron sandbox permissions, mounts, services, or security controls.
+- Do not substitute an unrelated renderer that changes the source format.
 
-SVG rasterizers help inspect exports. They do not replace Draw.io export from
-`.drawio` source.
+## Failure handling
 
-## Ubuntu Or WSL Setup
-
-Use `scripts/install-drawio-renderer-ubuntu.sh` from this skill when the target
-environment is Ubuntu-like and the user allows system package installation.
-The script installs:
-
-- `xvfb`
-- `librsvg2-bin`
-- the configured official amd64 diagrams.net `.deb` from
-  `jgraph/drawio-desktop`; set `DRAWIO_VERSION` to choose a different release
-
-After setup, verify:
-
-```bash
-command -v drawio
-command -v xvfb-run
-command -v rsvg-convert
-```
-
-Then render:
-
-```bash
-technical-diagrams/scripts/render-drawio.sh source.drawio export.svg
-technical-diagrams/scripts/render-drawio.sh source.drawio /tmp/preview.png
-```
-
-## Electron Sandbox Failures
-
-In some WSL or container profiles, Draw.io may install but fail with an Electron
-sandbox error. Common causes:
-
-- the filesystem is mounted with `nosuid`
-- `/opt/drawio/chrome-sandbox` has unusable ownership or permissions
-- the container blocks sandbox syscalls
-- WSL interop or GUI bridging is disabled
-
-Try these before falling back:
-
-1. Run through `xvfb-run -a`.
-2. Check `/opt/drawio/chrome-sandbox` ownership and mode.
-3. Check `mount` output for `nosuid`.
-4. Check whether a host-side diagrams.net command, project container, or CI
-   image can perform the export.
-5. Use `rsvg-convert` only to inspect an SVG that already exists.
-
-If every compatible export route is blocked, report source-only validation and
-name the exact setup attempts and errors.
-
-## Unacceptable Shortcut
-
-Do not switch to Mermaid because Draw.io setup is inconvenient. The diagram
-source remains `.drawio`; the task is to repair the renderer path, use a
-compatible Draw.io exporter, or state the blocked validation truthfully.
+1. Capture the exact command and error.
+2. Check existing project, host, container, and CI options.
+3. Stop when all already-available options fail.
+4. Report source validation separately.
+5. State that rendered visual QA is incomplete.
+6. Do not claim the diagram is production-ready.

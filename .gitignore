@@ -2,4 +2,4 @@ ppt-master/
 # Added by code-review-graph
 .code-review-graph/
 # Project-local graph state (CGC + CRG); never commit
-graphify/
+.agents/code-graphs/

@@ -1,72 +1,125 @@
 ---
 name: system-design
-description: >
-  Reason through system architecture, ERD/database models, UML-style class,
-  activity, sequence, state, permission, workflow, integration, and deployment
-  designs before implementation, documentation, or diagrams. Use when the user
-  wants to design a system, database schema, table set, domain model, process
-  flow, state machine, permission model, service boundary, or architecture
-  concept; when brainstorming should be recorded into .agents/brain; or when
-  bad naming, vague responsibilities, shallow ERD notes, or diagram-ready
-  design decisions need correction.
+description: Design and audit system architecture, ERDs, database schemas, domain models, services, integrations, deployments, permissions, workflows, activities, sequences, and state machines before implementation. Use for design decisions, normalization, boundaries, responsibilities, lifecycle behavior, naming, or diagram-ready specifications.
 ---
 
 # System Design
 
-## Goal
+## 1. Establish scope
 
-Help the agent reason through system designs in chat, preserve settled
-brainstorms as durable working notes, and prepare designs that can later become
-documentation, diagrams, migrations, or implementation tasks.
+1. Identify the design type and requested decision.
+2. Identify the system boundary, users, actors, data, services, integrations, environments, and constraints.
+3. Identify whether the user authorized design only, documentation, diagrams, or implementation.
+4. Keep implementation out of a design-only task.
+5. Record unresolved boundaries as unresolved.
 
-## Core Procedure
+## 2. Read project truth
 
-1. Identify the design type: ERD, architecture, class model, activity flow,
-   sequence flow, state machine, permission model, integration, deployment, or
-   mixed design.
-2. Gather local truth first: existing docs, planning files, schemas, diagrams,
-   decisions, source code, tests, and handoffs. Use authoritative external
-   sources when the design touches standards, security, authentication,
-   databases, protocols, UML notation, or framework behavior.
-3. Brainstorm in chat first. Use realistic workflows, traps, lifecycle changes,
-   table-like examples, or flow examples when they help the user reason.
-4. Keep names boring, standard, and recognizable. Prefer names that a careful
-   intern can interpret without team lore.
-5. Once the user accepts a design direction, record the refined brainstorm in
-   `.agents/brain/<domain>/...` before promoting it to docs, diagrams,
-   migrations, or code.
-6. Route maintained prose through the `documentation` skill when the output is
-   a reader-facing guide, Writerside topic, data dictionary, or reference page.
-7. Route production diagrams through the `technical-diagrams` skill when the
-   output needs Draw.io source, SVG export, visual QA, or diagram assets.
+1. Read relevant `.agents/MEMORY.md` entries and topic files.
+2. Read relevant active plans, handoffs, and settled design records.
+3. Read existing schemas, migrations, code, tests, docs, and diagrams.
+4. Use graph tools before filesystem search when a current code graph exists.
+5. Verify external standards and framework behavior with primary sources.
+6. Keep current implementation, settled decisions, proposals, and examples distinct.
 
-## Reference Routing
+## 3. Model real workflows
 
-| Need | Read |
-| --- | --- |
-| Design workflow and where to place artifacts | `references/design-workflow.md` |
-| Naming, responsibilities, and bad design language | `references/naming-and-responsibility.md` |
-| ERD, database table, and column design | `references/erd-design.md` |
-| Common pitfalls to avoid | `references/bad-patterns.md` |
+1. List the primary user and system workflows.
+2. Trace creation, reading, change, approval, failure, retry, cancellation, archival, and deletion.
+3. Trace normal, edge, and adversarial cases.
+4. Identify the source of truth for each state and fact.
+5. Identify operations that require atomicity, idempotency, ordering, or eventual consistency.
+6. Identify audit, security, privacy, retention, and recovery requirements.
 
-## Design Rules
+## 4. Define responsibilities and boundaries
 
-- Use plain domain language for names. Avoid clever, vague, or in-house names
-  unless the user explicitly accepts them.
-- Put explanation in the settled design record, not in overlong names.
-- Record concrete examples in settled artifacts. Chat examples should become
-  durable notes when they settle the design.
-- Treat `.agents/brain` notes as source material for later documentation and
-  diagrams. They should be understandable without chat history.
-- Keep temporary brainstorms separate from maintained docs and production
-  diagrams until the user accepts the design.
-- Include common pitfalls and rejected approaches when they prevent future
-  confusion.
+Read [naming and responsibility](references/naming-and-responsibility.md).
 
-## ERD Quick Standard
+1. Give every component one clear responsibility.
+2. State what each component owns.
+3. State what each component excludes.
+4. State when it is created, changed, and retired.
+5. State which actors and workflows use it.
+6. Separate independently meaningful components.
+7. Separate domain state from audit, security, usage, and operational streams.
+8. Reject boundaries that depend only on current screen layout or implementation convenience.
 
-When designing database tables, read `references/erd-design.md`. The settled
-table files should include dense responsibilities, datatypes, value/default
-rules, clear column notes, sample values where useful, example rows with
-random non-guessable IDs, and a short normalization check when table placement
-is disputed.
+## 5. Name components
+
+1. Use concise, familiar domain terms.
+2. Prefer names supported by local vocabulary and primary-source precedent.
+3. Avoid vague doctrine terms, clever abbreviations, generic `subject` fields, and names that encode an explanation.
+4. Use documentation for meaning that does not belong in the name.
+5. Preserve meaningful supplied spelling and multilingual terms.
+6. Ask before replacing a disputed name.
+
+## 6. Design data and ERDs
+
+Read [ERD design](references/erd-design.md).
+
+1. Define the row responsibility for every table.
+2. Identify candidate keys, primary keys, alternate keys, and foreign keys.
+3. Identify every functional, multivalued, and join dependency.
+4. Test 1NF, 2NF, 3NF, BCNF, 4NF, and 5NF where applicable.
+5. Split independently changeable facts.
+6. Verify lossless decomposition.
+7. Verify dependency preservation.
+8. Test insert, update, and delete anomalies.
+9. Test lifecycle behavior before and after related entities exist.
+10. Prefer concrete foreign keys.
+11. Use polymorphic references only after documenting allowed targets, integrity enforcement, and query behavior.
+12. Mark derived summaries as caches, views, or materialized views rather than source truth.
+13. Use opaque non-guessable example identifiers.
+14. Include normal, edge, and failure example rows.
+
+## 7. Design behavior
+
+1. Define actors, commands, events, states, transitions, guards, and outcomes.
+2. Give every transition one trigger and one resulting state.
+3. Define invalid transitions.
+4. Define retries, timeouts, compensation, and recovery.
+5. Define permission checks at the operation boundary.
+6. Define integration failure and partial-success behavior.
+7. Define observability without mixing logs into domain state.
+
+## 8. Compare alternatives
+
+1. Present only alternatives that materially differ.
+2. Test each alternative against the same workflows and constraints.
+3. Compare responsibility clarity, coupling, integrity, change isolation, query cost, operational risk, and migration cost.
+4. Identify irreversible choices.
+5. Recommend one design when the evidence supports it.
+6. Leave the decision open when the evidence does not resolve it.
+7. Record rejected alternatives only when the rejection prevents repeated design errors.
+
+Read [bad patterns](references/bad-patterns.md).
+
+## 9. Record the settled design
+
+Read [design workflow](references/design-workflow.md).
+
+1. Keep unstable brainstorming in chat.
+2. Record accepted design decisions under the project's `.agents/brain/<domain>/` convention.
+3. Include responsibilities, boundaries, names, relationships, examples, constraints, lifecycle, open questions, and rejected alternatives.
+4. Make the record understandable without chat history.
+5. Do not present an unaccepted candidate as settled.
+
+## 10. Promote the design
+
+1. Obtain user acceptance before moving a disputed or conceptual design into implementation.
+2. Use the documentation skill for maintained prose and data dictionaries.
+3. Use the technical-diagrams skill for production diagrams and exports.
+4. Use Maestro for multi-session execution.
+5. Keep the accepted design record as the implementation source.
+6. Record implementation deviations and obtain approval when they change the accepted design.
+
+## 11. Verify
+
+1. Re-run every named workflow against the final design.
+2. Re-run edge, failure, permission, and lifecycle cases.
+3. Verify every component has one responsibility and explicit exclusions.
+4. Verify names against local vocabulary.
+5. Verify every relationship, cardinality, constraint, and transition.
+6. Verify normalization claims with declared dependencies.
+7. Verify diagrams and documentation match the settled design.
+8. Read the final design record in full.

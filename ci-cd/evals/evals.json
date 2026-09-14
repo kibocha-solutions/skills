@@ -54,6 +54,41 @@
       "prompt": "this repo is configured for sahil, not johnkibocha. set up the ssh path safely before pushing and do not generate any new keys.",
       "expected_output": "Detects the non-default identity from repo-health and git config, requires a Windows SSH host alias such as git@sahil:owner/repo.git, refuses to push through git@github.com for the non-default identity, selects an existing key only, and asks the user for vault unlocks or private-key material.",
       "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Commit all four completed tasks as exactly one commit. Keep the complete commit message under 35 words. Do not list files or paths.",
+      "expected_output": "Creates exactly one final commit, selects one predominant durable purpose, condenses material secondary work into one prose paragraph, keeps the complete message under 35 words, and uses no filenames, paths, bullets, headings, or task-by-task summary.",
+      "files": [],
+      "expectations": [
+        "The delivered history contains exactly one new commit.",
+        "The commit message contains one predominant purpose.",
+        "The complete commit message contains fewer than 35 words.",
+        "The commit message contains no filenames, paths, bullets, headings, or task-by-task list."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Make exactly two commits from these six related changes. Do not add a third cleanup or verification commit.",
+      "expected_output": "Delivers exactly two final commits, groups the six changes by two predominant durable purposes, and creates no extra cleanup, validation, generated-artifact, or session-record commit.",
+      "files": [],
+      "expectations": [
+        "The delivered history contains exactly two new commits.",
+        "Neither message itemizes files or completed tasks.",
+        "No extra final commit is created for cleanup, validation, generated artifacts, or session records."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Use one commit for the configuration cleanup, validator changes, dependency handling, and obsolete package removal. Give me a normal concise commit message.",
+      "expected_output": "Creates one final commit with one type, one scope, and one predominant purpose; condenses any material secondary work into one prose paragraph of no more than 72 words; and excludes filenames, paths, bullets, headings, and task-by-task narration.",
+      "files": [],
+      "expectations": [
+        "The delivered history contains one new commit.",
+        "The title uses one type and one scope.",
+        "The body is one prose paragraph of no more than 72 words.",
+        "The message contains no filenames, paths, bullets, headings, or task-by-task narration."
+      ]
     }
   ]
 }

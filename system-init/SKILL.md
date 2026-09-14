@@ -1,88 +1,83 @@
 ---
 name: system-init
-description: >
-  Verifies and maintains a workstation's privileged-command scope (sudoers
-  grant on the operating account), workspace storage partition, and
-  standard development toolchain (Java, Kotlin, Python, Docker, Node) at
-  current LTS. One unified verification-and-maintenance package, run end to
-  end via its checklist. Use whenever setting up a workstation's sudoers
-  scope for the first time, or whenever touching any of what this skill
-  governs: sudoers/permission scope, workspace partitions, or toolchain
-  state.
+description: Audit and maintain workstation sudoers scope, workspace storage, partitions, mounts, tools, libraries, and the Java, Kotlin, Python, Docker, Node, Git, GitHub CLI, and GitLab CLI toolchain. Use for workstation setup, missing dependency installation, package-manager work, global or system installation, privileged-command scope, block devices, workspace mounts, or development tool versions.
 ---
 
 # System Init
 
-## Goal
+## 1. Establish scope
 
-Take a workstation from whatever state it's actually in — nothing set up,
-partially set up, or fully set up — to a fully verified, safely-scoped
-operating environment: a sudoers grant that's exactly as wide as intended
-and no wider, a workspace storage partition, and the standard dev toolchain
-at current LTS. This is the single source of truth behind `AGENTS.md`'s
-"Privileged Command Discipline" section — that stays short and usable on
-its own, this is the full procedure behind it.
+1. Identify the host, operating account, operating system, and requested outcome.
+2. Identify whether the request covers permissions, storage, toolchain, or all three.
+3. Separate read-only audit from requested changes.
+4. List every privileged file, command, device, mount, package, and version that may change.
+5. Do not infer authority for one category from authority for another.
 
-Run as one pass, not as separate unrelated steps.
+## 2. Run the read-only audit
 
-## How This Works
+Read [the checklist](references/checklist.md).
 
-Every phase in the checklist is independently in one of three states.
-Diagnose per item, not per machine — a workstation is rarely uniformly "new"
-or "done":
+1. Inspect the current sudoers grant.
+2. Inspect block devices, filesystems, mounts, and persistent mount configuration.
+3. Inspect installed tool versions and executable origins.
+4. Compare current LTS and stable versions with official sources.
+5. Record pass, gap, conflict, and unknown states.
+6. Do not mutate the system during the audit.
 
-- **From scratch** — the phase's target doesn't exist yet. Follow the full
-  setup procedure in the relevant reference.
-- **Partially available** — some of it works. Identify exactly what's
-  missing via the checklist item and close only that specific gap — do not
-  redo pieces that already work.
-- **Mostly available** — everything looks present. Run the checklist item
-  to confirm rather than assuming it's still correct; state can drift
-  (a sudoers file edited by hand, a mount unplugged, a package upgraded
-  past LTS).
+## 3. Apply permission rules
 
-## Reference Routing
+Read [permissions](references/permissions.md).
 
-- `references/checklist.md` — the sequential, runnable checklist that is
-  the operational spine of this skill. Start here for an actual pass;
-  everything else is remediation detail this points into.
-- `references/permissions.md` — for sudoers: how to set up a scoped grant
-  from scratch, and the full command-level behavioral boundaries (what
-  never to do even when technically permitted).
-- `references/storage-and-partitions.md` — for finding, identifying, and
-  mounting a workspace storage partition safely, and the hard rules around
-  never formatting or partitioning autonomously.
-- `references/toolchain.md` — for detecting the standard dev stack (Java,
-  Kotlin, Python, Docker, Node), checking it against current LTS/stable,
-  and the ask-before-resolving rule for anything missing or outdated.
+1. Use only commands present in the live sudoers grant.
+2. Use only the plain invocation required by the task.
+3. Do not use config overrides, shell escapes, arbitrary package files, unsafe confinement flags, or interpreter chaining.
+4. Use `sudoedit` only for exact files present in the live grant.
+5. Do not use a privileged editor or interpreter.
+6. Stop after a permission-denied or not-allowed result.
+7. Do not seek another route to the same privileged effect.
 
-## Checklist
+## 4. Apply installation rules
 
-The actual run is `references/checklist.md`: four phases in order
-(sudoers/permissions, storage, toolchain, completion report). Each item
-states the command to run, the expected result, where to go for remediation
-if it fails, and an instruction to re-run that exact check after fixing
-anything — before moving to the next item. The pass isn't done until every
-item is confirmed; a completion report that omits an unresolved item is
-wrong, not just incomplete.
+Read [dependency installation](references/dependency-installation.md).
 
-## Hard Rules
+1. Apply the qualifying-installation gate in `AGENTS.md`.
+2. Verify the exact package identity, publisher, source, version, and scope.
+3. Install a qualifying dependency without requesting separate permission.
+4. Stop when any integrity, identity, relevance, or safety gate fails.
+5. Stop on a privilege denial and ask the user to run the exact command.
+6. Verify and record the installed result before using it.
 
-- Never claim success on a phase without actually running its check command
-  and seeing the expected result — no assuming.
-- Never use a dangerous invocation form of a permitted command (config
-  overrides, pager-shelling subcommands, untrusted package sideloading) —
-  see `permissions.md` for the specific list.
-- Never format, partition, or wipe a block device without the live user
-  naming the exact target and confirming in that session — no exception for
-  a confident-looking heuristic.
-- An unmounted, unlabeled, or system-reserved-flagged partition is not
-  evidence it's available — default to off-limits.
-- Never attempt a command outside the granted sudoers scope, and never
-  chain through an allowed shell/interpreter to reach the same effect.
-- An install (package or toolchain) proceeds without asking only when the
-  user explicitly requested that specific thing in its own dedicated
-  message, it's clearly relevant to the project, and nothing about it looks
-  compromised — otherwise, ask first.
-- A permission-denied result is a real boundary: stop, report exactly what
-  was attempted and why it was blocked, don't retry through another path.
+## 5. Apply storage rules
+
+Read [storage and partitions](references/storage-and-partitions.md).
+
+1. Treat every unidentified device or partition as off-limits.
+2. Treat unmounted, unlabeled, reserved, boot, recovery, diagnostic, and foreign-system partitions as unavailable.
+3. Preserve all existing data.
+4. Do not format, partition, wipe, resize, or overwrite a block device unless the live user names the exact device and confirms the exact operation in the current session.
+5. Re-inspect the exact device immediately before an authorized destructive operation.
+6. Stop when device identity, ownership, or purpose is uncertain.
+7. Use UUID-based persistent mounts.
+8. Verify the mount and unprivileged workspace access after any authorized change.
+
+## 6. Apply toolchain rules
+
+Read [toolchain](references/toolchain.md).
+
+1. Inspect Java, Kotlin, Python, Docker, Node, Git, GitHub CLI, and GitLab CLI separately.
+2. Compare each version with its official current LTS or stable line.
+3. Keep the operating system's managed Python intact.
+4. Distinguish Docker group access from sudoers access.
+5. Distinguish a stale version from a broken installation.
+6. Apply the installation gate before changing any component.
+7. Re-run version, path, build, and smoke checks after each authorized change.
+
+## 7. Verify and report
+
+1. Re-run every check affected by a change.
+2. Confirm the exact sudoers commands and files available.
+3. Confirm the exact device, filesystem, UUID, mount point, owner, and persistence rule.
+4. Confirm every tool version and executable path.
+5. List unresolved gaps explicitly.
+6. Do not report full success while any required item is unverified.
+7. Do not include passwords, private keys, tokens, internal URLs, or unrelated system data.

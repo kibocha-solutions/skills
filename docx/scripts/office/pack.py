@@ -76,13 +76,13 @@ def _run_validation(
     validators = []
 
     if suffix == ".docx":
-        author = "AI Assistant"
+        author = "Editor"
         if infer_author_func:
             try:
                 author = infer_author_func(unpacked_dir, original_file)
             except ValueError as e:
                 print(
-                    f"Warning: {e} Using default author 'AI Assistant'.",
+                    f"Warning: {e} Using default author 'Editor'.",
                     file=sys.stderr,
                 )
 

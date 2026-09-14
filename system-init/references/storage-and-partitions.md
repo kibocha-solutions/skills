@@ -1,134 +1,50 @@
 # Storage and Partitions
 
-## Workspace Access Is Already Unprivileged — Not a `sudoers`/`EDITFILES` Concern
-
-The operating account has full read/write/delete access to `/mnt/data`
-directly — it owns the mount outright — not through `sudo`, not through
-`sudoedit`, not through the `EDITFILES` sudoers alias. No privilege is
-needed anywhere under `/mnt/data`; any file there can be read, written, or
-removed the same way any normally-owned file can. `EDITFILES` exists for a
-different, narrower problem entirely — specific files the account does
-*not* otherwise own (e.g. under `/etc/`) — see `permissions.md`. Do not
-route `/mnt/data` work through `sudoedit` or add `/mnt/data` paths to the
-sudoers file; that would be both unnecessary and, since `EDITFILES`
-requires exact individual file paths, unworkable for a whole directory
-tree anyway.
-
-For convenience, a home-directory symlink `~/data -> /mnt/data` lets the
-workspace be referenced as `~/data` instead of the absolute path. Create it
-if missing:
-
-```bash
-ln -sfn /mnt/data ~/data
-```
-
-## Read-Only Inspection First, Always
-
-Before any storage decision, gather the actual current state — never assume
-or classify from memory of a prior run:
+## 1. Inspect
 
 ```bash
 lsblk -f
-df -h
 findmnt
-cat /etc/fstab
+df -h
+sed -n '1,240p' /etc/fstab
 ```
 
-**GParted is the preferred, primary tool for identifying candidate
-partitions** — use it (or ask the user to open it and share what it shows)
-whenever a partition's purpose is unclear from the command-line tools alone.
-GParted shows filesystem type, label, partition-table flags, and mount
-point together in one view, which command-line tools can miss or
-misrepresent individually. This isn't a stylistic preference — a real case
-on this project's own workstation showed why: `lsblk -f` reported an
-unmounted, unlabeled partition (`nvme0n1p2`) as filesystem type `ext4`,
-which reads like plausible free space. GParted showed the authoritative
-truth: it carries the `msftres` flag — a Windows Microsoft Reserved
-Partition, system metadata, not usable space, not a workspace candidate,
-and not remotely close to "available." The filesystem-type guess was
-misleading; the partition-table flag was decisive.
+1. Record the model, device path, partition table, filesystem, label, UUID, size, mount point, flags, and known purpose.
+2. Use a trusted graphical partition view or platform management console when command output is ambiguous.
+3. Reconcile conflicting evidence before classifying a device.
 
-## The Hard Rule
+## 2. Classify
 
-Never run a formatting or partitioning operation against a block device —
-`mkfs`, `parted`, `fdisk`, `wipefs`, `dd` targeting a device, or any
-equivalent — autonomously. No exception for a confident-looking heuristic,
-no matter how thorough the inspection was. The live user must explicitly
-name the exact target device and confirm the action in that session, every
-time, on every machine.
+1. Mark the running system, boot, EFI, reserved, recovery, diagnostic, encrypted, RAID, LVM, and foreign-system partitions off-limits unless the user explicitly places them in scope.
+2. Mark every unknown partition off-limits.
+3. Do not treat an unmounted or unlabeled partition as free space.
+4. Do not treat a filesystem signature as proof of purpose.
+5. Preserve every device containing existing data.
 
-This rule exists specifically because classification can be wrong in ways
-that look right — see the `nvme0n1p2` case above. Confidence is not
-evidence.
+## 3. Authorize a destructive operation
 
-## Classification Defaults
+1. Name the exact device path and stable hardware identifiers.
+2. Name the exact operation and expected data loss.
+3. Obtain the user's current-session confirmation naming that device and operation.
+4. Re-run the inspection immediately before execution.
+5. Stop if any identifier changed or any ambiguity remains.
+6. Do not substitute a different device, partition, or command.
 
-- An **unmounted** partition is not evidence it's available — it may simply
-  not be in current use for an unrelated reason (a dual-boot OS not
-  currently running, reserved system metadata, a drive intentionally kept
-  offline).
-- An **unlabeled** partition is not evidence it's available.
-- A partition carrying a **system/reserved flag** — `msftres`, `boot`,
-  `esp`, `diag`, `hidden`, or similar — is off-limits, full stop, regardless
-  of mount state.
-- A partition that **cannot be positively identified** is off-limits by
-  default. Silence or uncertainty means "don't touch," never "probably
-  fine."
-- Partitions belonging to another OS's boot infrastructure (NTFS partitions
-  on a dual-boot machine, EFI system partitions, MSR partitions, the
-  currently-running Linux root) are always excluded, not just deprioritized.
-- A partition with a clearly-named, deliberate purpose that isn't the
-  workspace (e.g. a shared bridge/exchange partition between OSes) is
-  excluded — it has an existing purpose, it is not spare capacity.
+## 4. Configure a non-destructive mount
 
-## Existing-Data Safety
+1. Confirm the filesystem already exists and contains the expected data.
+2. Confirm the target mount point.
+3. Use the filesystem UUID in persistent configuration.
+4. Preserve existing mount options unless the user requests changes.
+5. Add failure-tolerant boot options when required by the platform and use case.
+6. Apply privileged changes only through an authorized exact-file edit path.
+7. Validate the configuration before relying on it.
 
-If a candidate target already contains data — a `workspace/` directory, a
-project directory, anything — preserve it unconditionally:
+## 5. Verify
 
-- Never delete.
-- Never overwrite.
-- Never reformat.
-- Never recreate destructively.
-
-If the target already matches the intended standard, the correct action is
-to standardize the mount configuration only (see below), not to touch the
-data.
-
-## Mount Standard (When Setting Up From Scratch)
-
-- UUID-based `/etc/fstab` entries only — never a raw `/dev/sdX` path, which
-  can shift across reboots or hardware changes.
-- Include `nofail` so a missing or failed disk doesn't hang boot.
-- `x-systemd.automount` is a reasonable default so the mount doesn't block
-  startup.
-
-Example (this workstation's actual working configuration, included as a
-concrete pattern to follow, not a value to copy onto a different device):
-
-```fstab
-UUID=1fcc973c-455c-4b22-8836-c017075d41c4 /mnt/data ext4 defaults,nofail,x-systemd.automount 0 2
-```
-
-## Worked Example (Dated, Illustrative — Re-Verify Live)
-
-On this workstation, as audited during this skill's initial setup:
-
-- `/dev/sda1` (ext4, label `data`) — the workspace disk, correctly mounted
-  at `/mnt/data` via the UUID-based fstab entry above, and independently
-  also mounted at `/media/codelf/data` (same device, via the desktop
-  session's own label-based automount — not a symlink, but functionally
-  equivalent).
-- `/media/codelf/DataBridge` (`nvme0n1p5`, exfat, labeled `DataBridge`) — a
-  deliberately-named shared/dual-boot bridge partition. Excluded: it has an
-  existing purpose.
-- `nvme0n1p1` (EFI), `p3`/`p4` (NTFS, Windows), `p6` (`/`, the running Linux
-  root) — all off-limits per the classification defaults above.
-- `nvme0n1p2` — the Microsoft Reserved Partition case described above.
-
-**This is evidence for the policy, not live truth to trust on a future
-run.** This skill may run on more than one machine, or after hardware
-changes on this one (a new drive, a repartition, a dual-boot change). Always
-re-run the read-only inspection commands and re-check with GParted when
-storage is actually relevant to the task at hand — never assume this
-worked example still describes current reality.
+1. Confirm the expected device is mounted at the expected path.
+2. Confirm the mounted UUID matches the persistent rule.
+3. Confirm the operating account owns or can use the workspace as intended.
+4. Confirm a read, write, rename, and delete test inside a dedicated temporary test directory.
+5. Remove only that test directory after verification.
+6. Reboot verification requires user coordination and explicit authorization.

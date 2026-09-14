@@ -1,73 +1,33 @@
 # Diagram Palette Protocol
 
-Use this reference before assigning colors to a diagram.
+## Procedure
 
-## Lookup Order
+1. Inspect existing project diagrams and style assets.
+2. Record the established background, text, border, fill, accent, warning, and muted colors.
+3. Reuse project tokens without alteration.
+4. Use bundled defaults only when no project palette exists.
+5. Assign color by semantic role.
+6. Apply the same role-to-color mapping throughout the diagram.
+7. Check contrast on every label, node, boundary, and connector.
+8. Verify the rendered export, not only the source values.
 
-Before searching broadly, inspect saved diagram assets in the target project:
+## Semantic roles
 
-1. `docs/diagrams/assets/palette.json`
-2. `docs/diagrams/assets/style-tokens.json`
-3. `docs/diagrams/assets/geometry.json`
-4. `docs/diagrams/<diagram-family>/assets/*.palette.json`
+| Role | Use |
+|---|---|
+| Background | Canvas and empty space |
+| Surface | Standard nodes and containers |
+| Primary | Main system, primary path, or selected focus |
+| Secondary | Supporting system or secondary path |
+| Boundary | Trust, ownership, network, or system boundary |
+| Warning | Risk, exception, or degraded state |
+| Critical | Prohibited, failed, or severe state |
+| Muted | Notes, metadata, and secondary labels |
 
-If no diagram palette exists, inspect reliable project design sources:
+## Constraints
 
-- CSS variables
-- Tailwind or theme configuration
-- brand guide
-- logo SVG
-- existing diagram set
-- app shell or product screenshots
-- documentation theme
-
-If a reliable project palette exists, create a diagram-safe palette from it. If
-palette inference is weak or inconsistent, state that no reliable project
-palette was found and use `assets/default-palette.json`.
-
-## Shade Roles
-
-Every color family used in a production diagram must define at least:
-
-- fill
-- border
-- header when headers are used
-- text
-
-Large component backgrounds must use pale tints. Borders, headers, arrows, and
-small accents carry stronger color identity.
-
-## Semantic Use
-
-Colors must encode meaning or hierarchy:
-
-- primary: core system or primary flow
-- secondary: external systems or supporting services
-- neutral: containers, groups, notes, ordinary databases
-- green: success, approved, healthy, available
-- amber: warning, pending, review, risk
-- red: error, blocked, danger, security risk
-- blue: information, control path, primary technical flow
-
-Do not use red, amber, or green as ordinary category colors. Limit category
-colors to three plus neutral and semantic colors.
-
-## Palette Files
-
-Create or update palette files deliberately. Do not silently diverge from an
-existing palette for one diagram.
-
-A reusable palette should include:
-
-- page background
-- primary, secondary, and label text
-- core system fill and border
-- external system fill and border
-- data store fill and border
-- container fill and border
-- risk, warning, and success roles
-- arrow stroke and label background
-
-Use diagram-family override palettes only when the family has special semantics
-such as activity decisions, deployment zones, threat boundaries, or permission
-layers.
+- Do not use color as the only carrier of meaning.
+- Pair warning and critical colors with text, shape, or line treatment.
+- Limit accents to established semantic roles.
+- Keep decorative gradients, shadows, and textures out unless the project system requires them.
+- Preserve monochrome legibility.

@@ -1,40 +1,77 @@
-# Commit Template
+# Commit Message Template
 
-Use this shape for final commits:
+## Template
 
 ```text
 type(scope): short imperative summary
 
-Why this change matters, what risk it addresses, or what operator behavior it
-changes. Keep the body concise.
+One optional prose paragraph.
 ```
 
-`type` is one of the canonical Conventional Commits types: `feat`, `fix`,
-`docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
-Summary is a single imperative sentence; body is 72 words or fewer, total.
+## One commit for four completed tasks
 
-Keep the title and body focused on the durable repo change. Do not mention
-unrelated workspace state, submodule noise, sandbox mechanics, local tooling,
-or incidental formatting and punctuation edits unless the user explicitly asks
-for those details in the commit message.
+Constraint: one final commit.
 
-Never name or point to an agentic/planning/scaffolding file (`AGENTS.md`,
-`design.md`, `implementation-plan.md`, and the like) or a skill by name — see
-`SKILL.md`'s Reference Boundary. This holds regardless of where the file
-lives and regardless of how obliquely it's described.
-
-Examples:
+Accepted:
 
 ```text
-fix(ci): restore workflow cache key stability
+refactor(governance): enforce repository operating standards
 
-The previous cache key changed on every run, which removed the intended speed
-benefit and made failures harder to compare across runs.
+Consolidate rule authority, verification gates, dependency handling, publication safeguards, and package structure into one enforceable workflow.
 ```
 
-```text
-docs(ci-cd): document autosquash cleanup workflow
+Rejected:
 
-The skills repo now expects procedural local commits to be squashed into one
-publishable commit before review or handoff.
+```text
+chore(repo): update several files
+
+- Rewrite AGENTS.md
+- Update ci-cd/SKILL.md
+- Delete pptx-master/
+- Add upload packaging
+```
+
+## Two authorized commits
+
+Constraint: two final commits.
+
+Accepted first message:
+
+```text
+fix(auth): enforce session expiration
+
+Reject expired sessions and clear stale credentials during logout.
+```
+
+Accepted second message:
+
+```text
+test(auth): cover expired-session handling
+
+Exercise refresh rejection, logout cleanup, and authenticated request failure.
+```
+
+## User-specified body limit
+
+Constraint: body of 12 words or fewer.
+
+Accepted:
+
+```text
+fix(auth): enforce session expiry
+
+Reject expired sessions and clear stale credentials during logout.
+```
+
+## Single-purpose condensation
+
+Constraint: one final commit for configuration cleanup, validation changes,
+dependency handling, and package removal.
+
+Accepted:
+
+```text
+refactor(tooling): standardize repository execution controls
+
+Unify configuration, validation, dependency handling, and package boundaries under the supported operating model.
 ```

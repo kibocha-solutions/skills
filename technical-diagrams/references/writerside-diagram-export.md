@@ -1,44 +1,22 @@
 # Writerside Diagram Export
 
-Use this reference when a technical diagram appears in Writerside-compatible
-documentation.
+## Procedure
 
-## Source And Export Layout
+1. Export the final diagram as SVG.
+2. Keep the editable `.drawio` source beside the documentation source or in the project diagram-source directory.
+3. Use a stable lowercase filename.
+4. Add accessible alt text that states the diagram subject and purpose.
+5. Reference the SVG with the project Writerside syntax.
+6. Build every affected Writerside instance with `wrs build <instance>` when the builder is available.
+7. Open the rendered topic.
+8. Check width, scaling, text legibility, theme contrast, and surrounding spacing.
+9. Correct the `.drawio` source or documentation placement.
+10. Re-export, rebuild, and inspect.
+11. Keep generated test output outside the repository.
 
-When the target project has no diagram convention, use:
+## Constraints
 
-```text
-docs/
-  diagrams/
-    assets/
-      palette.json
-      style-tokens.json
-      geometry.json
-    <diagram-family>/
-      sources/
-        <diagram-name>.drawio
-      exports/
-        <diagram-name>.svg
-```
-
-Create PNG exports only when the user requests them, the target platform
-requires raster output, or a temporary QA render is needed. Do not commit
-temporary QA PNGs unless the user requests review artifacts.
-
-## Writerside Markdown
-
-Reference the final SVG export from the topic:
-
-```md
-![System context showing users, the platform, and external services](../diagrams/architecture/exports/system-context.svg)
-```
-
-Use useful alt text. Add nearby prose that explains what the reader should
-notice when the diagram has operational or architectural implications.
-
-## Source Preservation
-
-Keep `.drawio` source in the repository beside generated exports. Do not use
-the `.drawio` file as the visible image unless the user asks for source access.
-
-If the SVG export disagrees with `.drawio`, regenerate the SVG from source.
+- Do not embed raster screenshots when an SVG export is available.
+- Do not edit the generated SVG as the primary source.
+- Do not claim Writerside validation when the builder did not run.
+- Do not leave `.idea/`, temporary reports, or generated ZIP files in the worktree.

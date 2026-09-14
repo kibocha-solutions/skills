@@ -1,47 +1,33 @@
-# Feature Staging Walkthrough
+# Feature Staging Example
 
-This walkthrough illustrates a feature staging workflow when designing or implementing a new feature or endpoint (e.g., *"Create the API endpoint for handling projects"*).
+## 1. Identify the requested feature
 
-## Step 1: Self-Inquiry
+Example: add a project API endpoint.
 
-Before writing code or configurations, ask these questions:
-- *How is a new endpoint created in this project? What patterns already exist?*
-- *What database schemas, models, or classes have already been defined that relate to this feature?*
-- *Are there existing Entity Relationship Diagrams (ERDs) or design specifications?*
+## 2. Find established patterns
 
----
+1. Search for existing endpoint implementations.
+2. Find related schemas, models, repositories, and services.
+3. Find design records and requirements.
 
-## Step 2: Locate Documentation & Requirements (via CodeGraphContext)
+## 3. Map dependencies
 
-Use CodeGraphContext (`find_code`) to locate design documents, ERD specifications, or schema layouts.
+1. Trace callers of the related repository or service.
+2. Trace downstream persistence and integration calls.
+3. Locate tests for the affected symbols.
+4. Record the affected flows.
 
-### Example Tool Call
-```json
-{
-  "name": "find_code",
-  "arguments": {
-    "query": "ERD project database schema"
-  }
-}
-```
+## 4. Plan the change
 
-If the query returns a documentation file such as `docs/database/project_erd.md`, read the file to understand the database structure and business constraints.
+1. Name each file and symbol to change.
+2. Name each interface or schema constraint to preserve.
+3. Name the tests to add or update.
+4. Name the documentation to update.
 
----
+## 5. Implement and verify
 
-## Step 3: Map the Codebase Architecture (via code-review-graph)
-
-Use code-review-graph (`query_graph` or `get_impact_radius`) to map out existing implementation patterns and dependencies.
-
-### Example Tool Call
-```json
-{
-  "name": "query_graph",
-  "arguments": {
-    "pattern": "callers_of",
-    "symbol": "ProjectRepository"
-  }
-}
-```
-
-This maps how existing repositories are called, helping you design the new API controller, service, and repository layers in harmony with the rest of the application.
+1. Implement within the approved scope.
+2. Run focused tests.
+3. Refresh the graph.
+4. Re-run impact and affected-flow queries.
+5. Verify graph results against the final source.

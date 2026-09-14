@@ -1,232 +1,136 @@
 ---
 name: pptx
-description: "Use this skill any time a .pptx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates, layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx filename, regardless of what they plan to do with the content afterward. If a .pptx file needs to be opened, created, or touched, use this skill."
+description: Read, create, edit, combine, split, convert, render, and verify PowerPoint `.pptx` and template `.potx` files. Use for presentations, decks, slides, templates, layouts, speaker notes, comments, or any task with a PowerPoint file as input or output.
 license: Proprietary. LICENSE.txt has complete terms
 ---
 
-# PPTX Skill
-
-## Quick Reference
-
-| Task | Guide |
-|------|-------|
-| Read/analyze content | `python -m markitdown presentation.pptx` |
-| Edit or create from template | Read [editing.md](editing.md) |
-| Create from scratch | Read [pptxgenjs.md](pptxgenjs.md) |
-
----
-
-## Reading Content
-
-```bash
-# Text extraction
-python -m markitdown presentation.pptx
-
-# Visual overview
-python scripts/thumbnail.py presentation.pptx
-
-# Raw XML
-python scripts/office/unpack.py presentation.pptx unpacked/
-```
-
----
-
-## Editing Workflow
-
-**Read [editing.md](editing.md) for full details.**
-
-1. Analyze template with `thumbnail.py`
-2. Unpack → manipulate slides → edit content → clean → pack
-
----
-
-## Creating from Scratch
-
-**Read [pptxgenjs.md](pptxgenjs.md) for full details.**
-
-Use when no template or reference presentation is available.
-
----
-
-## Design Ideas
-
-**Don't create boring slides.** Plain bullets on a white background won't impress anyone. Consider ideas from this list for each slide.
-
-### Before Starting
-
-- **Pick a bold, content-informed color palette**: The palette should feel designed for THIS topic. If swapping your colors into a completely different presentation would still "work," you haven't made specific enough choices.
-- **Dominance over equality**: One color should dominate (60-70% visual weight), with 1-2 supporting tones and one sharp accent. Never give all colors equal weight.
-- **Dark/light contrast**: Dark backgrounds for title + conclusion slides, light for content ("sandwich" structure). Or commit to dark throughout for a premium feel.
-- **Commit to a visual motif**: Pick ONE distinctive element and repeat it — rounded image frames, icons in colored circles, thick single-side borders. Carry it across every slide.
-
-### Color Palettes
-
-Choose colors that match your topic — don't default to generic blue. Use these palettes as inspiration:
-
-| Theme | Primary | Secondary | Accent |
-|-------|---------|-----------|--------|
-| **Midnight Executive** | `1E2761` (navy) | `CADCFC` (ice blue) | `FFFFFF` (white) |
-| **Forest & Moss** | `2C5F2D` (forest) | `97BC62` (moss) | `F5F5F5` (cream) |
-| **Coral Energy** | `F96167` (coral) | `F9E795` (gold) | `2F3C7E` (navy) |
-| **Warm Terracotta** | `B85042` (terracotta) | `E7E8D1` (sand) | `A7BEAE` (sage) |
-| **Ocean Gradient** | `065A82` (deep blue) | `1C7293` (teal) | `21295C` (midnight) |
-| **Charcoal Minimal** | `36454F` (charcoal) | `F2F2F2` (off-white) | `212121` (black) |
-| **Teal Trust** | `028090` (teal) | `00A896` (seafoam) | `02C39A` (mint) |
-| **Berry & Cream** | `6D2E46` (berry) | `A26769` (dusty rose) | `ECE2D0` (cream) |
-| **Sage Calm** | `84B59F` (sage) | `69A297` (eucalyptus) | `50808E` (slate) |
-| **Cherry Bold** | `990011` (cherry) | `FCF6F5` (off-white) | `2F3C7E` (navy) |
-
-### For Each Slide
-
-**Every slide needs a visual element** — image, chart, icon, or shape. Text-only slides are forgettable.
-
-**Layout options:**
-- Two-column (text left, illustration on right)
-- Icon + text rows (icon in colored circle, bold header, description below)
-- 2x2 or 2x3 grid (image on one side, grid of content blocks on other)
-- Half-bleed image (full left or right side) with content overlay
-
-**Data display:**
-- Large stat callouts (big numbers 60-72pt with small labels below)
-- Comparison columns (before/after, pros/cons, side-by-side options)
-- Timeline or process flow (numbered steps, arrows)
-
-**Visual polish:**
-- Icons in small colored circles next to section headers
-- Italic accent text for key stats or taglines
-
-### Typography
-
-**Choose an interesting font pairing** — don't default to Arial. Pick a header font with personality and pair it with a clean body font.
-
-| Header Font | Body Font |
-|-------------|-----------|
-| Georgia | Calibri |
-| Arial Black | Arial |
-| Calibri | Calibri Light |
-| Cambria | Calibri |
-| Trebuchet MS | Calibri |
-| Impact | Arial |
-| Palatino | Garamond |
-| Consolas | Calibri |
-
-| Element | Size |
-|---------|------|
-| Slide title | 36-44pt bold |
-| Section header | 20-24pt bold |
-| Body text | 14-16pt |
-| Captions | 10-12pt muted |
-
-### Spacing
-
-- 0.5" minimum margins
-- 0.3-0.5" between content blocks
-- Leave breathing room—don't fill every inch
-
-### Avoid (Common Mistakes)
-
-- **Don't repeat the same layout** — vary columns, cards, and callouts across slides
-- **Don't center body text** — left-align paragraphs and lists; center only titles
-- **Don't skimp on size contrast** — titles need 36pt+ to stand out from 14-16pt body
-- **Don't default to blue** — pick colors that reflect the specific topic
-- **Don't mix spacing randomly** — choose 0.3" or 0.5" gaps and use consistently
-- **Don't style one slide and leave the rest plain** — commit fully or keep it simple throughout
-- **Don't create text-only slides** — add images, icons, charts, or visual elements; avoid plain title + bullets
-- **Don't forget text box padding** — when aligning lines or shapes with text edges, set `margin: 0` on the text box or offset the shape to account for padding
-- **Don't use low-contrast elements** — icons AND text need strong contrast against the background; avoid light text on light backgrounds or dark text on dark backgrounds
-- **NEVER use accent lines under titles** — these are a hallmark of AI-generated slides; use whitespace or background color instead
-
----
-
-## QA (Required)
-
-**Assume there are problems. Your job is to find them.**
-
-Your first render is almost never correct. Approach QA as a bug hunt, not a confirmation step. If you found zero issues on first inspection, you weren't looking hard enough.
-
-### Content QA
-
-```bash
-python -m markitdown output.pptx
-```
-
-Check for missing content, typos, wrong order.
-
-**When using templates, check for leftover placeholder text:**
-
-```bash
-python -m markitdown output.pptx | grep -iE "xxxx|lorem|ipsum|this.*(page|slide).*layout"
-```
-
-If grep returns results, fix them before declaring success.
-
-### Visual QA
-
-**⚠️ USE SUBAGENTS** — even for 2-3 slides. You've been staring at the code and will see what you expect, not what's there. Subagents have fresh eyes.
-
-Convert slides to images (see [Converting to Images](#converting-to-images)), then use this prompt:
-
-```
-Visually inspect these slides. Assume there are issues — find them.
-
-Look for:
-- Overlapping elements (text through shapes, lines through words, stacked elements)
-- Text overflow or cut off at edges/box boundaries
-- Decorative lines positioned for single-line text but title wrapped to two lines
-- Source citations or footers colliding with content above
-- Elements too close (< 0.3" gaps) or cards/sections nearly touching
-- Uneven gaps (large empty area in one place, cramped in another)
-- Insufficient margin from slide edges (< 0.5")
-- Columns or similar elements not aligned consistently
-- Low-contrast text (e.g., light gray text on cream-colored background)
-- Low-contrast icons (e.g., dark icons on dark backgrounds without a contrasting circle)
-- Text boxes too narrow causing excessive wrapping
-- Leftover placeholder content
-
-For each slide, list issues or areas of concern, even if minor.
-
-Read and analyze these images:
-1. /path/to/slide-01.jpg (Expected: [brief description])
-2. /path/to/slide-02.jpg (Expected: [brief description])
-
-Report ALL issues found, including minor ones.
-```
-
-### Verification Loop
-
-1. Generate slides → Convert to images → Inspect
-2. **List issues found** (if none found, look again more critically)
-3. Fix issues
-4. **Re-verify affected slides** — one fix often creates another problem
-5. Repeat until a full pass reveals no new issues
-
-**Do not declare success until you've completed at least one fix-and-verify cycle.**
-
----
-
-## Converting to Images
-
-Convert presentations to individual slide images for visual inspection:
-
-```bash
-python scripts/office/soffice.py --headless --convert-to pdf output.pptx
-pdftoppm -jpeg -r 150 output.pdf slide
-```
-
-This creates `slide-01.jpg`, `slide-02.jpg`, etc.
-
-To re-render specific slides after fixes:
-
-```bash
-pdftoppm -jpeg -r 150 -f N -l N output.pdf slide-fixed
-```
-
----
-
-## Dependencies
-
-- `pip install "markitdown[pptx]"` - text extraction
-- `pip install Pillow` - thumbnail grids
-- `npm install -g pptxgenjs` - creating from scratch
-- LibreOffice (`soffice`) - PDF conversion (auto-configured for sandboxed environments via `scripts/office/soffice.py`)
-- Poppler (`pdftoppm`) - PDF to images
+# PPTX
+
+## 1. Establish the task
+
+1. Identify every source deck, template, reference, data source, and requested output.
+2. Confirm the audience, purpose, delivery setting, slide count, aspect ratio, language, and brand constraints.
+3. Preserve original files unless the user requests replacement.
+4. Distinguish source facts, template structure, examples, and proposed content.
+5. Read `../system-init/SKILL.md` before installing a missing dependency.
+
+## 2. Inspect an existing deck
+
+1. Extract text with `python -m markitdown <deck.pptx>`.
+2. Create a slide overview with `python scripts/thumbnail.py <deck.pptx>`.
+3. Render full-resolution slide images when layout matters.
+4. Read every slide in order.
+5. Read speaker notes and comments when they are in scope.
+6. Record slide size, masters, layouts, fonts, theme colors, logos, recurring elements, charts, tables, and media.
+7. Identify placeholders, sample data, stale dates, broken links, and hidden slides.
+
+## 3. Select the build path
+
+### Existing template or deck
+
+1. Read [editing](editing.md) in full.
+2. Map each requested slide to an existing layout.
+3. Preserve the template's masters, theme, typography, spacing, and brand system.
+4. Complete structural slide changes before editing slide content.
+5. Use the bundled unpack, add, clean, pack, and validate scripts.
+
+### New deck
+
+1. Read [PptxGenJS](pptxgenjs.md) in full.
+2. Define the aspect ratio and slide master.
+3. Create shared theme, typography, color, spacing, and component helpers.
+4. Use a fresh presentation instance.
+5. Use fresh option objects for every PptxGenJS call.
+
+## 4. Build the storyboard
+
+1. State one communication objective per slide.
+2. Put slides in a clear narrative order.
+3. Give each slide an assertion title.
+4. Assign the supporting evidence, visual, and source to each slide.
+5. Remove slides that do not advance the narrative or satisfy a requested function.
+6. Keep appendix and reference slides separate from the main narrative.
+
+## 5. Define the design system
+
+1. Derive colors and typography from the template, brand, or subject.
+2. Use one dominant color, supporting neutrals, and a restrained accent set.
+3. Use readable fonts available in the rendering environment.
+4. Set minimum slide-edge margins of 0.5 inches unless the template requires another grid.
+5. Set consistent gaps between related components.
+6. Use high contrast for text, icons, charts, and controls.
+7. Use full branding on the title slide only.
+8. Use a reduced identity and slide number on content slides when branding is required.
+9. Do not add decorative title underlines.
+10. Do not add ungrounded decorative elements.
+
+Read [letterhead and pagination](../documentation/references/letterhead-and-pagination.md) when the deck carries formal branding.
+
+## 6. Lay out each slide
+
+1. Choose a layout that matches the content relationship.
+2. Vary layouts without breaking the design system.
+3. Use left-aligned body text.
+4. Use centered text only where the composition requires it.
+5. Keep text within the assigned box and margin grid.
+6. Remove unused template elements completely.
+7. Keep each list item in a separate paragraph.
+8. Use native bullets or numbering.
+9. Do not type Unicode bullet characters into bulleted text.
+10. Preserve image aspect ratios.
+11. Add useful alternative text to images.
+
+## 7. Add content
+
+1. Use verified source facts only.
+2. Keep titles concise and specific.
+3. Keep body text scannable at presentation distance.
+4. Use full titles for people, organizations, programmes, and instruments when required.
+5. Put citations in a consistent source area.
+6. Keep internal paths, drafting notes, approval status, and production commentary out of slides.
+7. Remove all placeholder and sample text.
+8. Preserve user-supplied wording when locked.
+
+## 8. Add visuals and data
+
+1. Use charts for quantitative relationships.
+2. Use diagrams for process, hierarchy, architecture, or causality.
+3. Use tables only when exact comparison requires them.
+4. Use images only when they support the slide's claim or required design.
+5. Label chart units, time periods, categories, and sources.
+6. Use consistent scales for comparable charts.
+7. Avoid misleading axes, truncated context, or decorative data marks.
+8. Verify every value against its source.
+9. Recompute material figures independently.
+
+## 9. Edit package content
+
+1. Unpack the deck with `scripts/office/unpack.py`.
+2. Change slide order in `ppt/presentation.xml`.
+3. Duplicate or add slides with `scripts/add_slide.py`.
+4. Edit only the required slide, relationship, notes, comments, theme, or media files.
+5. Preserve XML namespaces and relationship identifiers.
+6. Use XML entities for smart quotation marks when editing raw XML.
+7. Run `scripts/clean.py` after structural changes.
+8. Repack with `scripts/office/pack.py` and the original deck.
+
+## 10. Validate content and structure
+
+1. Run `python -m markitdown <output.pptx>`.
+2. Compare extracted text with the approved storyboard and sources.
+3. Search for placeholder residue, sample names, stale dates, and missing content.
+4. Validate the Office package with `scripts/office/validate.py`.
+5. Open the final deck with LibreOffice or PowerPoint-compatible software.
+6. Confirm slide order, hidden-slide state, links, notes, comments, charts, tables, and media.
+
+## 11. Render and inspect
+
+1. Convert the final deck to PDF with `scripts/office/soffice.py`.
+2. Render every slide to an individual image with `pdftoppm`.
+3. Inspect every slide at readable resolution.
+4. Check overlap, clipping, overflow, broken glyphs, wrapping, alignment, spacing, margins, contrast, chart labels, citations, footer collisions, image quality, and placeholder residue.
+5. Compare each rendered slide with its storyboard objective.
+6. Correct every verified defect.
+7. Re-render every corrected slide.
+8. Re-run full content and package validation after the last correction.
+9. Deliver only the exact verified `.pptx` file.

@@ -1,5 +1,9 @@
 # Handoff: AGENTS.md compression
 
+Superseded path note, 2026-09-14: the authoring standard now lives at
+`skill-creator/references/skill-authoring-standard.md` and is routed by
+`skill-creator/SKILL.md`.
+
 ## Datetime
 
 2026-06-08 22:13 EAT

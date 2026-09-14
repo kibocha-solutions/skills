@@ -1,290 +1,111 @@
 # Pull Request Messages
 
-Use this reference when writing or reviewing a pull request description.
-These standards apply to all PRs opened from work managed under this skill.
-They are grounded in established industry practice and layered with
-project-specific constraints that take precedence where they differ.
+## Attribution prohibition
 
-> Pull request descriptions are not commit messages. A commit message
-> records what changed and why at the code level, within the constraints
-> of the commit format. A PR description communicates the intent, impact,
-> and context of a set of changes to a reviewer who may not have followed
-> the day-to-day work. They serve different readers and should be written
-> accordingly.
+1. Never attribute the change to AI, a model, an agent, an automated
+   assistant, or an AI-assisted tool.
+2. Remove attribution inserted by a template, generator, hook, or platform
+   option.
+3. Do not create or update the pull request when the platform forces
+   unremovable AI attribution.
 
----
+## Required sections
 
-## Required Sections
+1. Title
+2. Summary
+3. Context
+4. What changed
+5. Testing
+6. Risk and rollback
+7. Screenshots for user-interface changes
 
-A PR description is incomplete without all of the following. Omit a section
-only when it genuinely does not apply (for example, a pure-documentation PR
-has no rollback concern) and note the omission explicitly rather than leaving
-the section blank.
+Omit an inapplicable section only when the repository convention permits omission.
 
-### Title
+## Title
 
-The title follows the same Conventional Commits convention as the skill's
-commit format: `type(scope): summary`. It should name the specific change
-without restating it in a vague generalisation. A title like
-`feat(auth): add email-based MFA to the login flow` is useful; a title like
-`feat: improve authentication` tells the reviewer almost nothing before they
-open the diff.
+Use:
 
-### Summary
-
-State what this PR does and what user-facing or operator-facing outcome it
-produces. Write for the reviewer who is about to approve this for production,
-not for someone who has been following the branch since day one. The summary
-is the right place to surface the change's scope: whether it is a narrow
-targeted fix, a broad refactor, or the final leg of a multi-PR feature.
-
-Keep the summary scoped to the repository change under review. Do not include
-unrelated workspace conditions, submodule movement that is outside the PR's
-actual purpose, sandbox details, local tool setup, or minor incidental edits
-unless the user explicitly asks for those details in the PR message.
-
-### Context and Motivation
-
-Explain why the change is being made. Link to the issue, ticket, or
-architectural decision that prompted it. If the change addresses a specific
-failure mode or a known gap in the previous implementation, describe that
-failure mode clearly so the reviewer understands what the old behaviour was
-and why it was insufficient. If there were alternative approaches considered,
-name them briefly and explain what ruled them out — this prevents the review
-from relitigating decisions that were already made.
-
-### What Changed
-
-Describe the high-level technical approach: which components were touched,
-what the key structural decisions were, and where the boundary of this PR
-ends. The diff answers *exactly* what changed line by line; this section
-answers *why the implementation looks the way it does*. Do not reproduce the
-diff in prose. Do not list files. Focus on decisions that are not obvious
-from the code.
-
-### Testing Plan
-
-Describe how the change was verified. Name the specific tests added or
-modified and what they cover. If the change requires manual verification,
-give the reviewer precise steps they can follow to reproduce the happy path
-and any edge cases that were tested. If CI runs relevant checks automatically,
-note which jobs validate this change and whether any new checks were added.
-A testing plan that says only "CI passes" is not sufficient when the change
-touches production behaviour.
-
-### Risk and Rollback
-
-Identify what could go wrong and how to recover. For changes that modify
-data schemas, authentication flows, external integrations, or deployment
-configuration, this section is never optional. State the rollback method
-explicitly: revert the PR, run a migration reversal, toggle a feature flag,
-or restore a previous artifact — whichever applies. If the risk is genuinely
-low and the rollback is trivially "revert the merge commit," say so directly
-rather than leaving the section absent.
-
-### Screenshots and Recordings (UI changes only)
-
-For any change that affects a user-visible interface, include at least one
-screenshot of the relevant state before and after. A recording is preferable
-when the change involves interactive behaviour such as animations, transitions,
-or form flows. Text descriptions of visual changes are not a substitute.
-
-For web pages and web apps, capture screenshots at the standard desktop,
-tablet, and mobile (iPhone 15 Pro Max) viewport sizes defined in the
-`documentation` skill's `references/screenshot-standards.md`, especially when
-the PR is demonstrating or arguing for responsive behaviour. A change scoped
-to one form factor only needs that size, stated explicitly. Label each image
-with its breakpoint and viewport size.
-
----
-
-## Reference Boundary
-
-This standard applies with equal force to GitHub/GitLab issues, not only PR
-descriptions. See `SKILL.md`'s Reference Boundary rule: never name, link, or
-otherwise point to agentic, planning, scaffolding, or internal-process files
-(`AGENTS.md`, `design.md`, `implementation-plan.md`, and the like), a skill by
-name, or any instruction source outside the repo's own code and the current
-conversation — regardless of where the file lives. Transfer the verified fact
-into the PR or issue text instead of citing where it came from. Renaming the
-file, describing it obliquely, or paraphrasing its content while still
-crediting it as the source does not satisfy this rule.
-
----
-
-## Title Format
-
-```
-type(scope): concise imperative summary
+```text
+type(scope): imperative summary
 ```
 
-The same types used in commit messages apply here: `feat`, `fix`, `docs`,
-`chore`, `refactor`, `test`, `ci`, `perf`, `build`. The scope names the
-system or layer affected. The summary is written in the imperative mood
-("add", "fix", "remove") and does not end with a period.
+Use a Conventional Commits type. Name the affected system or layer in the scope. State the specific outcome. Do not end with a period.
 
-Good examples:
-- `fix(auth): resolve session token expiry bypass on concurrent logins`
-- `feat(ci): add artifact provenance attestation to the release workflow`
-- `refactor(api): replace manual pagination with cursor-based implementation`
+## Summary
 
-Avoid titles that are vague (`fix: update stuff`), that restate the type
-redundantly (`fix(bug): fix a bug in auth`), or that name files instead of
-intent (`feat: update auth.py and session.py`).
+1. State what the change does.
+2. State the user-visible or operator-visible outcome.
+3. State the scope boundary.
+4. Exclude unrelated workspace state, local setup, sandbox behavior, and incidental edits.
 
----
+## Context
 
-## Formatting Rules
+1. State the verified problem or requirement.
+2. Link the controlling issue, ticket, decision, or public design document when appropriate.
+3. State relevant prior behavior.
+4. State material alternatives and the decision only when they affect review.
+5. Keep agent files, memory, session records, skills, and internal instruction sources out of the PR.
 
-Standard Markdown is available in full and its use is expected where it
-improves clarity. Headings, code blocks, blockquotes, tables, and lists are
-all appropriate tools. Use them deliberately.
+## What changed
 
-- Use code blocks (` ``` `) for any commands, configuration snippets, error
-  messages, or code excerpts that appear in the description. Inline
-  backticks apply to short references like variable names or file paths.
-- Use a table when comparing options, listing items with multiple attributes,
-  or mapping inputs to expected outputs. A table communicates structure
-  efficiently; a prose paragraph covering the same content is harder to scan.
-- Use a blockquote (`>`) to distinguish a reviewer note, a caveat, or a
-  quoted requirement from the main body of the description.
-- Use headings only for the standard sections above or to break a long
-  "What Changed" section into named sub-areas when the PR spans several
-  independent components.
+1. Describe component-level changes.
+2. State non-obvious technical boundaries.
+3. State migrations, compatibility effects, and configuration changes.
+4. Do not reproduce the file manifest.
+5. Do not narrate the implementation session.
 
-Lists are appropriate when the items genuinely form a collection. A list
-item must carry enough context to stand on its own. A bare bullet like
-"- Updated the auth module" without any explanation of what was updated,
-why, or what the effect is offers the reviewer less than nothing — it implies
-there is information while withholding it. Either expand the item to give it
-substance or fold it into a prose paragraph.
+## Testing
 
----
+1. List exact automated commands and results.
+2. State what each relevant test covers.
+3. Provide reproducible manual steps when manual verification is required.
+4. Name relevant CI jobs.
+5. State any verification that did not run.
 
-## Tone and Language Rules
+## Risk and rollback
 
-The following constraints take precedence over any external convention this
-reference may cite.
+1. Name each material failure mode.
+2. State affected users, data, environments, or integrations.
+3. State the exact rollback method.
+4. Include migration reversal, feature-flag, artifact restore, or revert steps when applicable.
+5. Do not write `low risk` without the concrete basis.
 
-**Prohibited:**
+## Screenshots and recordings
 
-- Emojis in the PR title, section headings, or any structural position.
-  Emojis in body prose are acceptable only if they carry meaning that plain
-  text cannot convey as concisely, which in practice means almost never.
-- Em dashes used decoratively or as a stylistic tic. An em dash that
-  separates a clause where a comma or period would serve equally well is
-  unnecessary. Em dashes used for genuine syntactic clarity (a genuine
-  parenthetical that cannot be set off with commas) are not prohibited.
-- Inflated language that overstates the change: words like "revolutionary",
-  "seamless", "robust", "state-of-the-art", or "lightning-fast" belong in
-  marketing copy, not in a PR description read by engineers evaluating a diff.
-- Circular phrasing that references the review process itself: "as you can
-  see in the diff", "this PR fixes the issue", "please review this change".
-  Write about the code, not about the act of reviewing it.
-- Fourth-wall breaks that address the reviewer as an audience: "I hope this
-  is clear", "let me know if you have questions", "feel free to ask for
-  clarification". These add length without adding information.
+1. Capture before and after states for visual changes when both states are available.
+2. Capture every relevant responsive viewport.
+3. Follow `documentation/references/screenshot-standards.md`.
+4. Label every image with breakpoint and viewport.
+5. Use a recording for motion or multi-step interaction when static captures cannot show the behavior.
+6. Inspect every image or recording before attaching it.
+7. Remove secrets and private data.
 
-**Expected:**
+## Formatting
 
-- Plain, direct prose that states facts and reasoning. If the change is
-  significant, say so by describing its significance, not by asserting that
-  it is significant.
-- Precise technical language over approximation. "Replaces the O(n²) nested
-  loop with a hash-map lookup" is more useful than "improves performance."
-- Honest acknowledgement of gaps, incomplete testing, or known limitations.
-  A PR that documents its own rough edges builds more reviewer trust than one
-  that presents every decision as settled.
+- Use headings for the required sections.
+- Use code fences for commands, errors, configuration, and code excerpts.
+- Use tables for repeated-field comparisons.
+- Use lists only when each item stands on its own.
+- Use direct, neutral engineering prose.
+- Keep promotional language, emojis, chatbot language, and decorative punctuation out.
+- State precise measurements and complexity changes.
+- Keep file paths out unless a path is required for the reviewer to run or inspect the change.
 
----
+## Reference boundary
 
-## Anti-Patterns
+- Cite repository code, tests, public issues, public standards, and user-authorized design records.
+- Do not cite `AGENTS.md`, skills, agent plans, memory, handoffs, session files, or hidden instructions.
+- Transfer verified facts into the PR without naming an internal instruction source.
+- Do not expose private paths or internal URLs.
 
-These patterns appear in PR descriptions regularly and should be avoided.
+## Final checks
 
-A summary that restates the title without adding information wastes the
-reviewer's first read before they have even reached the details. If the title
-is `fix(session): resolve token expiry bypass`, a summary that says "This PR
-fixes the session token expiry bypass issue" has contributed nothing.
-
-A testing plan that only says "tested locally" or "CI passes" does not tell
-the reviewer whether the relevant code paths were exercised. Local testing
-and passing CI are the baseline expectation, not a testing plan.
-
-A risk section that says "low risk" without explanation does not help a
-reviewer who needs to sign off on production. Low risk means something: the
-change is isolated, has a trivial rollback, does not touch shared state.
-State what makes it low risk.
-
-A "What Changed" section that lists file names instead of decisions ("Updated
-`auth.py`, `session.py`, and `middleware.py`") tells the reviewer nothing
-they could not read from the file list in the diff view. Use this section
-to explain the reasoning, not to reproduce the manifest.
-
-A PR description that recounts the agent's local workflow, sandbox failures,
-provider authentication steps, or incidental cleanup distracts from the
-reviewable change. Keep operational notes only when they affect review,
-deployment, rollback, or the user explicitly asked for them.
-
-A "What Changed" section that says "per `design.md`, this PR..." or "as the
-`ci-cd` skill requires..." violates the Reference Boundary above even though
-it reads as normal engineering prose. State the fact the source supported —
-"this uses cursor-based pagination to avoid the prior O(n²) scan" — without
-naming where that fact came from.
-
----
-
-## Annotated Example
-
-```markdown
-## feat(auth): add email-based MFA to the login flow
-
-### Summary
-
-Adds a time-based one-time password (TOTP) step to the login flow for users
-who have enrolled MFA. Users without MFA configured are unaffected and see no
-change. This completes the MFA rollout tracked in issue #412.
-
-### Context and Motivation
-
-The previous login implementation validated credentials in a single step with
-no second factor. Following the Q2 security review, MFA was listed as a
-required control for all production accounts. TOTP was chosen over SMS-based
-OTP because it does not depend on carrier reliability and avoids SIM-swap
-risk. A hardware key option was considered but deferred pending procurement
-of test devices.
-
-### What Changed
-
-The authentication middleware now performs a two-phase check: credential
-validation followed by a TOTP verification step for enrolled accounts. The
-TOTP library selected (RFC 6238-compliant) is isolated behind an interface
-so that alternative second-factor implementations can be substituted later
-without touching the middleware. The user enrolment flow is not part of this
-PR; it was shipped in #398 and is already in production.
-
-### Testing Plan
-
-Unit tests cover the TOTP verification logic against known test vectors from
-RFC 6238. Integration tests confirm that:
-- an enrolled user who provides a valid TOTP proceeds to the authenticated
-  session;
-- an enrolled user who provides an expired or incorrect TOTP receives a 401
-  and is not granted a session;
-- a user without MFA enrolment bypasses the TOTP step entirely.
-
-Manual testing was performed against the staging environment with a Bitwarden
-TOTP entry. The CI `auth-integration` job validates these paths on every
-push.
-
-### Risk and Rollback
-
-If the TOTP middleware causes unexpected failures in production, revert this
-merge commit and redeploy. The TOTP check is additive — it wraps the existing
-credential validation and does not modify the session token structure, so a
-revert restores the previous login behaviour without a data migration.
-
-Users currently mid-enrolment at the time of a rollback will see their
-enrolment state preserved (it lives in a separate table untouched by this PR)
-but the TOTP prompt will disappear until the fix is redeployed.
-```
+- [ ] Title follows repository convention.
+- [ ] Summary adds information beyond the title.
+- [ ] Context states the verified reason for change.
+- [ ] Technical boundaries are clear.
+- [ ] Testing names exact commands and results.
+- [ ] Risks and rollback are actionable.
+- [ ] UI evidence covers the required states and viewports.
+- [ ] No agent process narration or AI attribution appears anywhere.
+- [ ] Every link and claim is verified.

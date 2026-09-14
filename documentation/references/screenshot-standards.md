@@ -1,38 +1,32 @@
 # Screenshot Standards
 
-Use this reference whenever a webpage or web app screenshot appears in a PR
-description, README, or documentation file — anywhere a reader needs to judge
-layout, responsiveness, or visual state.
+## Procedure
 
-## Standard Viewport Sizes
+1. Identify the visual state to prove.
+2. Read the repository's responsive breakpoints and screenshot conventions.
+3. Use repository-defined viewports when present.
+4. Otherwise capture the default viewports below.
+5. Set the viewport explicitly before navigation.
+6. Wait for a deterministic ready state.
+7. Remove transient cursors, tooltips, loaders, and animations unless they are the subject.
+8. Capture the complete required region.
+9. Do not resize or crop a different viewport to simulate the target.
+10. Label the capture with its breakpoint and CSS-pixel dimensions.
+11. Open and inspect the saved screenshot.
+12. Check clipping, overlap, spacing, text, controls, focus, and responsive reflow.
+13. Retake the screenshot after every relevant application change.
 
-Capture at these three fixed viewport sizes by default. Do not substitute
-arbitrary browser-window dimensions, and do not crop or scale a capture taken
-at a different size to approximate one of these.
+## Default viewports
 
-| Breakpoint | Viewport (CSS px) | Reference device |
-| --- | --- | --- |
-| Desktop | 1440 × 900 | Standard laptop/desktop viewport |
-| Tablet | 768 × 1024 | iPad portrait |
-| Mobile | 430 × 932 | iPhone 15 Pro Max (logical/CSS resolution, not physical pixels) |
+| Breakpoint | Viewport in CSS pixels |
+|---|---:|
+| Desktop | 1440 by 900 |
+| Tablet | 768 by 1024 |
+| Mobile | 430 by 932 |
 
-If the repository defines its own responsive breakpoints (CSS media queries,
-Tailwind config, design tokens), capture at those breakpoints instead and
-still label each capture with the breakpoint name and viewport size used —
-the point is a fixed, reproducible size per form factor, not this exact
-table.
+## Coverage
 
-## When All Three Are Required
-
-Capture all three sizes when the change affects layout, responsiveness, or is
-being documented specifically to demonstrate responsive behavior. A change
-scoped to a single form factor (a mobile-only interaction, a desktop-only
-admin panel) only needs the size that changed — say so explicitly rather than
-omitting the others silently.
-
-## Labeling
-
-Label each image with its breakpoint name and viewport size directly in the
-surrounding text or alt text (for example: "Desktop (1440×900)"). A screenshot
-with no size label leaves the reader unable to tell whether a layout issue is
-real or an artifact of an arbitrary capture width.
+- Capture all three default viewports for responsive or layout-wide changes.
+- Capture only the affected viewport for a form-factor-specific change.
+- State the tested viewport in the evidence caption.
+- Keep secrets, personal data, tokens, and private account content out of screenshots.

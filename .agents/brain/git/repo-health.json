@@ -1,22 +1,21 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-07-01T05:17:35Z",
+  "captured_at": "2026-09-14T12:17:46+03:00",
   "branch": "main",
   "identity": {
     "user_name": "JohnKibocha",
     "user_email": "johnkibocha@outlook.com"
   },
   "commit_pattern": {
-    "sample": [
-      "3f772c3 feat(graphify, ci-cd): add graphify skill and expand ci-cd discipline JohnKibocha",
-      "0d6e187 feat(maestro): add Maestro planning and session tracking skill JohnKibocha",
-      "8f830af feat(legalese): add graded Authority Register JohnKibocha",
-      "43f9f7a chore(repo): consolidate skill governance and sources JohnKibocha",
-      "e78ed90 feat(skills): add cross-domain agent skills JohnKibocha",
-      "6f5bfa1 feat(documentation): expand technical documentation guidance JohnKibocha",
-      "07d325f feat(technical-diagrams): add Draw.io diagram skill JohnKibocha",
-      "3ddeeea feat(documentation): add Writerside documentation skill JohnKibocha",
-      "55ac09c chore(repo): bootstrap skills repository scaffold JohnKibocha"
+    "minimum_full_commits": 2,
+    "full_log_command": "git log --show-signature -2 --date=iso-strict --format=fuller",
+    "entries": [
+      {
+        "raw": "commit 587f1c67788012436f0e5c480dc7ba54be67a47b\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-08-13T18:08:38+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-08-13T18:08:38+03:00\n\n    chore(repo): archive generalize-pbo-doctrine session\n\n    Session covered the documentation/legalese doctrine split, the graphify MCP\n    uvx fix, and the bootstrap memory correction shipped in the three preceding\n    commits. All tasks complete; archived per Maestro session lifecycle."
+      },
+      {
+        "raw": "commit d7ea137b547469366233abebda28ca8e594e5a9e\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-08-13T18:06:19+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-08-13T18:06:19+03:00\n\n    fix(bootstrap): correct stale rsync reference in deployment memory\n\n    skills-repo-deployment-workflow.md still described tool skills/ mirrors as\n    plain rsync copies; the mechanism changed to a real git sparse-checkout\n    tracking this repo's remote in 22e61fb. Updated the memory entry to match\n    so it stops giving agents an outdated mental model of how the mirror works."
+      }
     ],
     "inferred_convention": "conventional-commits"
   },
@@ -24,14 +23,42 @@
     "configured": true,
     "name": "origin",
     "url": "git@github.com:kibocha-solutions/skills.git",
+    "ssh_host": "github.com",
+    "ssh_host_alias": null,
+    "uses_default_identity": false,
     "auth_handshake_ok": true
+  },
+  "ssh_signing_path": {
+    "path": "unknown",
+    "evidence": [
+      "SSH_AUTH_SOCK uses the Bitwarden desktop agent socket",
+      "GitHub authentication succeeds with the configured github.com identity",
+      "the signing public-key fingerprint matches the trusted signer entry"
+    ],
+    "requires_user_action": false
+  },
+  "provider_cli": {
+    "provider": "github",
+    "cli": "gh",
+    "installed": true,
+    "authenticated": true,
+    "auth_checked_at": "2026-09-14T12:06:08+03:00",
+    "preferred_for_remote_operations": true
   },
   "signing": {
     "gpg_format": "ssh",
-    "signing_key": "C:/Users/codelf/.ssh/SshSigningKey.pub",
+    "signing_key": "/home/codelf/.ssh/SshSigningKey.pub",
     "allowed_signers_file": "/home/codelf/.ssh/allowed_signers",
     "signing_expected": true,
     "signing_intentionally_disabled": false
+  },
+  "branch_ancestry": {
+    "current": "main",
+    "trunk": "main",
+    "chain": [
+      "main"
+    ],
+    "chain_source": "upstream-tracking"
   },
   "stale": false
 }

@@ -3,7 +3,7 @@
 # Uses gitignore-style syntax. Directory-only patterns end with /.
 
 # Project-local graph state
-graphify/
+.agents/code-graphs/
 .code-review-graph/
 
 # Generated root instruction and editor config files
@@ -18,13 +18,9 @@ QODER.md
 .github/
 .idea/
 
-# Skill packages and agent tooling
-**/skills/
-.agents/skills/
-
 # Transient agent brain folders
-.agents/brain/active/
-.agents/brain/archive/
+.agents/brain/sessions/active/
+.agents/brain/sessions/archive/
 
 # Assistant-platform scaffolding
 .claude/

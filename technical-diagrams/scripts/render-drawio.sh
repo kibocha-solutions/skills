@@ -57,17 +57,16 @@ if [ -z "$renderer" ]; then
   cat >&2 <<'MSG'
 No compatible Draw.io renderer found.
 
-Install or expose one of these commands before production diagram handoff:
+Expose one of these existing commands before production diagram handoff:
   drawio-cli
   drawio
   diagrams.net
   diagramsnet
 
-Do not stop at this missing-command failure. Try installing a compatible
-diagrams.net renderer and headless support such as xvfb before falling back.
-Render-backed visual QA is required for production diagrams. If installation
-and compatible replacement are genuinely impossible, report source-only
-validation instead of claiming visual QA, and name the setup attempts.
+Check project, host, container, and CI render commands. Apply the dependency
+installation procedure in system-init when the renderer is required. Report
+source-only validation and do not claim rendered visual QA while no renderer
+is available.
 MSG
   exit 127
 fi
@@ -92,15 +91,15 @@ if [ "$status" -ne 0 ]; then
   cat >&2 <<'MSG'
 Draw.io rendering failed after a compatible command was found.
 
-Do not treat this as a source-only validation pass yet. Check:
+Check:
   - whether xvfb is installed when running headless
   - whether the filesystem blocks the Electron setuid sandbox with nosuid
   - whether /opt/drawio/chrome-sandbox has usable ownership and permissions
   - whether a project, CI image, container, or host command provides an
     alternate diagrams.net renderer
 
-Only report source-only validation after those setup paths are genuinely
-blocked, and include the failed command and error.
+Do not change sandbox permissions, mounts, services, or system packages.
+Report the failed command and error. Do not claim rendered visual QA.
 MSG
   exit "$status"
 fi

@@ -1,79 +1,84 @@
 ---
 name: bootstrap
-description: >
-  Verifies and aligns shared agentic rules between this skills repository and
-  each coding agent's own instruction file (CLAUDE.md, AGENTS.md, GEMINI.md,
-  copilot-instructions.md) across native Linux, macOS, and WSL environments. Use
-  when setting up a new environment, when shared rules need aligning, or when
-  running /bootstrap.
+description: Verify and align shared agent rules and skill mirrors for Claude Code, Codex, Gemini CLI, Gemini Antigravity, and GitHub Copilot across Linux, macOS, and WSL. Use for new workstation setup, stale installed skills, shared-rule alignment, session-start hook registration, or /bootstrap.
 ---
 
 # Bootstrap
 
-This repository (`skills`) is mirrored into each tool's home directory:
-`~/.claude/skills/`, `~/.codex/skills/`, `~/.gemini/skills/`, `~/.copilot/skills/`
-(as well as dynamically detected Windows host paths under `/mnt/c/Users/<username>/` when running in WSL). `AGENTS.md` at the repo root is the master source of truth for shared behavioral rules across all tools.
+## 1. Establish scope
 
-## Rule Alignment & Cross-Platform Support
+1. Identify the installed agent hosts.
+2. Identify native Linux, macOS, and WSL target paths.
+3. Confirm that the user requested alignment or bootstrap propagation.
+4. Read the repository root `AGENTS.md`.
+5. Read `references/hook-registration.md` only when registering hooks.
+6. Do not run a script for an unrequested host.
 
-Rather than using import pointers (`@skills/AGENTS.md`) or symlinks—or overwriting pre-existing user instructions—bootstrapping aligns each target tool's native instruction file non-destructively:
+## 2. Verify the source repository
 
-- Embedded block markers (`<!-- BEGIN SHARED SKILLS RULES -->` and `<!-- END SHARED SKILLS RULES -->`) delineate the shared rules block.
-- Pre-existing custom user instructions outside the block are fully preserved.
-- Legacy import pointers are safely cleaned up.
-- The block is located by the *first* start marker and the *last* end marker, not a naive non-greedy regex span — needed because the rules content itself legitimately quotes these exact marker strings as documentation (this section, for one), which would otherwise fool a `.*?`-style match into stopping at that literal mention instead of the real closing marker.
+1. Resolve the repository root.
+2. Verify the configured `origin` URL.
+3. Verify that the intended branch is `main`.
+4. List every top-level directory containing `SKILL.md`.
+5. Confirm that the working tree changes intended for deployment are committed
+   and pushed.
+6. Stop if the remote state does not contain the intended rules and skills.
 
-Each `ensure-*-link.sh` script also syncs this repo's skill folders (anything
-with a top-level `SKILL.md`) into `<tool-home>/skills/`, using the shared
-`sync_skills_from_git` helper in `lib.sh`. **This is a real git working
-copy, not a file copy**: each `<tool-home>/skills/` is `git init`'d in place
-and tracks this repo's actual remote (`git remote get-url origin`, resolved
-from the local checkout the bootstrap scripts run from, falling back to
-`git@github.com:kibocha-solutions/skills.git`), branch `main`. Every run does
-`fetch` + re-apply sparse-checkout + `reset --hard origin/main`, so each
-tool's copy always exactly matches what's actually pushed to the remote —
-never a possibly-uncommitted or stale local working-tree state, and a skill
-removed from the repo is automatically removed from every tool's copy too
-(sparse-checkout re-application drops paths that fall out of the pattern
-set).
+## 3. Resolve targets
 
-The sparse-checkout uses **non-cone mode** with an explicit pattern per
-skill directory plus `AGENTS.md` — cone mode was tried first and rejected,
-since cone mode always includes every root-level file regardless of the
-directory pattern list (`README.md`, `LICENSE.txt`, `.gitignore`,
-`migration-log.md`, and this repo's two code-review-graph ignore files would
-all have leaked into every tool's `skills/` folder). Non-cone mode checks
-out exactly what's listed and nothing else — no `sources/`, no `docs/`, no
-repo-root clutter in any tool's skills directory.
+Use these instruction files:
 
-Because `git init` is used in place rather than `git clone` (which refuses
-a non-empty directory), this works even when `<tool-home>/skills/` already
-has unrelated content sitting in it — a tool's own bundled/native skills —
-since git only ever manages paths in its own tracked tree and leaves
-untracked neighbors alone (e.g. Codex CLI's own bundled skills under
-`~/.codex/skills/.system/`, or Antigravity's native skills — see below). On
-the first run against a directory that isn't a git repo yet (i.e. was
-previously populated by the old rsync-based mirror), any existing top-level
-entry whose name matches a known skill folder in the local checkout is
-removed first, so the initial checkout has no stale collisions to contend
-with; anything whose name doesn't match a known skill is left untouched.
+| Host | Instruction file |
+|---|---|
+| Claude Code | `~/.claude/CLAUDE.md` |
+| Codex | `~/.codex/AGENTS.md` |
+| Gemini CLI | `~/.gemini/GEMINI.md` |
+| Gemini Antigravity | `~/.gemini/antigravity/builtin/GEMINI.md` |
+| GitHub Copilot | `~/.copilot/copilot-instructions.md` |
 
-### Environment & Platform Resolution
+1. Resolve each installed host's home directory.
+2. Under WSL, resolve the active Windows user under `/mnt/c/Users/`.
+3. Include an existing Windows-host instruction path.
+4. Keep Gemini CLI and Gemini Antigravity targets separate.
+5. Skip a target whose product directory does not exist.
 
-- **Native Linux & macOS**: Target paths resolve dynamically to `$HOME/.<tool>/<filename>`.
-- **WSL (Windows Subsystem for Linux)**: In addition to `$HOME/.<tool>/<filename>`, scripts inspect `/mnt/c/Users/`, resolve the active Windows host username dynamically, and align `/mnt/c/Users/<win_user>/.<tool>/<filename>` if present.
+## 4. Align rules
 
-| Tool | Target Global Instruction File | Rule Integration Method |
-|---|---|---|
-| Claude Code | `~/.claude/CLAUDE.md` | Non-destructive block alignment |
-| Codex CLI | `~/.codex/AGENTS.md` | Non-destructive block alignment |
-| Gemini CLI | `~/.gemini/GEMINI.md` | Non-destructive block alignment |
-| Gemini Antigravity | `~/.gemini/antigravity/builtin/GEMINI.md` | Non-destructive block alignment (separate product from Gemini CLI, separate file — see below) |
-| GitHub Copilot CLI | `~/.copilot/copilot-instructions.md` | Non-destructive block alignment |
+1. Use these block markers:
 
-## Running the Bootstrap Verification & Alignment
+```text
+<!-- BEGIN SHARED SKILLS RULES -->
+<!-- END SHARED SKILLS RULES -->
+```
 
-Run the alignment scripts for whichever tools are installed:
+2. Replace the content between the first start marker and the last end marker.
+3. Preserve all content outside the marker block.
+4. Remove legacy `@skills/AGENTS.md` import pointers.
+5. Replace a legacy instruction-file symlink with a regular file when the host
+   requires one.
+6. Never overwrite unrelated user instructions.
+
+## 5. Synchronize skills
+
+1. Initialize the target `skills/` directory as a Git working copy when
+   required.
+2. Preserve unrelated untracked host-native skills.
+3. Resolve `origin` from the source checkout.
+4. Fall back to `git@github.com:kibocha-solutions/skills.git` only when the
+   source checkout has no usable `origin`.
+5. Configure non-cone sparse checkout.
+6. Include `AGENTS.md` and every top-level skill directory.
+7. Exclude `sources/`, `docs/`, and unrelated root files.
+8. Fetch `origin/main`.
+9. Reapply the sparse-checkout patterns.
+10. Reset the managed working copy to `origin/main`.
+11. Remove a stale collision only when its top-level name matches a managed
+    skill.
+12. Never remove an unrelated host-native skill.
+
+## 6. Run host scripts
+
+Run only the scripts for confirmed targets:
 
 ```bash
 bash ~/.claude/skills/bootstrap/scripts/ensure-claude-link.sh
@@ -83,48 +88,36 @@ bash ~/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh
 bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-builtin-skills.sh
 ```
 
-Each script is idempotent and reports only when changes are made.
+For a source-checkout invocation, use the matching script under
+`bootstrap/scripts/`.
 
-## Gemini Antigravity Builtin Rules & Skills Mirror
+## 7. Handle Gemini Antigravity
 
-Google Antigravity (`~/.gemini/antigravity/`) is a separate product from
-Gemini CLI. It does not read `~/.gemini/GEMINI.md` or `~/.gemini/skills/` —
-confirmed directly on-disk (Antigravity has never picked up rules placed at
-the CLI location). It ships its own default skills in
-`~/.gemini/antigravity/builtin/skills/` (e.g. `agy-customizations`,
-`antigravity_guide`, `permissioned-github`), and reads its own rules file at
-`~/.gemini/antigravity/builtin/GEMINI.md`.
+1. Target `~/.gemini/antigravity/builtin/`.
+2. Align `builtin/GEMINI.md`.
+3. Synchronize managed skills into `builtin/skills/`.
+4. Preserve `agy-customizations`, `antigravity_guide`,
+   `permissioned-github`, and other unmanaged native skills.
+5. Check for `builtin/.checksum`.
+6. Warn the user before modifying `builtin/` when the checksum exists.
+7. Stop if Antigravity reports corruption or resets the directory.
 
-`ensure-gemini-builtin-skills.sh` handles both, targeting
-`~/.gemini/antigravity/builtin/` directly:
+## 8. Register automated alignment
 
-- Aligns `~/.gemini/antigravity/builtin/GEMINI.md` with this repo's
-  `AGENTS.md` non-destructively (same `align_agent_rules` mechanism and
-  block markers `ensure-gemini-link.sh` uses for the CLI location) — this is
-  a *separate* copy from `~/.gemini/GEMINI.md`, not a symlink, since the two
-  products read different files.
-- Syncs every skill folder in this repo (anything with a top-level
-  `SKILL.md`) into `~/.gemini/antigravity/builtin/skills/` via
-  `sync_skills_from_git` (see above — a real git sparse checkout tracking
-  the remote, not a file copy). It never touches Antigravity's own native
-  skills (`agy-customizations`, `antigravity_guide`, `permissioned-github`),
-  since git only manages paths in its own tracked tree.
+1. Read `references/hook-registration.md`.
+2. Add only the requested host's `SessionStart` hook.
+3. Preserve unrelated hook configuration.
+4. Run the registered command once.
+5. Confirm that repeated execution produces no unintended change.
 
-It no-ops silently if `~/.gemini/antigravity/builtin/` doesn't exist
-(Antigravity not installed).
+## 9. Verify
 
-```bash
-bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-builtin-skills.sh
-```
-
-Note: `~/.gemini/antigravity/builtin/.checksum` sits alongside this
-directory and appears to be an integrity check written at install time.
-Mirroring skills into `builtin/skills/` will make the on-disk contents no
-longer match that checksum. Whether Antigravity enforces this at runtime is
-unconfirmed — the app binary wasn't available to inspect. If Antigravity
-ever reports corruption or resets its builtin skills after this runs, that
-checksum is the likely cause.
-
-## Automated Alignment
-
-Register the scripts as a `SessionStart` hook in each tool's settings to run alignment automatically when a session starts. See `references/hook-registration.md` for hook JSON configurations.
+1. Confirm that each target instruction file contains exactly one complete
+   marker block.
+2. Confirm that content outside the block is unchanged.
+3. Confirm that each managed skill matches `origin/main`.
+4. Confirm that deleted repository skills are absent from managed mirrors.
+5. Confirm that native skills remain present.
+6. Confirm that no `sources/`, `docs/`, or unrelated root files entered a
+   mirror.
+7. Report changed targets, skipped targets, warnings, and failures.

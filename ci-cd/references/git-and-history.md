@@ -1,169 +1,73 @@
-# Git And History
+# Git and History
 
-Use this reference for commit creation, branch structure, pull requests, and
-history cleanup.
+## Procedure
 
-Primary-source basis:
+1. Inspect `git status`, the staged diff, and recent full commits.
+2. Resolve the current branch, trunk, upstream, and branch ancestry.
+3. Determine whether the branch or commits are shared.
+4. Preserve shared history.
+5. Use a short-lived topic branch or worktree for isolated work.
+6. Create temporary local commits only when they support safe iteration.
+7. Convert repair commits into fixup commits when appropriate.
+8. Run interactive autosquash only on unshared history.
+9. Verify the final diff and commit sequence.
+10. Publish only when the user requests publication.
 
-- Git `git-commit` and `git-rebase` docs for `--fixup`, `--autosquash`, and
-  `rebase.autoSquash`
-- GitHub docs for squash vs rebase merge tradeoffs and merge queue behavior
-- DORA guidance for short-lived branches and trunk-based development
+## History gates
 
-## Decision Rules
+- Never rewrite shared history without live user approval.
+- Never force-push without live user approval.
+- Never delete a collaborator-used branch without live user approval.
+- Treat uncertain ownership as shared.
+- Preserve commit boundaries the user requests.
+- Keep one coherent final commit when independent boundaries add no review value.
 
-- Prefer one meaningful final commit per coherent change.
-- Preserve multiple commits only when each commit is independently reviewable
-  and the user wants that shape.
-- Temporary local commits are fine. Published procedural commits are not.
-- Never rewrite shared history without explicit user approval.
-- Visible branch history is not automatically final history.
-- If the history is local, procedural, and clearly compressible into one
-  coherent fix, default to cleanup rather than preservation.
+## Branch procedure
 
-## Shared-History Check
+1. Discover the intended base from repository evidence.
+2. Create the topic branch from that base.
+3. Record the branch and parent in the repository ancestry log when the project uses one.
+4. Commit during implementation as needed.
+5. Mark repairs with `git commit --fixup=<commit>`.
+6. Run `git rebase -i --autosquash <base>` only after the shared-history check passes.
+7. Recheck the resulting tree and history.
+8. Merge or hand off one ancestry level at a time.
+9. Delete a temporary branch only after its work is preserved and its ownership is resolved.
 
-Before rebasing or autosquashing, inspect:
+## Final commit
 
-- whether the branch has been pushed,
-- whether other collaborators are using it,
-- whether the user asked to preserve commit boundaries,
-- whether the branch is a temporary cleanup branch or the intended long-lived
-  feature branch.
+1. Execute section 6 of `../SKILL.md`.
+2. Use `../assets/commit-message-template.md`.
+3. Verify the delivered commit count from the recorded starting commit.
+4. Verify the exact final message before publication.
 
-Treat uncertain ownership as shared-history risk.
+## Pull request checks
 
-## Default Cleanup Flow
+- Keep one coherent goal.
+- State user or operator impact.
+- State material implementation boundaries.
+- List exact tests and results.
+- State material risks and the rollback command or procedure.
+- Follow the repository merge method and merge queue.
+- Preserve multiple commits only when their boundaries are intentional and useful.
 
-1. Inspect `git status`, `git log --oneline --decorate --graph -n <N>`, and
-   `git diff --cached`.
-2. Decide whether the work belongs in:
-   - the current in-progress change,
-   - a short-lived topic branch or worktree,
-   - or a new logical commit series the user explicitly wants to preserve.
-3. If the current branch is noisy and local, decide whether to branch out to a
-   temporary cleanup branch before modifying history.
-3. If the work is one coherent change:
-   - stage only the intended files;
-   - create fixup commits as needed while iterating;
-   - fold them into the target commit with `git rebase -i --autosquash`.
-4. Before publishing:
-   - confirm the final diff is correct;
-   - confirm the final commit title is concise and useful;
-   - confirm no unrelated procedural commits remain;
-   - record branch-state continuity if the work will continue later.
+## Handoff fields
 
-## Topic Branch Pattern
+Record:
 
-Use a short-lived topic branch or worktree when:
+- current branch
+- intended base
+- branch purpose
+- shared or isolated status
+- temporary or durable status
+- history-cleanup status
+- safest next Git action
 
-- the cleanup is risky,
-- the branch already has unrelated work,
-- or the branch should not expose procedural debugging history to later agents
-  or reviewers.
+## Prohibited outcomes
 
-Recommended pattern:
-
-1. Branch from the intended base — discover the repo's real branch ancestry
-   chain first (see `SKILL.md`'s Branch Ancestry Discovery) rather than
-   assuming a fixed hierarchy.
-2. Commit freely while iterating.
-3. Autosquash to the final useful commit.
-4. Merge or fast-forward the cleaned result back to the target branch, one
-   level of the chain at a time.
-5. Delete the temporary branch when no longer needed, unless it has
-   collaborators — deleting a branch other people have pushed to, reviewed,
-   or built on requires explicit user confirmation even after its work has
-   landed, per `SKILL.md`'s Shared-History Danger Gate.
-
-This branch-out permission is not conditional on the task turning out risky —
-see `SKILL.md`'s Branch Ancestry Discovery and Clean Commit Procedure. Any
-task expected to take many actions may start on a disposable branch up front,
-with no depth limit on intermediate commits, as long as it is squashed to one
-compliant commit and shipped one chain level at a time before merge or
-handoff.
-
-## Autonomous Cleanup Default
-
-Autonomous cleanup is appropriate when all of these are true:
-
-- the branch is local or safely isolated;
-- the user did not ask to preserve the visible commit trail;
-- the commits clearly belong to one coherent outcome;
-- cleaning history does not endanger another collaborator's work.
-
-If any of these fail, downgrade from automatic cleanup to explicit warning or
-user confirmation.
-
-## Commit Message Format
-
-Use Conventional Commits. Type is one of the canonical types: `feat`, `fix`,
-`docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
-
-```text
-type(scope): summary
-
-Optional body that explains why, tradeoffs, or operational impact.
-```
-
-The summary is a single imperative sentence. The body, when present, is 72
-words or fewer, total — see `SKILL.md`'s Commit Hygiene Expectations for the
-full rule.
-
-Examples:
-
-- `feat(ci): add deployment smoke test gate`
-- `fix(actions): pin checkout action to commit SHA`
-- `docs(ci-cd): clarify fixup and autosquash workflow`
-
-The message must describe the durable repo-relevant result of the session, not
-the full path the agent took to get there. Mention the core feature, fix,
-refactor, documentation update, workflow change, or operational improvement.
-Do not include unrelated workspace state, submodule movement that is not the
-repo's actual change, sandbox or permission mechanics, local tool setup, or
-minor incidental edits unless the user explicitly asks for those details.
-
-## Pull Request Expectations
-
-- Keep the PR aligned to one coherent goal.
-- Summarize user-facing or operator-facing impact.
-- Call out rollout, rollback, and secret requirements when relevant.
-- Prefer squash merge when the branch contains iterative repair commits or when
-  the repo wants one useful final result.
-- Preserve multiple commits only when the commit boundaries are meaningful and
-  intentional.
-- If the repo uses a merge queue, align your advice with the queue's merge
-  method and required checks instead of assuming the contributor chooses merge
-  style manually.
-
-## Branch-State Handoff Minimum
-
-When a later chat must resume Git work, record:
-
-- current branch,
-- intended base branch,
-- branch purpose,
-- whether the branch is temporary,
-- whether history is cleaned,
-- procedural commit count when relevant,
-- safest next Git action.
-
-## Anti-Patterns
-
-- "wip", "misc fixes", or "address feedback" as final published commits.
-- Commit titles or bodies that read like session logs instead of repository
-  history.
-- Naming, linking, or otherwise pointing to `AGENTS.md`, `design.md`,
-  `implementation-plan.md`, a skill (e.g. "per the ci-cd skill"), or any other
-  agentic/planning/scaffolding file in a commit message — see the Reference
-  Boundary rule in `SKILL.md`. Renaming the file or describing it obliquely
-  ("the planning notes") instead of citing it by name does not cure this.
-- Mentioning unrelated local state, submodule noise, sandbox behavior, or
-  incidental punctuation and formatting fixes in the final message unless the
-  user explicitly asks for that content.
-- Creating a new commit when the right action is to amend or autosquash into
-  the existing change.
-- Rebasing or force-pushing a branch shared with others without approval.
-- Mixing unrelated fixes just because the files were already open.
-- Assuming `fix/api` or a similar branch name is the canonical feature branch
-  without inspecting its actual purpose and base.
+- Final commits named `wip`, `misc fixes`, or `address feedback`
+- Commit messages that narrate the work session
+- New commits that should have been fixups
+- Unapproved shared-history rewrites
+- Unrelated changes in one commit
+- Ancestry assumptions based only on a branch name

@@ -1,468 +1,179 @@
 ---
 name: documentation
-description: >
-  Draft, review, rewrite, and improve documentation, README files, guides,
-  procedures, reference pages, Writerside-compatible technical documentation,
-  API prose, docstrings, comments, and API comment blocks. Use to remove weak
-  AI-patterned writing such as generic importance claims, promotional tone,
-  unsupported synthesis, vague attribution, unnecessary verbosity, negative
-  parallelisms, purposeless fourth-wall references, placeholder residue,
-  citation artifacts, malformed markup, and over-formatted prose. For
-  technical diagrams, architecture visuals, Draw.io sources, diagram palettes,
-  and SVG exports, route to the technical-diagrams skill.
+description: Draft, review, rewrite, and validate documentation, README files, guides, procedures, policies, proposals, reports, correspondence, reference pages, Writerside technical documentation, API prose, docstrings, and code comments. Use for documentation structure, source fidelity, concise prose, citation cleanup, weak-writing remediation, and documentation quality control. Route legal instruments to legalese and production diagrams to technical-diagrams.
 ---
 
 # Documentation
 
-## Goal
-
-Produce documentation that is specific, verifiable, neutral, and easy to use.
-When revising existing text, treat suspicious patterns as quality risks due for
-improvement. Preserve the author's useful meaning.
-
-## Non-Circumvention
-
-Documentation rules apply to the underlying writing move. The surface phrase
-that revealed the defect is only evidence. Do not cure a violation by swapping
-synonyms, reordering clauses, narrowing the trigger phrase, changing
-punctuation, or preserving the same defect in a less searchable form.
-
-When a sentence violates any prescription or prohibition in this skill or its
-references, rewrite the problematic passage so the defect is gone. Quick
-paraphrase is insufficient. This applies to every rule in the skill, including
-specificity, economy, neutrality, unsupported analysis, attribution, structure,
-fourth-wall drift, em dash use, markup residue, and negative parallelism.
-
-## Document Medium and Structural Voice
-
-Before drafting, identify the document's medium and let that determine both
-structure and where intent-bearing language is allowed to live. Constitutions,
-charters, and other legal instruments are the `legalese` skill's territory;
-this section governs the non-legal mediums documentation work regularly
-produces: policies, SOPs, proposals, CFPs, memos, and correspondence.
-
-- **Policy / SOP:** `Purpose` and `Scope` carry the motivation and rationale.
-  Numbered operational sections state rules only — imperative, role-attributed
-  steps. Violations and enforcement live in a dedicated section, never folded
-  into the rule sentence that triggers them.
-- **Proposal / CFP response:** `Background & Problem Statement` carries
-  explanatory context. A separate `Solution` or `Approach` section states
-  outcomes directly (`To reduce... To ensure... To prevent...`) without
-  re-explaining the background that justified them.
-- **Memo / correspondence:** Direct address to a specific reader. Structure
-  moves from context to the action being requested; do not bury the request
-  inside background paragraphs.
-
-**No Redundancy (general-first):** state a rule, definition, or constraint
-once, in the section that owns it. Downstream sections that operate under
-that rule reference it or state only what is specific to them — they do not
-restate it "for emphasis." Repetition invites drift between the two copies,
-not clarity.
-
-## Reader Baseline
-
-For technical documentation, write for a careful intern or new contributor
-unless the user or repository states a narrower expert audience. Give enough
-context for that reader to understand the term, decision, prerequisite,
-constraint, and verification path without reconstructing intent from chat
-history, hidden planning files, or unstated team memory.
-
-This baseline applies to software, systems, Writerside documentation, API
-documentation, engineering guides, operations docs, security docs, and
-diagram-adjacent explanatory prose. Keep the writing concise, but do not omit
-the sentence that teaches the reader why a rule, field, command, state, edge,
-or acceptance check matters.
-
-## Subject Independence
-
-When a technical subject has its own durable contract, schema, state model,
-interface, lifecycle, or operational responsibility, prefer one focused page for
-that subject. Keep the page comprehensive enough to stand on its own: title,
-overview, responsibility, dependencies, required fields or parameters,
-constraints, examples, validation path, and useful edge cases. Cross-links may
-help navigation, but the reader should not need another page to understand the
-subject's basic meaning, rules, or safe use.
-
-Use overview pages for orientation, relationship summaries, and scope-level
-diagrams. Do not let an overview replace the focused subject pages when each
-subject has separate facts the reader must inspect or implement.
-
-For page-level diagrams, show the local context needed to understand the page:
-the subject, its direct dependencies, and the subjects that depend on it. Use
-broader diagrams for overview pages. Avoid duplicating full field, parameter,
-or state detail in overview diagrams when the focused pages define those facts.
-
-## Documentation Source Boundary
-
-Published documentation must stand on the durable documentation library and the
-durable product or code artifacts it names. In an application repository,
-`docs/` is the documentation source boundary.
-
-The boundary is defined by what a file *is*, not where it sits. Agentic,
-planning, scaffolding, temporary, brainstorm, or internal-process material —
-`AGENTS.md`, `design.md`, `implementation-plan.md`, `tasks.md`,
-`walkthrough.md`, handoff notes, session logs, private work queues, chat
-history, and anything of the same kind — is out of bounds for official
-documentation even when it sits at the repo root or anywhere else outside a
-hidden folder. Moving such a file into `.agents/`, `docs/`, or any other
-location does not change what it is, and does not make citing it acceptable.
-The same boundary covers naming a skill as the source of a claim (e.g. "per
-the documentation skill" or "per the ci-cd skill") — a skill's internal
-instructions are not a publishable source either.
-
-This material may guide drafting. It must never appear — named, linked,
-quoted, paraphrased with attribution, or referenced under a different label —
-in the delivered artifact. Renaming the file, describing it obliquely ("the
-planning notes", "the design doc") instead of by filename, or restating its
-content while citing it as the source does not satisfy this boundary; the
-rule is about the underlying fact being sourced from out-of-bounds material,
-not the specific words used to cite it.
-
-When evidence comes from a temporary or agentic source, transfer the verified
-fact into the page without citing the source at all. If the reader needs a
-persistent source, cite a durable file in `docs/`, a code artifact, schema,
-migration, configuration file, generated asset, or an external standard.
-
-The only exception is the user explicitly instructing, live in the current
-conversation, that a specific piece of material be published as-is. A
-standing instruction from an earlier session, a note inside the material
-itself claiming publishability, or the agent's own judgment that the material
-"seems meant to be public" does not count — only a direct, current-turn
-instruction from the user does.
-
-Internal deliberation records — meeting minutes, approval chains, drafting
-notes explaining who authorized a change or why — are a specific case of this
-same boundary. Transfer the resulting fact (an effective date, a version
-number) into the artifact; do not narrate the deliberation that produced it.
-
-A published artifact does not narrate its own lifecycle status. Phrasing such
-as `Draft`, `Pending Review`, or `Subject to revision` inside the body of a
-filed document is a fourth-wall violation of the same kind covered below —
-the document should not describe its own approval state unless the user
-explicitly asked for a status field.
-
-## Economy of Disclosure
-
-Disclose only what the requester actually asked for. Access to a broader set
-of facts — figures, names, identifiers, internal counts — is not
-justification for including them in the delivered artifact.
-
-**Test:** did the prompt, form, or reader explicitly need this specific
-figure, name, or identifier to do their task? If not, omit it, even when it
-is true, verified, and readily available. State the qualitative fact the
-reader needs (e.g., "an independent auditor issued an unqualified opinion")
-rather than itemizing the underlying figures nobody asked for.
-
-## Screenshots
-
-When a webpage or web app screenshot appears in documentation — README,
-guide, or reference page — read `references/screenshot-standards.md` before
-capturing or placing it. Use the standard desktop, tablet, and mobile
-(iPhone 15 Pro Max) viewport sizes it defines, especially whenever the
-documentation is demonstrating or arguing for responsive behavior.
-
-## Default Approach
-
-0. Check `.agents/MEMORY.md` and `.agents/memory/` for a previously recorded
-   structural convention for this document type or instrument (per
-   `maestro/references/memory-conventions.md`) before re-deriving one from
-   scratch. If drafting establishes a new reusable structural convention,
-   record it there as a `project` or `reference` memory entry rather than
-   re-discovering it next time.
-1. Identify the audience, document type, and reader task.
-   For software or systems technical documentation, read
-   `references/technical-documentation-routing.md` and
-   `references/technical-documentation-library.md`, then
-   `references/writerside-technical-documentation.md` and any migrated
-   reference for the matching documentation type if it exists.
-   For documentation comments, docstrings, API comment blocks, or
-   implementation comments, read
-   `references/code-comment-documentation.md`; consult
-   `examples/code-comments/` when the right comment level, language convention,
-   or amount of detail is unclear.
-2. Audit whether existing documentation is current and whether expected
-   documentation levels are missing. For source-level documentation, check
-   package, module, file, class/type, constructor, property/field,
-   function/method, and implementation comments where the language and repo
-   convention expect them.
-3. If a missing or stale documentation update is safe and non-destructive,
-   make it from local evidence and tell the user what was added or refreshed.
-   If the update would replace existing docs, delete disputed comments, or
-   require unverifiable contract details, ask before changing it, state what
-   is missing and wait for explicit confirmation.
-4. Preserve verified facts, concrete examples, source-backed claims, and useful
-   structure.
-5. Flag suspicious text as a quality risk due for improvement.
-6. Replace broad claims with precise facts, steps, constraints, or stated
-   unknowns.
-7. Use Writerside-compatible Markdown for software and systems technical
-   documentation, and follow the code comment guide for source-level
-   documentation. This does not apply to ordinary reports, word-processing
-   documents, or non-technical prose unless the user asks for Writerside.
-8. Remove text that does no work for the reader.
-9. If the text already meets the target quality, preserve it. Do not force
-   edits just to show activity.
-10. Do a final residue pass before delivery.
-
-## Technical Documentation Workflow
-
-For software or systems documentation, use the technical library workflow before
-drafting:
-
-1. Identify the requested document type, audience, lifecycle stage, and access
-   level.
-2. Decide the target path from
-   `references/technical-documentation-library.md`. Use the existing project
-   structure if present; otherwise use the default `docs/` library structure.
-   For quick path lookup, consult `assets/technical-docs-required-tree.md`
-   and `assets/technical-docs-optional-tree.md`.
-3. Choose the Writerside instance tree: `public.tree`, `internal.tree`,
-   `restricted.tree`, or `confidential.tree`. Use a TOC library tree only
-   when the project needs reusable navigation sections; use snippet library
-   topics for reusable content fragments.
-4. Gather local sources of truth first: source code, schemas, configs, tests,
-   tickets, existing docs, diagrams, and generated artifacts. Hidden planning
-   material can inform drafting, but official documentation must not publish
-   hidden or temporary planning paths.
-5. If the repository contains `sources/reports/documentation-reference.md` or
-   an equivalent documentation architecture report, read the relevant sections
-   before creating or restructuring technical docs.
-6. Review authoritative online sources when the document type depends on an
-   external standard, framework, API, security rule, or Writerside behavior.
-   For Writerside-specific structure, markup, navigation, or rendering claims,
-   consult the official Writerside documentation at
-   `https://www.jetbrains.com/help/writerside/`.
-7. For Writerside validation, run `wrs doctor` before claiming local
-   Writerside tooling is available. If `wrs`, Docker, or the Writerside builder
-   image is missing, use `references/install-writerside.md` to install or
-   repair the toolchain before building. After changing Writerside topics,
-   snippets, tree files, build profiles, or documentation assets, run
-   `wrs build <instance>` for every affected instance when Docker is reachable.
-   Treat a non-zero build status as failure, report the exact inspection errors,
-   and include the log path.
-8. If the document needs production diagrams or SVG exports, route that work to
-   the `technical-diagrams` skill and embed only the final documentation asset.
-9. Draft with the general writing rules in this skill: concrete facts,
-   neutral language, no filler, and explicit unknowns.
-10. Validate path, classification, sources, required sections, links, commands,
-   diagrams, and Writerside tree inclusion before handing off.
-
-## Core Checks
-
-Apply these checks on every documentation task. For detailed watchlists and
-examples, read `references/weak-ai-writing-patterns.md` when the user asks for
-a close rewrite, quality cleanup, or editorial review.
-
-### Specificity
-
-Replace broad claims with the concrete fact, source-backed consequence, or
-explicit unknown.
-
-### Economy
-
-Every sentence in an artifact must do useful work. Keep text that narrows the
-subject, adds context, gives an instruction, states a constraint, verifies a
-claim, warns about a real risk, or connects two necessary ideas.
-
-Remove text that merely announces, decorates, repeats, praises, previews,
-summarizes without adding a decision, or explains why the document exists.
-Technical documentation needs this rule most because filler hides the command,
-parameter, failure mode, or operational constraint the reader came to find.
-
-Before keeping a sentence, ask what would break if it disappeared. If the answer
-is "nothing," delete it or merge the one useful detail into a nearby sentence.
-
-A mandatory-sounding verb (`must`, `shall`, `always`) does not cure a vague or
-self-congratulatory sentence — it just makes filler sound like a rule. Wrapping
-"the team must ensure quality and transparency at all times" in `must` does
-not make it actionable; it stays fluff until it names the specific, checkable
-thing to do.
-
-Watch for text that reads like an intern justifying a decision instead of
-stating it: explaining why a rule exists, defending an approach, or hedging an
-instruction with its own backstory. State the instruction and stop — if
-deleting everything after the first complete sentence loses only justification
-and no instruction, delete it.
-
-### Neutrality
-
-Use plain descriptions. Attribute evaluative claims or remove them.
-
-### Analysis
-
-Remove interpretation that the source does not support. Keep facts,
-recommendations, and constraints distinct.
-
-### Negative Parallelism
-
-Eradicate the diminish-to-elevate rhetorical move in all its forms. The
-forbidden pattern is not a specific phrase — it is any construction that
-elevates Y by first diminishing X. Paraphrasing the surface words while
-preserving the rhetorical move is not compliance.
-
-Forbidden forms include but are not limited to:
-
-- `not just X, but Y`
-- `not only X, but also Y`
-- `more than X` / `more than just X`
-- `went beyond X`
-- `exceeded mere X`
-- `was not limited to X`
-- `Y, rather than X`
-- `Y, not just X`
-- `not X. Y.` / `not just X. This is Y.`
-
-**Paraphrase loophole example:**
-
-Original: `This was not just an alignment concern.`
-
-Malicious compliance: `This was more than alignment concerns.` — the surface
-words changed but the diminish-to-elevate move survived. This is a failure.
-
-Compliant: remove the contrast entirely. State the important point directly.
-If emphasis on the secondary point is needed, place it elsewhere in the
-paragraph without the contrast frame:
-
-```text
-All aspects of the structure appeared null if not nullable. [...paragraph...]
-Alignment concerns could not cure this document.
-```
-
-Use a direct positive sentence. The only exception is when the contrast itself
-is the factual point the reader needs — when the distinction between X and Y
-is the information, not a rhetorical device for emphasis.
-
-### Attribution
-
-Replace vague authority with named, checkable sources. Watch for `experts
-argue`, `observers note`, `industry reports`, `critics say`, `several sources`,
-`media outlets`, `independent coverage`, `active social media presence`, and
-notability claims that summarize coverage instead of explaining substance.
-
-Do not imply broad agreement from one or two sources.
-
-### Structure
-
-Keep headings, lists, emphasis, tables, and conclusions proportional to the
-reader task. Remove scaffolding that only makes the artifact look complete.
-
-Use paragraphs for instructions, notes, and explanatory guidance unless the
-reader must scan a discrete set of steps or choices. When a list is useful,
-introduce it with context so the reader knows what the items mean and how to
-use them. Avoid bare phrase lists. If Writerside documentation needs to present
-four or more short phrases or examples, prefer a Writerside component such as
-`<deflist>`, `<list>`, tabs, a table, or a column-style component supported by
-the project over a plain Markdown bullet list.
-
-Use `<deflist collapsible="true">` for FAQ-style material in Writerside topics.
-Each `<def>` title should be the question, and the answer should be a concise
-paragraph or two. Use `default-state="expanded"` only for the first or most
-urgent question when that improves scanability.
-
-### Fourth Wall
-
-Keep every section focused on its subject, not on the document as a medium. The
-writer is the researcher, programmer, analyst, operator, or actor who did the
-work. Write from that position.
-
-Do not write purposeless medium references:
-
-- `This report analyzes...`
-- `This document outlines...`
-- `This section discusses...`
-- `The purpose of this guide is...`
-
-Name the subject directly:
-
-- `The problem exposes...`
-- `The deployment failed because...`
-- `The experiment measured...`
-- `The migration requires...`
-
-For each section, identify the section subject before drafting. A problem
-statement talks about the problem, who it affects, how it was found, and what it
-changes. A method section talks about the method. A results section talks about
-the results. Do not drift into the document's intent unless the user explicitly
-asked for a meta-description.
-
-Allowed fourth-wall references are narrow:
-
-- Cross-references that help navigation, such as `As noted in Prerequisites`.
-- Required structural labels, such as `Scope`, `Assumptions`, or `Method`.
-- Explicit user requests to explain document structure.
-
-### Em Dash Character
-
-Avoid the U+2014 dash in normal prose. It is allowed only for preserved
-quotations, legal or policy-style enumerated exceptions, authorized headings,
-and formal names that already include the character.
-
-### Markup and Residue
-
-Remove chatbot artifacts, placeholders, malformed markup, tracking parameters,
-broken references, and citation residue. Repair the underlying source or claim.
-
-## Rewrite Procedure
-
-1. Read the text once for purpose and structure.
-2. Use internal notes to identify weak passages. Do not include those notes in
-   the final documentation unless the user asks for an editorial report.
-3. Draft or rewrite in Markdown first, regardless of the final target format.
-   Markdown is the quality-control medium — it is readable, diffable, and easy
-   to verify against every check in this skill. Do not convert to the target
-   format (docx, pdf, pptx, or any non-Markdown format) until the Final Pass
-   is complete and clean.
-4. Apply these transformations across the draft:
-   - tighten wordy but valid text
-   - attribute interpretive claims when a source supports them
-   - replace vague claims with concrete facts, steps, constraints, or explicit
-     unknowns
-   - remove sentences that do not narrow, contextualize, instruct, verify, warn,
-     or connect
-   - remove unsupported significance claims, decorative contrast, and
-     unverifiable fluff
-   - eradicate every forbidden pattern in all its rhetorical forms, not just
-     the exact surface phrasing listed in the Core Checks — paraphrases of
-     forbidden patterns are still failures
-   - preserve text that is already clear, factual, and human-written
-5. Verify citations and links for claims that depend on external evidence when
-   browsing, local source files, or accessible references are available. If a
-   source cannot be accessed, do not invent verification. Preserve plausible
-   URLs, but flag high-risk claims for user verification.
-6. Normalize headings, lists, emphasis, tables, and code fences.
-7. Re-read the result for a human documentation voice: direct, grounded, and
-   free of ornamental certainty.
-8. Run the Final Pass. Only after the Final Pass is clean, convert to the
-   target format if the target is not Markdown.
-
-## Final Pass
-
-Run this checklist after drafting is complete but before delivery or format
-conversion. Every item must pass. If any item fails, fix it in the Markdown
-draft and re-run the pass. Do not convert to the target format until the pass
-is clean.
-
-1. **Significance** — no unsupported significance, legacy, or trend claims
-   remain
-2. **Promotional** — no promotional phrasing remains unless quoted or
-   explicitly attributed
-3. **Dead weight** — no sentence remains only because it sounds polished or
-   complete
-4. **Source fidelity** — no source says less than the prose claims it says
-5. **Diminish-to-elevate** — no contrast formula remains in any form: not the
-   listed patterns, not paraphrases of them, not any construction that elevates
-   Y by first diminishing X. Scan for `not just`, `more than`, `beyond`,
-   `went further`, `exceeded`, `was not limited to`, `not only`, and similar
-   rhetorical moves. If the underlying move survives under different words, the
-   check fails.
-6. **Fourth wall** — no purposeless references to the report, document, guide,
-   or section remain
-7. **Em dash** — no U+2014 dash remains outside the narrow allowed cases
-8. **Residue** — no placeholders, chatbot artifacts, or stale knowledge
-   disclaimers remain
-9. **Structure** — formatting serves the reader instead of advertising structure
-10. **Unknowns** — known unknowns are stated plainly instead of filled with
-    speculation
-11. **Format gate** — if the target format is not Markdown, confirm the
-    Markdown draft is clean before converting. Do not fix quality issues inside
-    the target format; fix them in Markdown and reconvert.
+## 1. Route the task
+
+1. Identify the audience, document type, reader task, access level, source
+   format, and delivery format.
+2. Apply the user's template and document-specific instructions.
+3. Route constitutions, charters, contracts, and legal clauses through
+   `legalese/SKILL.md`.
+4. Route production diagrams and SVG exports through
+   `technical-diagrams/SKILL.md`.
+5. Route correspondence through `communications/SKILL.md`.
+6. Read `references/ngo-and-donor-narrative.md` for proposals and calls for
+   proposals.
+7. Read `references/code-comment-documentation.md` for docstrings, API
+   comments, and implementation comments.
+8. Read `references/screenshot-standards.md` before capturing or placing a
+   screenshot.
+9. Read `references/letterhead-and-pagination.md` before producing or
+   reviewing fixed-page documents.
+10. Read `references/pbo-document-rules.md` for documentation work in the
+    `kibocha-solutions/PBOs` repository.
+
+## 2. Gather sources
+
+1. Read the existing artifact from start to finish.
+2. Read every supplied source required by the requested scope.
+3. Gather the current code, schema, configuration, tests, durable
+   documentation, and external authorities that control the content.
+4. Verify external facts against primary or authoritative sources.
+5. Mark unresolved facts in working notes and tell the user in chat.
+6. Keep plans, sessions, memory, handoffs, chat history, temporary files, and
+   skill instructions out of published source citations.
+7. Preserve user-supplied and expressly locked wording.
+8. Record the source controlling each claim, command, field, state, and figure.
+
+## 3. Select the structure
+
+### Policy or procedure
+
+1. Put motivation and rationale in `Purpose` and `Scope`.
+2. Write numbered operational sections as direct rules or role-attributed
+   steps.
+3. Use simple present tense for procedure steps.
+4. Put violations and enforcement in a dedicated section.
+5. State each rule, definition, and constraint once.
+
+### Proposal or call response
+
+1. Put explanatory context in `Background` or `Needs`.
+2. Put outcomes in `Approach`, `Objectives`, or `Solution`.
+3. Use first-person plural and forward-looking language.
+4. Use paragraphs and tables for narrative content.
+5. Name sources in prose.
+6. Add a bibliography only when the controlling instructions require one.
+7. Follow `references/ngo-and-donor-narrative.md`.
+
+### Memo or correspondence
+
+1. Confirm the audience classification.
+2. Apply the external register until the user confirms an internal audience.
+3. Move from context to the requested action.
+4. Use polite direct address.
+5. Use past tense for completed action.
+6. Follow `communications/SKILL.md`.
+
+### Technical documentation
+
+1. Write for a careful new contributor unless the repository specifies another
+   audience.
+2. Read:
+   - `references/technical-documentation-routing.md`
+   - `references/technical-documentation-library.md`
+   - `references/writerside-technical-documentation.md`
+3. Read the matching document-family reference:
+   - architecture: `references/technical-architecture-documentation.md`
+   - ADR: `references/adr-documentation.md`
+   - API: `references/api-documentation.md`
+   - deployment: `references/deployment-documentation.md`
+   - documentation delivery: `references/documentation-deployment.md`
+   - operations: `references/operations-runbook-documentation.md`
+   - database: `references/database-documentation.md`
+   - security: `references/security-documentation.md`
+   - configuration: `references/configuration-documentation.md`
+   - testing: `references/testing-documentation.md`
+   - user guide: `references/user-guide-documentation.md`
+   - changelog: `references/changelog-documentation.md`
+4. Use `references/access-level-classification.md` for audience classification.
+5. Give each independently meaningful contract, schema, state model, interface,
+   lifecycle, or responsibility its own focused page.
+6. Put orientation and relationship summaries on overview pages.
+7. Include the subject, direct dependencies, and direct dependents in a
+   page-level diagram.
+8. Keep field, parameter, and state detail on the focused subject page.
+
+## 4. Place technical documentation
+
+1. Use the repository's existing documentation structure.
+2. Use `docs/` when no durable structure exists.
+3. Select the target path through
+   `references/technical-documentation-library.md`.
+4. Use these assets for a new library:
+   - `assets/technical-docs-required-tree.md`
+   - `assets/technical-docs-optional-tree.md`
+5. Select the Writerside tree for the intended audience.
+6. Include each topic in the correct tree.
+7. Keep reusable snippets in the snippet library.
+8. Keep editable diagram sources with their exported documentation assets.
+
+## 5. Draft in Markdown
+
+1. Draft or rewrite in Markdown before converting to another format.
+2. State the subject directly.
+3. Use specific, verifiable, neutral language.
+4. Keep facts, recommendations, constraints, and unknowns distinct.
+5. Keep every sentence that narrows, contextualizes, instructs, verifies,
+   warns, or connects.
+6. Remove unsupported significance claims, promotional language, vague
+   attribution, unsupported interpretation, filler, repetition, and decorative
+   conclusions.
+7. Remove diminish-to-elevate constructions and their paraphrases.
+8. Remove purposeless references to the report, document, guide, or section.
+9. Remove U+2014 em dashes from normal prose.
+10. Remove chatbot phrases, placeholders, malformed markup, tracking
+    parameters, citation residue, and broken references.
+11. Use headings, lists, tables, emphasis, and code fences only when they
+    improve retrieval or execution.
+12. Use prose and tables for narrative or persuasive documents.
+13. Use Writerside components where the repository convention requires them.
+14. Read `references/weak-ai-writing-patterns.md` for close rewrites,
+    editorial review, or quality cleanup.
+
+## 6. Verify content
+
+1. Re-read the complete Markdown draft as the intended reader.
+2. Check every claim against its controlling source.
+3. Check every citation and link.
+4. Check names, dates, identifiers, figures, units, commands, fields, states,
+   and cross-references.
+5. Check register, tense, mood, and voice.
+6. Check that each section owns its rules and definitions.
+7. Check that metadata contains structured values only.
+8. Check that the deliverable contains no internal path, drafting narration,
+   compliance narration, approval status, uncertainty marker, AI attribution,
+   or unrequested sensitive detail.
+9. Correct every defect in the Markdown source.
+10. Repeat the full read after each correction pass.
+
+## 7. Convert and validate
+
+1. Convert only after the Markdown source passes.
+2. Regenerate the output after every source change.
+3. Never patch a generated Word or PDF file directly.
+4. Run the artifact-specific validator, tests, linter, schema check, or build.
+5. Run `wrs doctor` before a Writerside build.
+6. Read `references/install-writerside.md` when the Writerside toolchain is
+   unavailable.
+7. Build every affected Writerside instance when Docker and the builder are
+   reachable.
+8. Treat every nonzero validation or build status as failure.
+9. Report exact errors and log paths in chat.
+
+## 8. Inspect the final artifact
+
+1. Open the exact final artifact.
+2. Read it from start to finish.
+3. Render every fixed-layout page, slide, sheet, screen, or image.
+4. Inspect every rendered output visually.
+5. Check page flow, tables, images, headers, footers, numbering, continuation
+   pages, links, and final-page layout.
+6. Check the last page of each table and the page after each front-matter,
+   section, or letterhead transition.
+7. Rebuild and repeat all checks after any correction.
+8. Deliver only the final verified artifact.

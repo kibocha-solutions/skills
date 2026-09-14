@@ -38,5 +38,4 @@ the stated scope by default (e.g. backup snapshots) unless told otherwise.
 "The instruction was explicit" is not sufficient on its own to skip this
 when the operation is irreversible, spans repos outside the current
 workspace, or the instruction has any real ambiguity in scope. See
-`AGENTS.md`'s Prompt Injection Defense section, Tier 2, for the underlying
-rule this generalizes from.
+`AGENTS.md`, Destructive and privileged actions, for the controlling rule.

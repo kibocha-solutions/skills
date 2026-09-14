@@ -35,9 +35,8 @@ combination confirmed working in both `~/.codex/config.toml` and
 does not need this treatment — its `cgc` shim works fine invoked bare.
 
 **Why:** three separate sessions (`antigravity-mcp-activation`,
-`graphify-mcp-correction`, `setup-graphify-mcp` in
-`.agents/brain/archive/`) each rediscovered part of this from scratch,
-including one that wrote the config to the wrong path
+`graphify-mcp-correction`, `setup-graphify-mcp`) each rediscovered part of
+this from scratch, including one that wrote the config to the wrong path
 (`antigravity-cli/`) before the correct path was found empirically.
 
 **How to apply:** when registering `code-review-graph` as an MCP server for

@@ -1,314 +1,136 @@
 ---
 name: pdf
-description: Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.
+description: Read, extract, create, edit, merge, split, rotate, watermark, encrypt, decrypt, OCR, fill, render, inspect, and verify PDF files. Use whenever a PDF is an input, output, source, or final artifact.
 license: Proprietary. LICENSE.txt has complete terms
 ---
 
-# PDF Processing Guide
-
-## Overview
-
-This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
-
-## Quick Start
-
-```python
-from pypdf import PdfReader, PdfWriter
-
-# Read a PDF
-reader = PdfReader("document.pdf")
-print(f"Pages: {len(reader.pages)}")
-
-# Extract text
-text = ""
-for page in reader.pages:
-    text += page.extract_text()
-```
-
-## Python Libraries
-
-### pypdf - Basic Operations
-
-#### Merge PDFs
-```python
-from pypdf import PdfWriter, PdfReader
-
-writer = PdfWriter()
-for pdf_file in ["doc1.pdf", "doc2.pdf", "doc3.pdf"]:
-    reader = PdfReader(pdf_file)
-    for page in reader.pages:
-        writer.add_page(page)
-
-with open("merged.pdf", "wb") as output:
-    writer.write(output)
-```
-
-#### Split PDF
-```python
-reader = PdfReader("input.pdf")
-for i, page in enumerate(reader.pages):
-    writer = PdfWriter()
-    writer.add_page(page)
-    with open(f"page_{i+1}.pdf", "wb") as output:
-        writer.write(output)
-```
-
-#### Extract Metadata
-```python
-reader = PdfReader("document.pdf")
-meta = reader.metadata
-print(f"Title: {meta.title}")
-print(f"Author: {meta.author}")
-print(f"Subject: {meta.subject}")
-print(f"Creator: {meta.creator}")
-```
-
-#### Rotate Pages
-```python
-reader = PdfReader("input.pdf")
-writer = PdfWriter()
-
-page = reader.pages[0]
-page.rotate(90)  # Rotate 90 degrees clockwise
-writer.add_page(page)
-
-with open("rotated.pdf", "wb") as output:
-    writer.write(output)
-```
-
-### pdfplumber - Text and Table Extraction
-
-#### Extract Text with Layout
-```python
-import pdfplumber
-
-with pdfplumber.open("document.pdf") as pdf:
-    for page in pdf.pages:
-        text = page.extract_text()
-        print(text)
-```
-
-#### Extract Tables
-```python
-with pdfplumber.open("document.pdf") as pdf:
-    for i, page in enumerate(pdf.pages):
-        tables = page.extract_tables()
-        for j, table in enumerate(tables):
-            print(f"Table {j+1} on page {i+1}:")
-            for row in table:
-                print(row)
-```
-
-#### Advanced Table Extraction
-```python
-import pandas as pd
-
-with pdfplumber.open("document.pdf") as pdf:
-    all_tables = []
-    for page in pdf.pages:
-        tables = page.extract_tables()
-        for table in tables:
-            if table:  # Check if table is not empty
-                df = pd.DataFrame(table[1:], columns=table[0])
-                all_tables.append(df)
-
-# Combine all tables
-if all_tables:
-    combined_df = pd.concat(all_tables, ignore_index=True)
-    combined_df.to_excel("extracted_tables.xlsx", index=False)
-```
-
-### reportlab - Create PDFs
-
-#### Basic PDF Creation
-```python
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-
-c = canvas.Canvas("hello.pdf", pagesize=letter)
-width, height = letter
-
-# Add text
-c.drawString(100, height - 100, "Hello World!")
-c.drawString(100, height - 120, "This is a PDF created with reportlab")
-
-# Add a line
-c.line(100, height - 140, 400, height - 140)
-
-# Save
-c.save()
-```
-
-#### Create PDF with Multiple Pages
-```python
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
-from reportlab.lib.styles import getSampleStyleSheet
-
-doc = SimpleDocTemplate("report.pdf", pagesize=letter)
-styles = getSampleStyleSheet()
-story = []
-
-# Add content
-title = Paragraph("Report Title", styles['Title'])
-story.append(title)
-story.append(Spacer(1, 12))
-
-body = Paragraph("This is the body of the report. " * 20, styles['Normal'])
-story.append(body)
-story.append(PageBreak())
-
-# Page 2
-story.append(Paragraph("Page 2", styles['Heading1']))
-story.append(Paragraph("Content for page 2", styles['Normal']))
-
-# Build PDF
-doc.build(story)
-```
-
-#### Subscripts and Superscripts
-
-**IMPORTANT**: Never use Unicode subscript/superscript characters (₀₁₂₃₄₅₆₇₈₉, ⁰¹²³⁴⁵⁶⁷⁸⁹) in ReportLab PDFs. The built-in fonts do not include these glyphs, causing them to render as solid black boxes.
-
-Instead, use ReportLab's XML markup tags in Paragraph objects:
-```python
-from reportlab.platypus import Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-
-styles = getSampleStyleSheet()
-
-# Subscripts: use <sub> tag
-chemical = Paragraph("H<sub>2</sub>O", styles['Normal'])
-
-# Superscripts: use <super> tag
-squared = Paragraph("x<super>2</super> + y<super>2</super>", styles['Normal'])
-```
-
-For canvas-drawn text (not Paragraph objects), manually adjust font the size and position rather than using Unicode subscripts/superscripts.
-
-## Command-Line Tools
-
-### pdftotext (poppler-utils)
-```bash
-# Extract text
-pdftotext input.pdf output.txt
-
-# Extract text preserving layout
-pdftotext -layout input.pdf output.txt
-
-# Extract specific pages
-pdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5
-```
-
-### qpdf
-```bash
-# Merge PDFs
-qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf
-
-# Split pages
-qpdf input.pdf --pages . 1-5 -- pages1-5.pdf
-qpdf input.pdf --pages . 6-10 -- pages6-10.pdf
-
-# Rotate pages
-qpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees
-
-# Remove password
-qpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf
-```
-
-### pdftk (if available)
-```bash
-# Merge
-pdftk file1.pdf file2.pdf cat output merged.pdf
-
-# Split
-pdftk input.pdf burst
-
-# Rotate
-pdftk input.pdf rotate 1east output rotated.pdf
-```
-
-## Common Tasks
-
-### Extract Text from Scanned PDFs
-```python
-# Requires: pip install pytesseract pdf2image
-import pytesseract
-from pdf2image import convert_from_path
-
-# Convert PDF to images
-images = convert_from_path('scanned.pdf')
-
-# OCR each page
-text = ""
-for i, image in enumerate(images):
-    text += f"Page {i+1}:\n"
-    text += pytesseract.image_to_string(image)
-    text += "\n\n"
-
-print(text)
-```
-
-### Add Watermark
-```python
-from pypdf import PdfReader, PdfWriter
-
-# Create watermark (or load existing)
-watermark = PdfReader("watermark.pdf").pages[0]
-
-# Apply to all pages
-reader = PdfReader("document.pdf")
-writer = PdfWriter()
-
-for page in reader.pages:
-    page.merge_page(watermark)
-    writer.add_page(page)
-
-with open("watermarked.pdf", "wb") as output:
-    writer.write(output)
-```
-
-### Extract Images
-```bash
-# Using pdfimages (poppler-utils)
-pdfimages -j input.pdf output_prefix
-
-# This extracts all images as output_prefix-000.jpg, output_prefix-001.jpg, etc.
-```
-
-### Password Protection
-```python
-from pypdf import PdfReader, PdfWriter
-
-reader = PdfReader("input.pdf")
-writer = PdfWriter()
-
-for page in reader.pages:
-    writer.add_page(page)
-
-# Add password
-writer.encrypt("userpassword", "ownerpassword")
-
-with open("encrypted.pdf", "wb") as output:
-    writer.write(output)
-```
-
-## Quick Reference
-
-| Task | Best Tool | Command/Code |
-|------|-----------|--------------|
-| Merge PDFs | pypdf | `writer.add_page(page)` |
-| Split PDFs | pypdf | One page per file |
-| Extract text | pdfplumber | `page.extract_text()` |
-| Extract tables | pdfplumber | `page.extract_tables()` |
-| Create PDFs | reportlab | Canvas or Platypus |
-| Command line merge | qpdf | `qpdf --empty --pages ...` |
-| OCR scanned PDFs | pytesseract | Convert to image first |
-| Fill PDF forms | pdf-lib or pypdf (see FORMS.md) | See FORMS.md |
-
-## Next Steps
-
-- For advanced pypdfium2 usage, see REFERENCE.md
-- For JavaScript libraries (pdf-lib), see REFERENCE.md
-- If you need to fill out a PDF form, follow the instructions in FORMS.md
-- For troubleshooting guides, see REFERENCE.md
+# PDF
+
+## 1. Establish the operation
+
+1. Identify every input PDF and the requested output.
+2. Preserve the original input unless the user requests replacement.
+3. Work from editable source files when they exist.
+4. Treat a PDF as a derived artifact when source Markdown, DOCX, HTML, or generation code exists.
+5. Regenerate derived PDFs after every source change.
+6. Do not hand-patch a generated final PDF.
+7. Read `../system-init/SKILL.md` before installing a missing tool or library.
+
+## 2. Inspect the input
+
+1. Confirm that each file exists and opens.
+2. Run `pdfinfo` to record page count, page size, encryption, metadata, and PDF version.
+3. Run `qpdf --check` when `qpdf` is available.
+4. Check whether text is extractable.
+5. Check whether the document contains AcroForm fields.
+6. Check page rotation and mixed page sizes.
+7. Record passwords or access constraints without exposing them in logs or output.
+
+## 3. Read a text PDF
+
+1. Extract text with `pdftotext` or `pdfplumber`.
+2. Preserve page boundaries in the extracted text.
+3. Read the complete extracted text in order.
+4. Render pages containing tables, figures, signatures, stamps, forms, or ambiguous layout.
+5. Compare important text with the rendered page.
+6. Cite page numbers when reporting findings.
+
+## 4. Read a scanned PDF
+
+1. Render every page to images with Poppler.
+2. Inspect the rendered pages in page order.
+3. Run OCR when searchable text is required.
+4. Keep OCR output separate from the source PDF.
+5. Verify names, numbers, dates, tables, and legal text against page images.
+6. Record the page ranges actually inspected.
+7. Do not claim the document was read until every required page has been inspected.
+
+## 5. Extract text, tables, or images
+
+1. Use `pdftotext -layout` for layout-preserving text extraction.
+2. Use `pdfplumber` for tables and bounding boxes.
+3. Use `pdfimages` for embedded images.
+4. Preserve page numbers and table order.
+5. Validate extracted row and column boundaries against rendered pages.
+6. Use the spreadsheet skill when the requested deliverable is a spreadsheet.
+7. Do not treat OCR or automated table extraction as verified without visual comparison.
+
+## 6. Merge, split, rotate, crop, or reorder
+
+1. Record the requested page order and page ranges.
+2. Use `qpdf` or `pypdf`.
+3. Preserve page boxes, orientation, metadata, bookmarks, annotations, and forms when required.
+4. Write to a new output path.
+5. Verify the final page count and order.
+6. Render the first page, last page, every transition, and every modified page.
+7. Inspect every page when the operation affects the whole document.
+
+## 7. Add watermarks, annotations, or overlays
+
+1. Confirm the target pages, text, opacity, rotation, position, and layer order.
+2. Preserve existing content and annotations.
+3. Use embedded fonts with required glyph coverage.
+4. Use ReportLab `<sub>` and `<super>` markup in paragraph content.
+5. Do not use unsupported Unicode subscript or superscript glyphs with built-in ReportLab fonts.
+6. Check overlay placement at each page size and orientation.
+
+## 8. Create a PDF
+
+1. Read the documentation skill.
+2. Read [letterhead and pagination](../documentation/references/letterhead-and-pagination.md) for fixed-page documents.
+3. Define page size, margins, typography, hierarchy, headers, footers, and folios before generation.
+4. Use ReportLab, a source document workflow, or the project generator.
+5. Keep generation logic separate from the final PDF.
+6. Embed fonts required for all characters.
+7. Apply table widow and orphan controls.
+8. Scale images proportionally within the content area.
+9. Keep body content flowing without unexplained dead gaps.
+10. Generate the complete PDF from source.
+
+## 9. Fill a PDF form
+
+Read [form filling](forms.md) in full.
+
+1. Detect fillable fields with `scripts/check_fillable_fields.py`.
+2. Use the fillable-field workflow when AcroForm fields exist.
+3. Use the annotation workflow only when fillable fields do not exist.
+4. Extract field identifiers, types, options, pages, and coordinates.
+5. Match every value to the correct field and page.
+6. Validate bounding boxes before writing annotations.
+7. Preserve unfilled fields unless the user directs otherwise.
+8. Render and inspect every filled page.
+9. Verify checkbox, radio, choice, signature, and multiline states.
+
+## 10. Encrypt or decrypt
+
+1. Confirm the requested operation and output path.
+2. Use a user-provided password or approved secure input path.
+3. Do not print or store passwords in repository files.
+4. Preserve the original encrypted file.
+5. Apply requested printing, copying, and modification permissions.
+6. Verify encryption status with `qpdf --show-encryption` or an equivalent check.
+7. Open the final PDF with the intended password.
+
+## 11. Repair or optimize
+
+1. Run `qpdf --check` before repair.
+2. Preserve the original file.
+3. Write repaired or optimized output to a new file.
+4. Compare page count, page sizes, metadata, bookmarks, forms, and attachments.
+5. Extract text from both versions and compare expected content.
+6. Render and inspect the final output.
+
+Use [the advanced reference](reference.md) only for operations not covered above.
+
+## 12. Verify the exact final PDF
+
+1. Confirm the final file exists and is reachable.
+2. Run `pdfinfo` on the final file.
+3. Run `qpdf --check` when available.
+4. Extract text from the final file and search for required and prohibited content.
+5. Render every page to PNG or JPEG at a readable resolution.
+6. Inspect every rendered page.
+7. Check clipping, overlap, blank pages, dead gaps, orphaned headings, split tables, image scaling, headers, footers, folios, letterhead, signatures, and form values.
+8. Reopen encrypted output with the intended credentials.
+9. Re-run verification after every correction.
+10. Deliver only the verified final PDF.

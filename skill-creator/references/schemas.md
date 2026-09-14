@@ -2,7 +2,16 @@
 
 This document defines the JSON schemas used by skill-creator.
 
----
+## Contents
+
+- [evals.json](#evalsjson)
+- [history.json](#historyjson)
+- [grading.json](#gradingjson)
+- [metrics.json](#metricsjson)
+- [timing.json](#timingjson)
+- [benchmark.json](#benchmarkjson)
+- [comparison.json](#comparisonjson)
+- [analysis.json](#analysisjson)
 
 ## evals.json
 
@@ -198,7 +207,8 @@ Output from the executor agent. Located at `<run-dir>/outputs/metrics.json`.
 
 Wall clock timing for a run. Located at `<run-dir>/timing.json`.
 
-**How to capture:** When a subagent task completes, the task notification includes `total_tokens` and `duration_ms`. Save these immediately — they are not persisted anywhere else and cannot be recovered after the fact.
+**Capture:** Save `total_tokens` and `duration_ms` when the task notification
+arrives. The notification is the controlling source for these values.
 
 ```json
 {

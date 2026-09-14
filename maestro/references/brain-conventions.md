@@ -1,195 +1,63 @@
 # Brain Conventions
 
-This file defines the authoritative directory layout and naming rules for the `.agents/brain/` system.
+## Directory layout
 
----
-
-## Root Location
-
-The brain always lives at the **project workspace root**:
-
-```
-<project-root>/
-└── .agents/
-    ├── brain/
-    │   ├── session/
-    │   │   ├── active/
-    │   │   └── archive/
-    │   └── handoffs/   ← in-progress-work continuity notes, see below
-    └── skills/        ← skills live here in repos that bundle them
+```text
+<project-root>/.agents/
+├── MEMORY.md
+├── memory/
+└── brain/
+    ├── handoffs/
+    └── sessions/
+        ├── active/
+        └── archive/
 ```
 
-The `.agents/brain/` directory is committed to version control. It is part of the project, not a hidden cache. This means any agent — or human — can inspect past sessions, review decisions, and understand the full history of how the project evolved.
+## Session name
 
----
+Use `YYYY-MM-DD-HHMM-<slug>`.
 
-## Session Naming
+1. Use local time.
+2. Use two to five lowercase words.
+3. Separate words with hyphens.
+4. Describe the task.
+5. Do not use generic slugs such as `task` or `work`.
 
-Session folders use a fixed format:
+## Session layout
 
-```
-YYYY-MM-DD-HHMM-<slug>
-```
-
-- **YYYY-MM-DD** — ISO date of session creation (local time)
-- **HHMM** — 24-hour time of session creation, no colon
-- **slug** — 2–5 lowercase words describing the task, hyphen-separated
-
-### Good slug examples
-| Task | Slug |
-|---|---|
-| Refactor product documentation | `product-doc-refactor` |
-| Implement JWT authentication | `jwt-auth-implementation` |
-| Migrate Postgres to v15 | `postgres-v15-migration` |
-| Build admin dashboard UI | `admin-dashboard-ui` |
-
-### Rules
-- Slugs describe the **task**, not the outcome ("add-login-page" not "login-done")
-- No version numbers in slugs — use the date for versioning
-- No abbreviations that aren't universally obvious (use `auth` not `athntctn`)
-- Maximum 5 words. If you need more, you have two tasks, not one.
-
----
-
-## Session Structure
-
-```
-.agents/brain/sessions/active/<session-slug>/
-├── meta/                    # Supporting content
-│   ├── research-notes.md    # Research gathered before planning
-│   ├── context.md           # Domain context, constraints, decisions
-│   └── <anything else>/     # Diagrams, copied reference files, etc.
-├── implementation_plan.md   # The contract (required for full sessions)
-├── tasks.md                 # Live checklist (required)
-├── walkthrough.md           # Completion record (required)
-└── goal.md                  # Goal spec + thresholds (optional)
+```text
+<session>/
+├── meta/
+├── implementation_plan.md
+├── tasks.md
+├── walkthrough.md
+└── goal.md
 ```
 
-### meta/
-Anything you want the next agent to have ready without re-researching:
-- Notes from web research
-- API docs snippets
-- Decisions made and why
-- Files copied for reference
-
-Keep meta files concise. They are not the walkthrough — they are *inputs* to the plan, not outputs of the work.
-
-### implementation_plan.md
-The plan, written before execution starts. See `SKILL.md §3` for the required structure.
-
-### tasks.md
-The live checklist, updated continuously during execution. See `SKILL.md §4`.
-
-### walkthrough.md
-The completion record. Written for the next agent or human reviewer. See `SKILL.md §5`.
-
-### goal.md
-Optional goal specification. See `references/goal-protocol.md` for the format and when to create it.
-
----
-
-## Active vs. Archive
-
-| State | Location | Meaning |
-|---|---|---|
-| `active/` | `.agents/brain/sessions/active/<slug>/` | Work is in progress or paused |
-| `archive/` | `.agents/brain/sessions/archive/<slug>/` | Session is complete and frozen |
-
-An archived session is **never modified**. It is a historical record.
-
-When archiving:
-1. Ensure `walkthrough.md` is complete and accurate.
-2. Ensure all `tasks.md` items are `[x]` or explicitly noted as deferred/abandoned.
-3. Move (do not copy) the session folder from `active/` to `archive/`.
-
-```bash
-mv .agents/brain/sessions/active/<slug> .agents/brain/sessions/archive/<slug>
-```
-
----
+1. Require `implementation_plan.md`, `tasks.md`, and `walkthrough.md` for a full session.
+2. Use `meta/` for task-specific sources and research.
+3. Create `goal.md` only when authorized or required.
+4. Keep generated binaries and downloaded datasets out of version control.
 
 ## Handoffs
 
-`.agents/brain/handoffs/` holds continuity notes for work moving to a new
-chat session — a different, narrower purpose than a session folder. Where a
-session captures the full plan and execution record for one task, a handoff
-is a short note: what's in flight, what decision was just made, what the
-next agent needs to know before continuing. Named the same way as sessions
-(`YYYY-MM-DD-HHMM-<slug>.md`), but a single file, not a folder.
+1. Store handoffs in `.agents/brain/handoffs/`.
+2. Name each handoff `YYYY-MM-DD-HHMM-<slug>.md`.
+3. Record the objective, current task, completed work, changed files, verification, blockers, and next action.
+4. Create a handoff before moving substantial unfinished work to another task or chat.
+5. Do not use a handoff as permanent policy.
 
-Create one when work is about to move to a new chat, a major decision was
-made, a repo-structure change was completed, or the next agent would
-otherwise have to reconstruct scattered context. Don't create one for every
-small edit, and don't treat a handoff as permanent policy — if it conflicts
-with `AGENTS.md` or the user's latest instruction, the higher-priority
-source wins.
+## Multiple sessions
 
-## Gitignore Considerations
+1. List every active session before creating a new one.
+2. Match by objective before slug.
+3. Keep independent tasks in separate sessions.
+4. Do not merge sessions.
+5. Do not archive an incomplete session without user authorization.
 
-Do **not** gitignore `.agents/brain/`. The entire brain is project history.
+## Version control
 
-You may gitignore large generated artifacts inside `meta/` if they are reproducible (e.g., downloaded datasets, compiled binaries). Mark these clearly in a `meta/README.md`.
-
-Example `.gitignore` entry if needed:
-```gitignore
-# Reproducible artifacts in brain meta — regenerate with scripts/fetch-data.sh
-.agents/brain/**/meta/raw-data/
-```
-
----
-
-## Client-Facing Exports
-
-Do not solve "clients shouldn't see agent tooling" by excluding `.agents/`
-from version control — that breaks cross-agent continuity for everyone
-working in the repo, and the underlying concern (code being judged as
-lower-quality merely for having visible AI-assistance markers, independent
-of actual quality) is real but solvable without giving up the tooling.
-
-Instead, mark agent-facing directories `export-ignore` in `.gitattributes`
-at the project root:
-
-```gitattributes
-.agents/ export-ignore
-.claude/ export-ignore
-```
-
-This strips them from anything produced by `git archive` (a release
-tarball, a zip export) while leaving them fully committed and functional in
-the working repo. It does not help if a client is given direct access to
-the live repository (added as a collaborator, repo transferred) — that
-requires a separate clean delivery branch with these directories removed
-and history squashed before handoff, which is a repo-specific decision, not
-a default.
-
----
-
-## Multiple Active Sessions
-
-A project may have more than one active session simultaneously. This is normal when:
-- Multiple independent features are in development
-- A blocked session is waiting on user input while another proceeds
-
-When starting work, scan **all** active sessions and identify the most relevant one by slug. If two sessions are equally relevant, read both `implementation_plan.md` files and pick the one that matches the current instruction.
-
-Never merge two active sessions. If work in one session overtakes or obsoletes another, archive the obsolete one with a note in its `walkthrough.md` explaining why.
-
----
-
-## Searching the Brain
-
-To find a prior session:
-
-```bash
-# List all active sessions
-ls .agents/brain/sessions/active/
-
-# List all archived sessions
-ls .agents/brain/sessions/archive/
-
-# Search for a topic across all session plans
-grep -r "jwt" .agents/brain/sessions/ --include="implementation_plan.md" -l
-
-# Find the most recent session
-ls -t .agents/brain/sessions/active/ | head -1
-```
+1. Keep `.agents/brain/` and `.agents/memory/` in version control unless the project policy says otherwise.
+2. Ignore only reproducible generated artifacts within session `meta/` folders.
+3. Use `.gitattributes` `export-ignore` for distributions that must omit agent files.
+4. Do not remove project continuity files merely to prepare a client export.

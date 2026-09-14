@@ -1,199 +1,112 @@
 ---
 name: maestro
-description: Plan, track, and execute complex multi-session tasks. Use this skill when a task requires structured planning before implementation, spans multiple chat sessions, involves distinct phases (research, build, verify), needs goal-based progress tracking with automatic threshold monitoring, or when the user asks to plan, map out, or orchestrate a project. Activate this skill proactively for any task that cannot be completed in a single straightforward step.
+description: Plan, track, resume, verify, and archive substantial or multi-session work with repository-local sessions under `.agents/brain/`. Use for multi-step tasks, phased work, long-running tasks, project orchestration, explicit planning requests, or work that must survive context changes.
 ---
 
 # Maestro
 
-Maestro is the agent planning and execution protocol. It gives every complex task a persistent home — a session folder in `.agents/brain/sessions/active/` — and keeps the agent oriented across restarts, scope changes, and long execution runs.
+## 1. Orient
 
-Read `references/brain-conventions.md` for the full directory specification.
-Read `references/session-lifecycle.md` for the session state machine.
-Read `references/goal-protocol.md` for goal activation, threshold monitoring, and archival logic.
-Read `references/memory-conventions.md` for what belongs in `.agents/MEMORY.md`, what doesn't, and when to write to it.
+1. Identify the project root.
+2. Read `.agents/MEMORY.md` in full when it exists.
+3. Read every topic file linked from relevant memory entries.
+4. Read relevant files in `.agents/brain/handoffs/`.
+5. List every session in `.agents/brain/sessions/active/`.
+6. Match the current task to active sessions by objective and slug.
+7. Do not create a duplicate session.
 
----
+Read [brain conventions](references/brain-conventions.md) before creating or moving session files.
 
-## 1. Orient First
+## 2. Resume or create a session
 
-At the start of any substantial task, before writing a single line of code or making any file change:
+### Resume
 
-1. Sweep `.agents/MEMORY.md` and any linked topic files in `.agents/memory/`,
-   plus the most recent relevant entry in `.agents/brain/handoffs/` if one exists, to get
-   acquainted with durable project knowledge and any in-flight continuity
-   notes. Do this whenever asked explicitly (e.g. "check memory," "what do
-   you know about this repo") and, where applicable, before any substantial
-   or multi-step task even without being asked.
-2. Check whether `.agents/brain/sessions/active/` contains a session for this task.
-   - Match by slug (keywords from the task description).
-   - If a match exists, read its `implementation_plan.md` and `tasks.md` to resume.
-3. If no matching session exists, create one now. See §2.
+1. Read `tasks.md`.
+2. Read `implementation_plan.md` when present.
+3. Read `walkthrough.md`.
+4. Read `goal.md` when present.
+5. Continue the current `[/]` task or the first `[ ]` task.
+6. Do not re-plan completed work.
 
-This step is mandatory. An agent that skips it risks duplicating work,
-overwriting a prior plan, or re-deriving knowledge that was already recorded.
+### Create
 
----
+1. Create `.agents/brain/sessions/active/YYYY-MM-DD-HHMM-<slug>/`.
+2. Use local time and a two-to-five-word lowercase slug.
+3. Create `meta/`, `implementation_plan.md`, `tasks.md`, and `walkthrough.md`.
+4. Create `goal.md` only when the user requests a tracked goal or the governing runtime explicitly requires it.
+5. Put source material and task-specific research in `meta/`.
 
-## 2. Create a Session
+## 3. Write the plan
 
-Name the session folder using the format: `YYYY-MM-DD-HHMM-<slug>`
+Write `implementation_plan.md` before substantive edits.
 
-- Date/time from the current local time at session creation.
-- Slug: 2–5 lowercase words from the task, hyphen-separated. Be descriptive.
-  - Good: `2026-06-20-2242-product-doc-refactor`
-  - Good: `2026-06-21-0900-api-auth-implementation`
-  - Bad: `2026-06-20-2242-task` (too vague)
+1. State the objective and final user-visible outcome.
+2. List numbered, falsifiable acceptance criteria.
+3. List proposed changes by component and file.
+4. Mark each file `[NEW]`, `[MODIFY]`, `[MOVE]`, or `[DELETE]`.
+5. List blocking questions.
+6. List the verification method for every acceptance criterion.
+7. Stop for user input only when a missing decision would materially change the result or authority.
 
-Create this structure inside `.agents/brain/sessions/active/<session-slug>/`:
+## 4. Write and maintain tasks
 
-```
-<session-slug>/
-├── meta/                    # Supporting content: research notes, references, context
-├── implementation_plan.md   # The plan (see §3)
-├── tasks.md                 # Live TODO checklist (see §4)
-├── walkthrough.md           # Completion record (see §5)
-└── goal.md                  # Goal spec + thresholds (see goal-protocol.md — optional but recommended)
-```
+1. Set the state at the top of `tasks.md`.
+2. Divide work into ordered phases.
+3. Use `[ ]` for not started.
+4. Use `[/]` for the single active task.
+5. Use `[x]` only after artifact verification.
+6. Use `[!]` for a genuine blocker.
+7. Add unplanned work under `## Added`.
+8. Do not expand scope silently.
+9. Update the task list immediately after each state change.
 
----
+## 5. Execute
 
-## 3. Write the Implementation Plan
+1. Work through tasks in order.
+2. Preserve unrelated worktree changes.
+3. Apply the skills triggered by each task.
+4. Record material deviations in `walkthrough.md`.
+5. Record commands and verification results needed for resumption.
+6. Update `walkthrough.md` after each completed phase.
+7. Create a handoff before changing tasks or chats when reconstruction would otherwise be required.
 
-The `implementation_plan.md` is the contract for the task. Write it before touching any code or files.
+## 6. Monitor thresholds
 
-It must contain:
+Read [goal protocol](references/goal-protocol.md) when `goal.md` exists.
 
-### Goal Statement
-One clear paragraph: what is being built, why, and what "done" looks like from the user's perspective.
+1. Check progress, quality, and scope thresholds at the start of each continuation.
+2. Decompose stalled work.
+3. Re-plan work with repeated verification failures.
+4. Stop for the user when added scope crosses the approved threshold.
+5. Record every threshold event in `walkthrough.md`.
 
-### Acceptance Criteria
-A numbered list of verifiable conditions. These are not tasks — they are the finish line.
+## 7. Verify
 
-```markdown
-## Acceptance Criteria
-1. All API endpoints return correct status codes under test.
-2. The database migration runs without errors on a clean schema.
-3. The walkthrough documents every endpoint added.
-```
+Read [session lifecycle](references/session-lifecycle.md).
 
-Acceptance criteria must be falsifiable. "Works correctly" is not a criterion. "Returns 200 for valid inputs and 422 for invalid inputs" is.
+1. Confirm that every required task is `[x]`.
+2. Verify each acceptance criterion against the exact final artifact.
+3. Reopen failed criteria as tasks under `## Added`.
+4. Run every required automated, manual, and visual check.
+5. Read each changed instruction or narrative file in full.
+6. Record evidence and limitations in `walkthrough.md`.
+7. Set the session state to `DONE` only after all criteria pass.
 
-### Proposed Changes
-Group by component. List files as `[NEW]`, `[MODIFY]`, or `[DELETE]` with a one-line rationale each.
+## 8. Preserve durable knowledge
 
-### Open Questions
-Any ambiguity that blocks the plan. List these explicitly and stop for user input if they are blocking.
+Read [memory conventions](references/memory-conventions.md).
 
-### Verification Plan
-How the agent will confirm each acceptance criterion is met before closing the session.
+1. Identify facts, decisions, or user preferences that future work cannot recover cheaply from current artifacts.
+2. Update an existing topic before creating a new one.
+3. Keep behavioral rules in `AGENTS.md` or the relevant skill.
+4. Keep session state in the session folder.
+5. Keep secrets, private strategy, and client-confidential content out of memory.
 
----
+## 9. Archive
 
-## 4. Maintain tasks.md
-
-`tasks.md` is the live execution checklist. Update it continuously as work progresses.
-
-Status markers:
-- `[ ]` — not started
-- `[/]` — in progress (agent is actively working on this)
-- `[x]` — complete
-- `[!]` — blocked (waiting for user input or an external dependency)
-
-Rules:
-- Mark a task `[/]` when you begin it. Mark it `[x]` only when it is verifiably done.
-- Never mark `[x]` based on intent ("I will write the test"). Mark it only after the work exists.
-- If you add new tasks mid-execution (scope expansion), add them to a clearly labeled `## Added` section at the bottom. Do not silently expand the original task list.
-
-```markdown
-# Tasks — api-auth-implementation
-
-## Phase 1: Research
-- [x] Read existing auth middleware
-- [x] Document current token flow
-
-## Phase 2: Implementation
-- [x] Add JWT validation function
-- [/] Wire validation into route handlers
-- [ ] Write integration tests
-
-## Phase 3: Verification
-- [ ] Run test suite
-- [ ] Update walkthrough
-
-## Added
-- [ ] Fix token expiry edge case discovered during implementation
-```
-
----
-
-## 5. Maintain walkthrough.md
-
-`walkthrough.md` is the running record of what was done and why. It is written for the *next agent* reading this session, not for the current user.
-
-Update it as phases complete — do not wait until the end.
-
-Include:
-- What was changed and the rationale behind non-obvious decisions.
-- Commands run and their outcomes.
-- Any deviations from the implementation plan, and why.
-- Verification results (test output, screenshots if relevant).
-
----
-
-## 6. Goal Activation
-
-If `goal.md` exists in the session, the agent monitors three thresholds continuously. When any threshold is met, two things happen simultaneously:
-
-1. **Autonomous response** — the agent adjusts its execution strategy (see `references/goal-protocol.md` §3).
-2. **User notification** — the agent surfaces the condition clearly and, where appropriate, recommends `/goal` for a deeper autonomous run.
-
-Thresholds are defined in `goal.md`. Read `references/goal-protocol.md` before writing or evaluating `goal.md`.
-
-If `goal.md` does not exist, offer to create one when the task is complex or long-running.
-
----
-
-## 7. Session Archival
-
-Sessions are archived when a **new plan is issued** and the **prior session's tasks are all complete**.
-
-The lifecycle is:
-1. User gives a new instruction or the next phase of work begins.
-2. Agent checks the current active session's `tasks.md`.
-3. Before archiving, decide whether anything from this session is durable
-   knowledge that the next agent — possibly in a different session, possibly
-   a different tool entirely — would otherwise have to re-derive or ask for
-   again. If so, add or update an entry in `.agents/MEMORY.md` per
-   `references/memory-conventions.md`; an archived session folder is a
-   historical record, not something future agents browse by default.
-4. If all tasks are `[x]` (no `[ ]` or `[/]` remaining), finalize the walkthrough, then move the session folder from `active/` to `archive/`.
-5. Create a new session for the next phase.
-
-If tasks remain incomplete when a new instruction arrives, do **not** archive. Instead, flag the incomplete work to the user and ask whether to continue, defer, or abandon it.
-
-Do not archive proactively based on task completion alone — wait for the new-plan trigger.
-
----
-
-## 8. Resuming a Session
-
-When resuming after a context reset or new chat session:
-
-1. Read `tasks.md` to find the current `[/]` and `[ ]` items.
-2. Read `implementation_plan.md` to re-anchor on acceptance criteria.
-3. Read `walkthrough.md` to understand what was already done.
-4. Continue from where the last `[/]` task left off.
-
-Do not re-plan from scratch. The session folder is the source of truth.
-
----
-
-## 9. Minimal Session (Quick Tasks)
-
-For tasks that are complex enough to warrant a session but too small for a full plan, use a minimal session:
-
-- Create the session folder and `tasks.md`.
-- Skip `implementation_plan.md` and `goal.md`.
-- Write a brief `walkthrough.md` summary when done.
-
-Use judgment. A 3-step task needs a minimal session. A 30-step task needs the full protocol.
+1. Wait for a new task or phase before archiving a `DONE` session.
+2. Confirm the final walkthrough and acceptance evidence.
+3. Move the session from `sessions/active/` to `sessions/archive/`.
+4. Do not edit an archived session.
+5. Create a new session for the new task.
+6. Keep an incomplete session active unless the user authorizes abandonment.

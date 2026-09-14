@@ -45,10 +45,3 @@ Safe next Git action: autosquash locally, verify the final diff, then merge the 
 ```text
 fix(api): correct rate limiting behavior for burst traffic
 ```
-
-## Why this example matters
-
-The later agent must not assume `fix/api` is the long-lived feature branch or
-that the 14 visible commits are meant to survive review. It also must not rely
-on one-line log output when deciding the final commit style; the full log shows
-signature status, dates, subject shape, and body conventions.

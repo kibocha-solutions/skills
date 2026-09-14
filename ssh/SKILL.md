@@ -1,88 +1,82 @@
 ---
 name: ssh
-description: >
-  Configure, troubleshoot, and document SSH authentication, SSH access, SSH
-  config, password-manager SSH agents, Git SSH remotes, SSH commit signing,
-  host aliases, deploy keys, operator keys, and SSH security controls. Use
-  whenever the user mentions SSH keys, ssh-agent, Bitwarden SSH Agent,
-  1Password SSH Agent, WSL SSH, core.sshCommand, gpg.ssh.program,
-  allowedSignersFile, authorized_keys, bastions, deploy keys, or signed
-  commits.
+description: Configure, diagnose, secure, and document SSH access, SSH agents, host aliases, Git remotes, deploy keys, operator keys, and SSH commit signing across Linux, macOS, Windows, and WSL. Use for SSH keys, ssh-agent, password-manager agents, authorized_keys, bastions, Git SSH authentication, or SSH signing.
 ---
 
 # SSH
 
-## Goal
+## 1. Classify the task
 
-Help the user configure, diagnose, and document SSH access and SSH signing
-with platform-specific accuracy. Keep SSH concerns separate from CI/CD
-workflow concerns: this skill owns SSH methods, key paths, agents, host
-aliases, signing configuration, remote authentication, and infrastructure SSH
-controls.
+1. Identify the host environment and the SSH client that will run.
+2. Identify whether the task concerns server access, file transfer, tunneling, Git authentication, commit signing, or infrastructure controls.
+3. Identify every account, host, repository, key, agent, and configuration file in scope.
+4. Use the CI/CD skill for branch, commit, pull request, pipeline, release, or history workflow.
+5. Use this skill for SSH transport, identity, key, agent, and signing configuration.
 
-When the task also involves commits, branches, pull requests, CI pipelines,
-deployment, releases, or history cleanup, use the `ci-cd` skill for that
-workflow and this skill for the SSH portion.
+## 2. Inspect before changing
 
-## Reference Routing
+Run the applicable read-only checks:
 
-Read only the reference needed for the current SSH task:
+```bash
+ssh -V
+type -a ssh
+type -a ssh-add
+ssh-add -L
+git config --show-origin --get-regexp '^(core\.sshCommand|gpg\.format|gpg\.ssh\.program|gpg\.ssh\.allowedSignersFile|user\.signingkey|commit\.gpgsign)$'
+```
 
-- `references/ssh-access-guide.md` for general SSH use, server access, host
-  aliases, `scp`, `rsync`, `sftp`, tunnels, agent forwarding, Bitwarden, and
-  1Password agent setup.
-- `references/version-control-ssh-auth.md` for Git provider SSH
-  authentication, GitHub/GitLab/Bitbucket remote URLs, account aliases,
-  Windows OpenSSH, WSL, Bitwarden, 1Password, and local SSH keys for clone,
-  fetch, pull, and push.
-- `references/git-commit-signing-with-ssh-keys.md` for SSH commit signing,
-  `gpg.format ssh`, `user.signingkey`, `gpg.ssh.program`,
-  `gpg.ssh.allowedSignersFile`, provider verification, Bitwarden signing,
-  1Password signing, and local-key signing.
-- `references/securing-ssh-access.md` for critical infrastructure, operator
-  keys, deploy keys, service accounts, emergency access, rotation,
-  offboarding, `authorized_keys`, bastions, and production SSH controls.
+1. Inspect `SSH_AUTH_SOCK` without printing unrelated environment variables.
+2. Inspect the active SSH config file.
+3. Inspect the target Git remote when relevant.
+4. Identify which configuration layer supplies each effective value.
+5. Do not change configuration until the active route is proven.
 
-## Operating Rules
+## 3. Apply safety gates
 
-- Inspect the active environment before changing it. Prefer evidence from
-  `ssh -V`, `ssh-add -L`, `type -a ssh`, `type -a ssh-add`, `git config
-  --show-origin --get-regexp '^(core\.sshCommand|gpg\.format|gpg\.ssh\.program|gpg\.ssh\.allowedSignersFile|user\.signingkey|commit\.gpgsign)$'`,
-  `SSH_AUTH_SOCK`, and the relevant SSH config files.
-- Do not generate SSH keys unless the user explicitly asks for key generation.
-  When key generation is requested, do not print private-key material in chat.
-- Do not remove, replace, or bypass signing configuration just to make a Git
-  operation succeed. If signing is configured and fails, diagnose the active
-  signing path.
-- Do not introduce `npiperelay`, `socat`, `rbw`, or a WSL `SSH_AUTH_SOCK`
-  bridge for the selected Bitwarden-on-WSL method. The documented method uses
-  Windows OpenSSH from WSL with `core.sshCommand ssh.exe`,
-  `gpg.ssh.program /mnt/c/Windows/System32/OpenSSH/ssh-keygen.exe`, and shell
-  aliases for interactive convenience.
-- For 1Password on WSL, follow 1Password's WSL signing helper path from the
-  user's 1Password configuration. Do not invent the `op-ssh-sign-wsl.exe`
-  path if it is not visible in the environment or provided by the user.
-- When writing documentation, use direct procedure language. Avoid changelog
-  narration, fourth-wall commentary, unsupported design rationale, and
-  historical struggle notes.
-- If a later reference has already covered a concept in an earlier reference,
-  cross-reference the document by title instead of duplicating the full
-  explanation.
+1. Do not generate a key unless the user explicitly asks for key generation.
+2. Do not display, copy, transmit, or store private-key material in chat or repository files.
+3. Do not remove or replace a key, host entry, signer, agent, or access rule without explicit authorization for that target.
+4. Do not bypass host-key verification.
+5. Stop on a host-key mismatch until the expected fingerprint is verified through an independent trusted channel.
+6. Do not disable a service, reload SSH, edit a firewall, terminate a session, or change a privileged file unless the user explicitly requested that exact operation and the runtime permits it.
+7. Use `sudoedit` for authorized privileged file edits.
+8. Preserve a working access session while testing server configuration changes.
 
-## Verification Pattern
+## 4. Route to the procedure
 
-Use the narrowest verification set that proves the requested path:
+1. Read [SSH access](references/ssh-access-guide.md) for hosts, aliases, transfers, tunnels, and agent routing.
+2. Read [Git SSH authentication](references/version-control-ssh-auth.md) for provider remotes and multiple accounts.
+3. Read [SSH commit signing](references/git-commit-signing-with-ssh-keys.md) for Git signing and allowed signers.
+4. Read [critical infrastructure access](references/securing-ssh-access.md) for production, bastions, deploy keys, machine users, rotation, and offboarding.
+5. Read only the references required by the current task.
 
-- Agent visibility: `ssh-add -L` or, on WSL with Windows OpenSSH,
-  `ssh-add.exe -L`.
-- Provider authentication: `ssh -T git@github.com`, `ssh -T git@gitlab.com`,
-  `ssh -T git@bitbucket.org`, or the configured host alias.
-- Git remote use: `git ls-remote origin HEAD`.
-- SSH signing config: `git config gpg.format`,
-  `git config user.signingkey`, `git config gpg.ssh.program`, and
-  `git config gpg.ssh.allowedSignersFile`.
-- Commit verification: `git log --show-signature -1` after a signed test or
-  real commit.
+## 5. Configure the selected route
 
-Stop and report the exact failing command and error text when the evidence no
-longer supports the selected path.
+1. Use one SSH client and agent route consistently.
+2. Use host aliases for multiple accounts on the same provider or host.
+3. Put aliases in the configuration file read by the active SSH client.
+4. Use `IdentitiesOnly yes` when the client must offer a specific identity.
+5. Use the narrowest key scope that satisfies the task.
+6. Prefer repository-local Git identity and signing configuration when accounts differ by repository.
+7. Preserve existing signing configuration during authentication troubleshooting.
+8. Do not introduce an agent bridge when the selected platform route does not require one.
+
+## 6. Verify
+
+1. Verify agent visibility with `ssh-add -L` or the platform-specific equivalent.
+2. Verify the selected host alias with `ssh -G <alias>`.
+3. Verify server access with a harmless identity command.
+4. Verify provider authentication with the provider's documented SSH test command.
+5. Verify repository access with `git ls-remote origin HEAD`.
+6. Verify signing configuration with `git config --show-origin`.
+7. Verify an existing signed commit with `git log --show-signature -1`.
+8. Create a test commit only when the user authorized a commit.
+9. Stop and report the exact failing command and error when evidence contradicts the selected route.
+
+## 7. Document
+
+1. Record the active client, agent, config path, alias, public-key fingerprint, owner, scope, and verification command.
+2. Record the installation and removal location for infrastructure keys.
+3. Record review and rotation dates when required.
+4. Do not record private keys, secrets, internal URLs, or credentials.
+5. Use direct procedure language.
