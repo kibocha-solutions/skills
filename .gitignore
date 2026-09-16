@@ -3,3 +3,5 @@ ppt-master/
 .code-review-graph/
 # Project-local graph state (CGC + CRG); never commit
 .agents/code-graphs/
+sources/bundles/
+
