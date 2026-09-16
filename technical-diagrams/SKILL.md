@@ -57,15 +57,17 @@ Produce each applicable output:
   dependency.
 - If no renderer is available, complete source validation, report the missing capability, and do not claim rendered visual QA.
 
-## Final checks
+## Pre-completion checklist
 
 - [ ] Final `.drawio` source exists and parses.
 - [ ] Node identifiers are unique.
 - [ ] Edge references resolve.
 - [ ] Labels are complete and readable.
-- [ ] Required exports exist.
-- [ ] Exports match the final source.
+- [ ] Required SVG exports exist and match the final source.
 - [ ] Every rendered output was visually inspected.
 - [ ] No clipping, overlap, collision, orphan, or unintended whitespace remains.
 - [ ] Project palette, geometry, typography, and naming are preserved.
 - [ ] Unsupported validation claims are absent.
+- [ ] Zero AI attribution in diagram metadata, comments, or exported SVGs.
+- [ ] No U+2014 em dashes in normal prose.
+

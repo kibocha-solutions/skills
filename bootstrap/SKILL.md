@@ -32,14 +32,13 @@ Use these instruction files:
 |---|---|
 | Claude Code | `~/.claude/CLAUDE.md` |
 | Codex | `~/.codex/AGENTS.md` |
-| Gemini CLI | `~/.gemini/GEMINI.md` |
-| Gemini Antigravity | `~/.gemini/antigravity/builtin/GEMINI.md` |
+| Gemini CLI & Antigravity | `~/.gemini/GEMINI.md` |
 | GitHub Copilot | `~/.copilot/copilot-instructions.md` |
 
 1. Resolve each installed host's home directory.
 2. Under WSL, resolve the active Windows user under `/mnt/c/Users/`.
 3. Include an existing Windows-host instruction path.
-4. Keep Gemini CLI and Gemini Antigravity targets separate.
+4. Prune redundant root `AGENTS.md` files from host directories when the host uses a product-specific file.
 5. Skip a target whose product directory does not exist.
 
 ## 4. Align rules
@@ -85,7 +84,6 @@ bash ~/.claude/skills/bootstrap/scripts/ensure-claude-link.sh
 bash ~/.codex/skills/bootstrap/scripts/ensure-codex-link.sh
 bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-link.sh
 bash ~/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh
-bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-builtin-skills.sh
 ```
 
 For a source-checkout invocation, use the matching script under
@@ -93,21 +91,23 @@ For a source-checkout invocation, use the matching script under
 
 ## 7. Handle Gemini Antigravity
 
-1. Target `~/.gemini/antigravity/builtin/`.
-2. Align `builtin/GEMINI.md`.
-3. Synchronize managed skills into `builtin/skills/`.
-4. Preserve `agy-customizations`, `antigravity_guide`,
-   `permissioned-github`, and other unmanaged native skills.
-5. Check for `builtin/.checksum`.
-6. Warn the user before modifying `builtin/` when the checksum exists.
-7. Stop if Antigravity reports corruption or resets the directory.
+1. Target `~/.gemini/skills/`.
+2. Register managed skills in `~/.gemini/config/skills.json` and symlink to `~/.gemini/config/skills`.
+3. Align `~/.gemini/GEMINI.md` with shared rules.
+4. Remove redundant `AGENTS.md` from `~/.gemini/`.
+5. Preserve `~/.gemini/antigravity/builtin/skills/` exclusively for built-in application skills (`agy-customizations`, `antigravity_guide`, `generative_ui`, `migrate-workflows`, `permissioned-github`).
+6. Clean any managed skills accidentally placed in `builtin/skills/`.
 
-## 8. Register automated alignment
+## 8. Register automated alignment and compliance hooks
 
 1. Read `references/hook-registration.md`.
-2. Add only the requested host's `SessionStart` hook.
+2. Add the requested host's lifecycle hooks:
+   - Claude Code: `SessionStart` (alignment) and `UserPromptSubmit` (compliance enforcement) in `~/.claude/settings.json`.
+   - Gemini Antigravity: `PreInvocation` (compliance enforcement) in `~/.gemini/config/hooks.json`.
+   - Codex CLI: `SessionStart` (alignment) in `~/.codex/hooks.json`.
+   - GitHub Copilot: `sessionStart` (alignment) in `~/.copilot/hooks/bootstrap.json`.
 3. Preserve unrelated hook configuration.
-4. Run the registered command once.
+4. Test each registered script directly once.
 5. Confirm that repeated execution produces no unintended change.
 
 ## 9. Verify
@@ -121,3 +121,14 @@ For a source-checkout invocation, use the matching script under
 6. Confirm that no `sources/`, `docs/`, or unrelated root files entered a
    mirror.
 7. Report changed targets, skipped targets, warnings, and failures.
+
+## 10. Pre-completion checklist
+
+- [ ] Target instruction files identified and verified.
+- [ ] Redundant root `AGENTS.md` removed from host directories (`~/.gemini/`, `~/.claude/`, `~/.copilot/`).
+- [ ] Rule blocks bounded by exact `BEGIN/END SHARED SKILLS RULES` markers.
+- [ ] Content outside marker blocks intact.
+- [ ] Managed skills synced and matching `origin/main`.
+- [ ] Native built-in skills preserved.
+- [ ] MCP servers configured with valid local paths across all hosts.
+- [ ] Lifecycle hooks registered and verified.

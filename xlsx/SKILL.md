@@ -140,16 +140,19 @@ The helper must not be used for XLSM files. Use an application path that preserv
 6. Correct defects in the workbook.
 7. Regenerate and inspect the exact final output.
 
-## Final checks
+Read [financial modeling standards](references/financial-and-formula-modeling-standards.md) before building complex calculation workbooks.
+Inspect [model examples](examples/good-vs-bad-financial-model.md) for formula design patterns.
 
-- [ ] The final file exists at the requested path.
-- [ ] The file opens after saving.
-- [ ] Required sheets and ranges are present.
+## Pre-completion checklist
+
+- [ ] Source facts and data read manually in full from start to finish.
+- [ ] The final file exists at the requested path and opens cleanly.
+- [ ] Required sheets, tables, and ranges are present with native data types.
 - [ ] Untouched workbook structures are preserved.
-- [ ] Formulas are preserved and recalculate where supported.
-- [ ] Formula errors were checked in every used cell.
-- [ ] Dates, numbers, percentages, currencies, and identifiers retain correct types.
-- [ ] External links and macros were preserved or explicitly handled.
-- [ ] Every visually relevant sheet was rendered and inspected.
-- [ ] No clipping, overlap, unreadable text, or broken chart remains.
-- [ ] Reported validation matches the exact delivered file.
+- [ ] Formulas are preserved and recalculate cleanly without `#REF!`, `#DIV/0!`, or `#VALUE!`.
+- [ ] Every visually relevant sheet rendered to image or PDF and inspected.
+- [ ] No clipping, truncated column text (`###`), overlap, or unreadable styling.
+- [ ] Exact final `.xlsx` deliverable verified and bound to its SHA-256 hash.
+- [ ] Zero AI attribution in document properties, comments, or metadata.
+- [ ] No U+2014 em dashes in normal prose.
+

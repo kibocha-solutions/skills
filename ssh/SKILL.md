@@ -80,3 +80,18 @@ git config --show-origin --get-regexp '^(core\.sshCommand|gpg\.format|gpg\.ssh\.
 3. Record review and rotation dates when required.
 4. Do not record private keys, secrets, internal URLs, or credentials.
 5. Use direct procedure language.
+
+Inspect [SSH configuration examples](examples/ssh-signing-and-alias-patterns.md) for host alias and signing setups.
+
+## 8. Pre-completion checklist
+
+Before completing any SSH or signing configuration task, confirm evidence exists for each item:
+
+- [ ] Existing SSH and Git configurations inspected with read-only commands.
+- [ ] No private keys displayed, transmitted, or logged.
+- [ ] Host-key verification preserved; no strict host checking bypassed.
+- [ ] Multiple accounts configured with separate host aliases and `IdentitiesOnly yes`.
+- [ ] SSH agent reachability verified via `ssh-add -L`.
+- [ ] Zero AI attribution in Git commits, author fields, or documentation.
+- [ ] No U+2014 em dashes in normal prose.
+

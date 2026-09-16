@@ -165,3 +165,19 @@ Read [the post-drafting checklist](references/post-drafting-checklist.md).
 5. Inspect every page.
 6. Verify page flow, headings, tables, images, cross-references, headers, footers, folios, signature blocks, and execution pages.
 7. Deliver only the final verified artifact.
+
+## 9. Pre-completion checklist
+
+Before delivering any legal instrument, confirm evidence exists for each item:
+
+- [ ] Controlling sources and existing text read manually in full from start to finish.
+- [ ] Authority register verified (Standard, Formal, Sovereign, or Archaic; Sovereign default).
+- [ ] Rationale and intent restricted to recitals or preamble; operative provisions contain direct commands only.
+- [ ] No synonym stacking; every enumerated item possesses an independent legal vector.
+- [ ] Closed ecosystem: every defined term used consistently; cross-references resolve.
+- [ ] Sentinel audit: clause tested against hostile readings, agent bypass, and procedural evasion.
+- [ ] Supremacy, subordination, and severability explicitly defined.
+- [ ] No AI attribution, internal drafting markers, or status labels in deliverable text.
+- [ ] No U+2014 em dashes in normal prose.
+- [ ] Final instrument read manually in full from start to finish.
+

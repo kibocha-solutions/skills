@@ -37,6 +37,14 @@ align_agent_rules() {
   mkdir -p "$(dirname "$target")"
   touch "$target"
 
+  # Prune redundant AGENTS.md in host directory when target is not AGENTS.md
+  local target_dir target_base
+  target_dir="$(dirname "$target")"
+  target_base="$(basename "$target")"
+  if [ "$target_base" != "AGENTS.md" ] && [ -f "$target_dir/AGENTS.md" ]; then
+    rm -f "$target_dir/AGENTS.md"
+  fi
+
   local start_marker="<!-- BEGIN SHARED SKILLS RULES -->"
   local end_marker="<!-- END SHARED SKILLS RULES -->"
 

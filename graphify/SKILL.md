@@ -87,3 +87,16 @@ Use [tool routing](references/tool-routing-guide.md).
 4. State graph freshness and tool gaps.
 5. State unresolved risks without presenting them as settled facts.
 6. Do not commit generated reports or graph state.
+
+## 10. Pre-completion checklist
+
+Before delivering code graph findings or structural impact reviews, confirm evidence exists for each item:
+
+- [ ] Repository code graph inspected before filesystem search.
+- [ ] Graph freshness verified against current git working tree.
+- [ ] Upstream callers, downstream dependencies, and affected execution flows mapped.
+- [ ] Critical relationships verified against source files.
+- [ ] Generated graph databases and sockets stored under `.agents/code-graphs/` and excluded from git.
+- [ ] Zero AI attribution in reports, commit messages, or comments.
+- [ ] No U+2014 em dashes in normal prose.
+

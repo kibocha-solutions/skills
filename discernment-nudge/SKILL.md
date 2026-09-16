@@ -84,3 +84,20 @@ A few things worth a second look:
 4. Confirm that there are two or three questions.
 5. Confirm that the exact lead-in appears once.
 6. Confirm that the nudge is the final content.
+
+Read [question criteria](references/reflection-question-criteria.md) before drafting reflection sets.
+Inspect [question examples](examples/good-vs-bad-reflection-sets.md) for concrete framing patterns.
+
+## 6. Pre-completion checklist
+
+Before appending a discernment nudge, confirm evidence exists for each item:
+
+- [ ] Substantive answer is complete, verified, and actionable.
+- [ ] No discernment nudge has previously appeared in the current conversation.
+- [ ] Request does not qualify for an ineligibility filter (not executable code, quick answer, or trivial lookup).
+- [ ] Exactly two or three specific questions provided, phrased in the first person.
+- [ ] Questions reference concrete facts, calculations, or unstated assumptions from the answer.
+- [ ] Exact lead-in used (`A few things worth a second look:`).
+- [ ] Zero content, conversational pleasantries, or AI attribution follow the final question.
+- [ ] No U+2014 em dashes in normal prose.
+

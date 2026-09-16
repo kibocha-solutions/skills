@@ -4,57 +4,46 @@ description: How this repo is deployed across tools and the standard workflow fo
 type: project
 ---
 
-This repo (`git@github.com:kibocha-solutions/skills.git`) is the single
+This repository (`git@github.com:kibocha-solutions/skills.git`) is the single
 working copy. Each tool's `skills/` directory (`~/.claude/skills`,
-`~/.codex/skills`, `~/.gemini/skills`, `~/.copilot/skills`) is a real git
-working copy tracking this repo's remote — `git init`'d in place with a
-non-cone sparse-checkout (every skill folder plus `AGENTS.md`, nothing else
-at repo root), not a plain-file `rsync` mirror. The `bootstrap` skill's
-`ensure-*-link.sh` scripts populate it via the shared `sync_skills_from_git`
-helper in `bootstrap/scripts/lib.sh`: every run does `fetch` + sparse-checkout
-re-apply + `reset --hard origin/main`, so it always exactly matches what's
-pushed to the remote, and a skill removed from this repo is automatically
-removed from every tool's copy too. There is nothing to `git pull` manually
-in those locations — re-running the tool's `ensure-*-link.sh` (or letting its
-`SessionStart` hook fire) is what refreshes them. Google Antigravity is a
-separate case: it has its own default skills at
-`~/.gemini/antigravity/builtin/skills/`, distinct from Gemini CLI's
-`~/.gemini/skills/`, kept in sync by the dedicated
-`ensure-gemini-builtin-skills.sh` script using the same
-`sync_skills_from_git` helper — see `bootstrap/SKILL.md`.
+`~/.codex/skills`, `~/.gemini/skills`, `~/.copilot/skills`) is a real Git
+working copy tracking this repository's remote, initialized in place with a
+non-cone sparse checkout (every skill folder plus `AGENTS.md`, nothing else
+at repository root). The `bootstrap` skill's `ensure-*-link.sh` scripts populate
+it via the shared `sync_skills_from_git` helper in `bootstrap/scripts/lib.sh`.
+Every run performs `fetch`, sparse checkout re-apply, and `reset --hard origin/main`.
+A skill removed from this repository is automatically removed from every tool's
+copy. Re-running the tool's `ensure-*-link.sh` script or allowing its
+`SessionStart` hook to fire refreshes the working copy.
 
-`AGENTS.md` at the repo root is the single source of truth for behavioral
-rules across all four tools. Each tool's own global memory file
-(`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `copilot-instructions.md`) gets this
-file's full contents non-destructively embedded between `<!-- BEGIN SHARED
-SKILLS RULES -->` / `<!-- END SHARED SKILLS RULES -->` markers by
-`align_agent_rules` in `lib.sh` — not a one-line `@skills/AGENTS.md` pointer
-or a symlink (both are legacy; `align_agent_rules` actively cleans up the old
-pointer line and `ensure-codex-link.sh` replaces a pre-existing symlink with
-a real file). Content outside the markers is preserved untouched.
+For Google Gemini (both CLI and Antigravity), managed skills live in
+`~/.gemini/skills/` and are registered in `~/.gemini/config/skills.json` with a
+symlink at `~/.gemini/config/skills`. The `~/.gemini/antigravity/builtin/skills/`
+directory is reserved strictly for native IDE builtins (`agy-customizations`,
+`antigravity_guide`, `generative_ui`, `migrate-workflows`,
+`permissioned-github`) and is cleaned of managed repository skills.
 
-**Standard workflow for publishing a change to this repo:**
+`AGENTS.md` at the repository root is the single source of truth for behavioral
+rules across all tools. Each tool's canonical global instruction file
+(`CLAUDE.md`, `AGENTS.md` for Codex, `GEMINI.md`, `copilot-instructions.md`)
+receives this file's full contents embedded between `<!-- BEGIN SHARED SKILLS
+RULES -->` and `<!-- END SHARED SKILLS RULES -->` markers via `align_agent_rules`
+in `lib.sh`. Redundant `AGENTS.md` files at the root of `~/.gemini/`,
+`~/.claude/`, and `~/.copilot/` are automatically removed during alignment.
 
-1. Make the requested change(s) in the working copy.
-2. Where the change is a new predominant unit of work, create a new commit
-   following `ci-cd/SKILL.md`'s Commit Hygiene Expectations: single scope
-   (never compound), title names the predominant change only, body 72 words
-   or fewer focused on the useful work, one compressed trailing sentence for
-   any secondary change swept in — never a split into multiple commits just
-   because the diff had more than one strand.
-3. Where the change is instead a direct fix to work that hasn't become its
-   own story yet (e.g. correcting something just committed), amend the
-   existing commit without changing its message (`git commit --amend
-   --no-edit`) instead of creating a new one. Ask if it's unclear which
-   applies.
-4. Push to `origin main` — this repo's history is almost entirely
-   direct-to-main commits, not PRs.
-5. Re-run the relevant `ensure-*-link.sh` script per installed tool (and
-   `ensure-gemini-builtin-skills.sh` if Antigravity is present) — idempotent,
-   safe to run unconditionally. This refreshes both the embedded rules block
-   and every tool's skill mirror in one pass; no separate per-location `git
-   pull` step exists in this workflow.
+Standard workflow for publishing a change to this repository:
+
+1. Make the requested change in the working copy.
+2. If the change is a new predominant unit of work, create a single commit
+   following `ci-cd/SKILL.md` commit hygiene expectations: one canonical type,
+   one specific scope, imperative title without trailing period, prose body 72
+   words or fewer without bullet lists or file paths, and zero AI attribution.
+3. If the change is a direct fix to work not yet pushed, amend the existing
+   commit without changing its message (`git commit --amend --no-edit`).
+4. Push to `origin main`.
+5. Re-run `ensure-*-link.sh` across installed tools.
+6. Verify MCP servers and lifecycle hooks (`UserPromptSubmit` for Claude Code,
+   `PreInvocation` for Antigravity, and `SessionStart` for Codex and Copilot).
 
 Updates to this memory system (`.agents/MEMORY.md` and `.agents/memory/`)
-are swept into whatever commit is already in progress and are not called out
-in the commit message.
+are included in the in-progress commit and omitted from commit messages.

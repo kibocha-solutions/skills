@@ -81,3 +81,14 @@ Read [toolchain](references/toolchain.md).
 5. List unresolved gaps explicitly.
 6. Do not report full success while any required item is unverified.
 7. Do not include passwords, private keys, tokens, internal URLs, or unrelated system data.
+
+## 8. Pre-completion checklist
+
+- [ ] Read-only audit completed before proposing changes.
+- [ ] All privileged commands are permitted by live sudoers grant.
+- [ ] Toolchain and dependency installations verified with smoke tests.
+- [ ] Storage and partition operations strictly verified with UUIDs and live confirmation.
+- [ ] Zero AI attribution in scripts, configs, or reports.
+- [ ] No U+2014 em dashes in normal prose.
+- [ ] All reported versions and paths match the exact final environment.
+

@@ -123,3 +123,18 @@ Read [design workflow](references/design-workflow.md).
 6. Verify normalization claims with declared dependencies.
 7. Verify diagrams and documentation match the settled design.
 8. Read the final design record in full.
+
+Inspect [boundary examples](examples/good-vs-bad-system-boundaries.md) for service decoupling patterns.
+
+## 12. Pre-completion checklist
+
+Before delivering any system design specification, confirm evidence exists for each item:
+
+- [ ] Existing schemas, code, and project truth read manually in full from start to finish.
+- [ ] Every component has a single responsibility and explicit ownership boundaries.
+- [ ] Normalization verified (dependencies stated, anomalies eliminated).
+- [ ] State machines define explicit transitions, invalid transitions, and compensation paths.
+- [ ] Technical diagrams match the settled design without notation drift.
+- [ ] Zero AI attribution in design documents, diagrams, or specifications.
+- [ ] No U+2014 em dashes in normal prose.
+

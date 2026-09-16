@@ -213,3 +213,19 @@ python -m scripts.package_skill <skill-folder>
 3. Verify the package exists and contains the final skill.
 4. Re-read the final `SKILL.md`.
 5. Report the package path, validation results, and any unrun evaluation.
+
+Inspect [evaluation examples](examples/benchmark-and-evaluation-patterns.md) for objective assertion patterns.
+
+## 12. Pre-completion checklist
+
+Before delivering any new or revised skill, confirm evidence exists for each item:
+
+- [ ] Existing `SKILL.md` and related resources read manually in full from start to finish.
+- [ ] Frontmatter contains valid `name` and trigger-rich `description`.
+- [ ] Body uses imperative sentences organized in execution order.
+- [ ] `SKILL.md` body is under 500 lines; deep specs placed in `references/`.
+- [ ] Contrasting good vs bad implementations provided in `examples/`.
+- [ ] Evaluation cases in `evals/evals.json` are objective and falsifiable.
+- [ ] No U+2014 em dashes in normal prose.
+- [ ] Zero AI attribution in skill content or metadata.
+

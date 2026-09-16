@@ -151,3 +151,19 @@ When no independent agent is available:
 6. Render and inspect the exact final artifact when layout matters.
 7. Ask the user whether one final review is required.
 8. Deliver the verified document and its location.
+
+Read [interview protocols](references/coauthoring-interview-protocols.md) before initiating stakeholder discovery.
+Inspect [interview examples](examples/good-vs-bad-coauthoring-interview.md) for concrete question patterns.
+
+## 10. Pre-completion checklist
+
+Before completing any co-authored document deliverable, confirm evidence exists for each item:
+
+- [ ] Source files and user-supplied context read manually in full from start to finish.
+- [ ] Document structure confirmed with user before drafting sections.
+- [ ] Section options curated collaboratively with explicit tradeoff evaluation.
+- [ ] Independent reader testing executed (or manual fallback completed) with zero unanswered gaps.
+- [ ] All placeholders, drafting notes, and conversational commentary removed.
+- [ ] Zero AI attribution in document content or metadata.
+- [ ] No U+2014 em dashes in normal prose.
+

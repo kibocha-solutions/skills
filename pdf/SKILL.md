@@ -89,7 +89,7 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ## 9. Fill a PDF form
 
-Read [form filling](forms.md) in full.
+Read [form filling](references/forms.md) in full.
 
 1. Detect fillable fields with `scripts/check_fillable_fields.py`.
 2. Use the fillable-field workflow when AcroForm fields exist.
@@ -120,7 +120,8 @@ Read [form filling](forms.md) in full.
 5. Extract text from both versions and compare expected content.
 6. Render and inspect the final output.
 
-Use [the advanced reference](reference.md) only for operations not covered above.
+Use [the advanced reference](references/advanced-pdf-operations.md) for operations not covered above.
+Inspect [PDF generation examples](examples/good-vs-bad-pdf-generation.md) for flowable document patterns.
 
 ## 12. Verify the exact final PDF
 
@@ -134,3 +135,17 @@ Use [the advanced reference](reference.md) only for operations not covered above
 8. Reopen encrypted output with the intended credentials.
 9. Re-run verification after every correction.
 10. Deliver only the verified final PDF.
+
+## 13. Pre-completion checklist
+
+Before delivering any PDF deliverable, confirm evidence exists for each item:
+
+- [ ] Source files and requirements read manually in full from start to finish.
+- [ ] Derived PDFs regenerated from clean sources after the final edit; no hand-patched files.
+- [ ] Multi-page tables include repeating headers across page boundaries.
+- [ ] Every page rendered to image (`pdftoppm -jpeg -r 150`) and visually inspected.
+- [ ] Zero text clipping, overlap, dead space, or orphaned headings.
+- [ ] Exact final `.pdf` deliverable verified and bound to its SHA-256 hash.
+- [ ] Zero AI attribution in metadata, document content, or author/producer tags.
+- [ ] No U+2014 em dashes in normal prose.
+

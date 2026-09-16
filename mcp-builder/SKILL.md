@@ -23,7 +23,7 @@ license: Complete terms in LICENSE.txt
 5. Record the protocol revision and SDK versions in the implementation plan.
 6. Do not copy examples from an older major version without migrating them.
 
-Use [TypeScript implementation](reference/node_mcp_server.md) or [Python implementation](reference/python_mcp_server.md).
+Use [TypeScript implementation](references/node_mcp_server.md) or [Python implementation](references/python_mcp_server.md).
 
 ## 3. Choose the transport
 
@@ -36,7 +36,7 @@ Use [TypeScript implementation](reference/node_mcp_server.md) or [Python impleme
 
 ## 4. Design the MCP surface
 
-Read [MCP best practices](reference/mcp_best_practices.md).
+Read [MCP best practices](references/mcp_best_practices.md).
 
 1. Use tools for actions and parameterized operations.
 2. Use resources for retrievable content with stable identifiers.
@@ -106,7 +106,7 @@ Read [MCP best practices](reference/mcp_best_practices.md).
 
 ## 10. Evaluate usability
 
-Read [evaluation procedure](reference/evaluation.md).
+Read [evaluation procedure](references/evaluation.md).
 
 1. Create ten independent, read-only tasks with stable answers.
 2. Cover discovery, pagination, multi-step retrieval, ambiguity resolution, and output interpretation.
@@ -124,3 +124,20 @@ Read [evaluation procedure](reference/evaluation.md).
 4. Include tested client configuration examples without credentials.
 5. Re-run all verification against the final code.
 6. Confirm the documentation matches the final exposed MCP surface.
+
+Inspect [MCP server examples](examples/good-vs-bad-mcp-server.md) for stdio logging and schema hygiene.
+
+## 12. Pre-completion checklist
+
+Before delivering any MCP server implementation, confirm evidence exists for each item:
+
+- [ ] Current MCP specification and target language SDK documentation read in full.
+- [ ] Stdio transport maintains clean stdout (zero raw print statements or debug logs on stdout).
+- [ ] Diagnostic logging routed strictly to stderr.
+- [ ] Tool names follow snake_case convention (`<service>_<verb>_<resource>`).
+- [ ] Strict input schemas defined with parameter types and bounds.
+- [ ] Read-only, destructive, and idempotent tool hints explicitly annotated.
+- [ ] Client configuration JSON tested without embedding secrets.
+- [ ] Zero AI attribution in server metadata, schemas, or source code.
+- [ ] No U+2014 em dashes in normal prose.
+

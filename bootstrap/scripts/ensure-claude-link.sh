@@ -37,6 +37,12 @@ for target in "${targets[@]}"; do
   if [ "$res" = "changed" ]; then
     changed=1
   fi
+
+  # Explicitly prune redundant AGENTS.md in Claude root
+  if [ -f "$(dirname "$target")/AGENTS.md" ]; then
+    rm -f "$(dirname "$target")/AGENTS.md"
+    changed=1
+  fi
 done
 
 if [ "$changed" -eq 1 ]; then

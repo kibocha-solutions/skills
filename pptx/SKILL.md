@@ -28,7 +28,7 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ### Existing template or deck
 
-1. Read [editing](editing.md) in full.
+1. Read [editing](references/editing.md) in full.
 2. Map each requested slide to an existing layout.
 3. Preserve the template's masters, theme, typography, spacing, and brand system.
 4. Complete structural slide changes before editing slide content.
@@ -36,7 +36,7 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ### New deck
 
-1. Read [PptxGenJS](pptxgenjs.md) in full.
+1. Read [PptxGenJS](references/pptxgenjs.md) in full.
 2. Define the aspect ratio and slide master.
 3. Create shared theme, typography, color, spacing, and component helpers.
 4. Use a fresh presentation instance.
@@ -134,3 +134,20 @@ Read [letterhead and pagination](../documentation/references/letterhead-and-pagi
 7. Re-render every corrected slide.
 8. Re-run full content and package validation after the last correction.
 9. Deliver only the exact verified `.pptx` file.
+
+Inspect [deck examples](examples/good-vs-bad-deck-patterns.md) for assertion-evidence layout patterns.
+
+## 12. Pre-completion checklist
+
+Before delivering any PowerPoint presentation, confirm evidence exists for each item:
+
+- [ ] Source facts, data, and storyboard read manually in full from start to finish.
+- [ ] Every slide has an assertion title delivering the core takeaway.
+- [ ] Office package validates without errors via `validate.py`.
+- [ ] Converted to PDF and rendered to slide images (`pdftoppm -jpeg -r 150`).
+- [ ] Every slide image visually inspected for contrast, alignment, text clipping, and wrapping.
+- [ ] All sample data, placeholder residue, and template defaults removed.
+- [ ] Exact final `.pptx` deliverable verified and bound to its SHA-256 hash.
+- [ ] Zero AI attribution in slides, speaker notes, author properties, or metadata.
+- [ ] No U+2014 em dashes in normal prose.
+

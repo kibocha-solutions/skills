@@ -82,12 +82,18 @@ python3 webapp-testing/scripts/with_server.py \
 - [ ] Failed requests and responses
 - [ ] Final rendered appearance
 
-## Final checks
+Read [Playwright test architecture](references/playwright-test-architecture.md) for locator hierarchy and stability patterns.
+
+## Pre-completion checklist
 
 - [ ] The tested server command matches the project.
 - [ ] The tested route is recorded.
-- [ ] Assertions cover the requested behavior.
+- [ ] Assertions cover the requested behavior using semantic role locators.
+- [ ] Zero unhandled console errors or failed network requests recorded during test execution.
 - [ ] Screenshots come from the exact final application state.
 - [ ] Every delivered screenshot was visually inspected.
-- [ ] No managed process remains running.
+- [ ] No managed server or browser process remains running.
+- [ ] Zero AI attribution in test files, logs, or reports.
+- [ ] No U+2014 em dashes in normal prose.
 - [ ] Reported results match the exact final test run.
+

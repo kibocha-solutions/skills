@@ -177,3 +177,19 @@ description: Draft, review, rewrite, and validate documentation, README files, g
    section, or letterhead transition.
 7. Rebuild and repeat all checks after any correction.
 8. Deliver only the final verified artifact.
+
+## 9. Pre-completion checklist
+
+Before delivering any documentation artifact, confirm evidence exists for each item:
+
+- [ ] Source documents and existing artifacts read manually in full from start to finish.
+- [ ] Motivation and rationale kept in Purpose and Scope; operative sections state direct rules or role-attributed steps only.
+- [ ] No compliance narration, drafting status ("draft", "WIP"), or internal workflow notes in deliverable prose.
+- [ ] No uncertainty markers (`[estimate]`, "provisional", "to be confirmed") in deliverable text.
+- [ ] No quantity hedges ("about", "around", "approximately", "roughly") around figures.
+- [ ] Documents referenced by title only; no internal repository paths, session filenames, memory files, or handoffs cited in external deliverables.
+- [ ] Zero AI attribution across all documents, deliverables, and metadata.
+- [ ] No U+2014 em dashes in normal prose.
+- [ ] Derived deliverables regenerated from clean sources after the final edit and visually verified.
+- [ ] All links, code symbols, commands, and cross-references verified against controlling code or authoritative sources.
+

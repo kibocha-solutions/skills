@@ -110,3 +110,19 @@ Read [memory conventions](references/memory-conventions.md).
 4. Do not edit an archived session.
 5. Create a new session for the new task.
 6. Keep an incomplete session active unless the user authorizes abandonment.
+
+Inspect [session examples](examples/session-lifecycle-and-recovery.md) for task state transitions and recovery patterns.
+
+## 10. Pre-completion checklist
+
+Before marking a Maestro session complete, confirm evidence exists for each item:
+
+- [ ] Every listed task in `tasks.md` is marked `[x]`.
+- [ ] Every acceptance criterion in `implementation_plan.md` verified against the exact final artifact.
+- [ ] Any failed check or unexpected defect reopened under `## Added` and resolved.
+- [ ] `walkthrough.md` records verifiable evidence, test commands, and limitations.
+- [ ] All changed narrative or instruction files read manually in full from start to finish.
+- [ ] Durable knowledge and decisions recorded in `.agents/MEMORY.md` or topic files.
+- [ ] Zero AI attribution across all session artifacts and commits.
+- [ ] No U+2014 em dashes in normal prose.
+

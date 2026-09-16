@@ -218,3 +218,19 @@ pdftoppm -jpeg -r 150 output.pdf page
 7. Correct the generation source or unpacked XML.
 8. Rebuild, validate, render, and inspect again after every correction.
 9. Deliver only the exact final verified DOCX.
+
+## 12. Pre-completion checklist
+
+Before delivering any DOCX deliverable, confirm evidence exists for each item:
+
+- [ ] Source documents and requested content read manually in full from start to finish.
+- [ ] Explicit DXA dimensions used for all page margins, tables, and column widths.
+- [ ] No raw newline characters inside text runs; paragraphs separated into distinct `w:p` elements.
+- [ ] Multi-page tables include `tblHeader` and row-level `cantSplit` protection.
+- [ ] Package validation passes with zero errors via `validate.py`.
+- [ ] Converted to PDF and rendered to page images (`pdftoppm -jpeg -r 150`).
+- [ ] Every rendered page visually inspected for layout, table breaks, and text clipping.
+- [ ] Exact final `.docx` deliverable verified and bound to its SHA-256 hash.
+- [ ] Zero AI attribution in metadata, document content, or author properties.
+- [ ] No U+2014 em dashes in normal prose.
+

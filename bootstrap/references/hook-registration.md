@@ -1,65 +1,76 @@
-# SessionStart Hook Registration
+# Multi-Agent Lifecycle Hook Registration
 
-## Preconditions
+## 1. Overview
 
-1. Read the target tool's current hook documentation.
-2. Inspect the existing settings file.
-3. Preserve unrelated hooks and settings.
-4. Register only the matching bootstrap script.
-5. Validate the final JSON or shell file.
-6. Start a new session and verify one real hook execution.
+Agent hooks enforce repository rules, maintain skill links, and inject compliance directives before model inference. This document defines the registration schemas and paths across Claude Code, Gemini Antigravity, Gemini CLI, Codex CLI, and GitHub Copilot.
 
-## Claude Code
+## 2. Hook Types and Contracts
+
+### SessionStart Hooks
+Run once at agent launch or session resumption to ensure instruction files and skill directories match repository state.
+
+### Turn Enforcement Hooks
+Run before model evaluation on every turn to inject mandatory compliance directives into the model context:
+- Claude Code: `UserPromptSubmit` hook prints text to stdout, prepended directly to the user prompt.
+- Gemini Antigravity: `PreInvocation` hook outputs a JSON payload with `injectSteps` containing an `ephemeralMessage`.
+
+## 3. Host Configurations
+
+### Claude Code
 
 Target: `~/.claude/settings.json`
 
-Merge this object into `hooks.SessionStart`:
-
 ```json
 {
-  "matcher": "",
-  "hooks": [
-    {
-      "type": "command",
-      "command": "bash \"$HOME/.claude/skills/bootstrap/scripts/ensure-claude-link.sh\"",
-      "timeout": 10
-    }
-  ]
+  "agentPushNotifEnabled": true,
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "bash \"$HOME/.claude/skills/bootstrap/scripts/enforce-claude-rules.sh\"",
+        "timeout": 10
+      }
+    ],
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash \"$HOME/.claude/skills/bootstrap/scripts/ensure-claude-link.sh\"",
+        "timeout": 10
+      }
+    ]
+  }
 }
 ```
 
-Do not replace existing `SessionStart` entries.
+Behavior:
+- `enforce-claude-rules.sh` outputs the plain text compliance mandate.
+- `ensure-claude-link.sh` verifies `~/.claude/CLAUDE.md` and sparse checkout.
 
-## Codex CLI
+### Gemini Antigravity
 
-Target: `~/.codex/hooks.json`
-
-Merge this object into `hooks.SessionStart`:
+Target: `~/.gemini/config/hooks.json`
 
 ```json
 {
-  "matcher": "startup|resume",
-  "hooks": [
-    {
-      "type": "command",
-      "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/ensure-codex-link.sh\"",
-      "timeout": 10,
-      "statusMessage": "Checking AGENTS.md link"
-    }
-  ]
+  "compliance-guard": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "bash /home/vaelric/.gemini/skills/bootstrap/scripts/enforce-gemini-rules.sh"
+      }
+    ]
+  }
 }
 ```
 
-Do not replace existing `SessionStart` entries.
+Behavior:
+- Handler receives context on stdin.
+- Script outputs JSON matching the `PreInvocation` schema:
+  `{"injectSteps": [{"ephemeralMessage": "..."}]}`
 
-## Gemini CLI
+### Gemini CLI
 
-Targets:
-
-- `~/.gemini/settings.json`
-- `~/.gemini/hooks/`
-
-Merge this object into `hooks.SessionStart`:
+Targets: `~/.gemini/settings.json` or `~/.gemini/hooks/`
 
 ```json
 {
@@ -75,25 +86,33 @@ Merge this object into `hooks.SessionStart`:
 }
 ```
 
-Requirements:
+### Codex CLI
 
-- Keep the command path relative to `~/.gemini/`.
-- Use milliseconds for `timeout`.
-- Keep hook stdout valid JSON.
+Target: `~/.codex/hooks.json`
 
-## GitHub Copilot CLI
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/ensure-codex-link.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking AGENTS.md link"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### GitHub Copilot CLI
 
 Target: `~/.copilot/hooks/bootstrap.json`
-
-Use the current Copilot hook schema. Confirm these fields against the installed client before writing:
-
-- `version`
-- `hooks.sessionStart`
-- `type`
-- `bash` or `powershell`
-- `timeoutSec`
-
-Example:
 
 ```json
 {
@@ -110,14 +129,17 @@ Example:
 }
 ```
 
-Do not claim execution verification until a Copilot session runs the hook.
+## 4. Cross-OS Portability
 
-## Final checks
+1. Under Linux and macOS, paths resolve relative to `$HOME`.
+2. Under WSL, scripts target `$HOME` within the Linux environment and map `/mnt/c/Users/<user>/` when managing Windows-side installations.
+3. Hook scripts must be marked executable (`chmod +x`).
+4. Scripts must use `set -euo pipefail` to fail fast on unexpected conditions.
 
-- [ ] Existing hooks remain.
-- [ ] JSON parses.
-- [ ] Script path resolves.
-- [ ] Script is executable.
-- [ ] Timeout uses the target tool's unit.
-- [ ] Hook output matches the target schema.
-- [ ] A new session executed the hook.
+## 5. Verification Checklist
+
+- [ ] Target configuration files exist and contain valid JSON or TOML.
+- [ ] Registered script paths resolve and have executable permissions.
+- [ ] Scripts produce exit code 0 when run standalone.
+- [ ] Turn enforcement scripts produce valid stdout matching the host contract.
+- [ ] Pre-existing hooks in target configuration files remain intact.

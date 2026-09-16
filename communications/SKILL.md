@@ -30,6 +30,8 @@ license: Complete terms in LICENSE.txt
 
 ## 3. Draft an external communication
 
+Read [external correspondence standards](references/external-correspondence-standards.md).
+
 1. Use a formal tone.
 2. Address the recipient directly.
 3. State the necessary context.
@@ -46,15 +48,16 @@ license: Complete terms in LICENSE.txt
 
 ## 4. Draft an internal communication
 
-1. Select the matching template:
+1. Read [leadership and incident formats](references/leadership-and-incident-formats.md) when preparing executive briefings or incident notices.
+2. Select the matching template:
    - 3P update: `examples/3p-updates.md`
    - company newsletter: `examples/company-newsletter.md`
    - FAQ: `examples/faq-answers.md`
    - other internal communication: `examples/general-comms.md`
-2. Read the selected template from start to finish.
-3. Gather every field the template requires.
-4. Follow its structure, tone, and formatting.
-5. Ask for missing information only when the omission blocks a usable draft.
+3. Read the selected template from start to finish.
+4. Gather every field the template requires.
+5. Follow its structure, tone, and formatting.
+6. Ask for missing information only when the omission blocks a usable draft.
 
 ## 5. Review and deliver
 
@@ -68,3 +71,17 @@ license: Complete terms in LICENSE.txt
 6. Render and inspect the exact final artifact when layout matters.
 7. Correct the source and repeat the full review after every change.
 8. Deliver only the verified final communication.
+
+## 6. Pre-completion checklist
+
+Before delivering any communication, confirm evidence exists for each item:
+
+- [ ] Source material and context read manually in full from start to finish.
+- [ ] Audience register confirmed (external formal by default; internal only when confirmed).
+- [ ] Recipient, purpose, deadlines, and requested actions stated directly.
+- [ ] Referenced documents cited by reader-facing title only; no repository paths or hashes leaked.
+- [ ] Zero AI attribution across all messages, documents, and sign-offs.
+- [ ] Zero uncertainty markers or quantity hedges in deliverable text.
+- [ ] No U+2014 em dashes in normal prose.
+- [ ] Full review completed as the recipient.
+

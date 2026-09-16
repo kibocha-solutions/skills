@@ -300,3 +300,14 @@ Record these fields when work continues in another session:
    run and artifact.
 7. Update the repository-health cache when its fields changed.
 8. Report the completed action, checks, warnings, and remaining blockers.
+
+## 14. Pre-completion checklist
+
+- [ ] Repository health snapshot refreshed and verified.
+- [ ] Staged change set matches single predominant purpose.
+- [ ] Commit message conforms to `type(scope): summary` and <= 72 words in one prose paragraph.
+- [ ] No bullets, numbered lists, file paths, or line numbers in commit message.
+- [ ] Zero AI attribution across commits, author fields, PR text, release notes, or tags.
+- [ ] No U+2014 em dashes in normal prose.
+- [ ] Verification commands passed against exact final commit.
+

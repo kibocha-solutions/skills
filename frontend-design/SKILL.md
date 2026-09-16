@@ -134,3 +134,21 @@ Do not select any of these without support from the brief:
 6. Correct weak or generic choices in the source.
 7. Repeat the behavioral and visual checks after every correction.
 8. Deliver only the verified implementation and final screenshots.
+
+Read [design tokens and accessibility](references/design-tokens-and-accessibility.md) for scale standards.
+Inspect [component examples](examples/good-vs-bad-component-design.md) for semantic HTML and focus patterns.
+
+## 10. Pre-completion checklist
+
+Before delivering any frontend design work, confirm evidence exists for each item:
+
+- [ ] Design brief and requirements read manually in full from start to finish.
+- [ ] Named color, typography, and spacing tokens derived from the brief.
+- [ ] Semantic HTML elements used (`<button>`, `<nav>`, `<main>`, `<header>`).
+- [ ] WCAG AA contrast ratio verified for all text and interactive elements.
+- [ ] Visible `:focus-visible` styles preserved for keyboard navigation.
+- [ ] Responsive layouts verified across mobile, tablet, and desktop breakpoints.
+- [ ] Screenshots captured and visually inspected at all required viewports.
+- [ ] Zero AI attribution in markup, comments, or documentation.
+- [ ] No U+2014 em dashes in normal prose.
+
