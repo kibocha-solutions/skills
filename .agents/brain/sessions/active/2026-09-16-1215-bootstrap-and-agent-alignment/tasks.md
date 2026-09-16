@@ -1,6 +1,6 @@
 # Tasks: Multi-Agent Bootstrap Alignment, MCP Standardization & Rule Enforcement
 
-State: IN_PROGRESS
+State: DONE
 
 ## Phase 1: Cleanups & Script Alignment
 - [x] Implement host `AGENTS.md` cleanup helper in `bootstrap/scripts/lib.sh`
@@ -30,6 +30,7 @@ State: IN_PROGRESS
 ## Phase 5: Verification & Propagation
 - [x] Test execution of all `ensure-*-link.sh` scripts and hook validation
 - [x] Verify host rule files (`GEMINI.md`, `CLAUDE.md`, `copilot-instructions.md`, `AGENTS.md`)
-- [/] Await user signing & remote resolution to create `/ci-cd` compliant commit
-- [ ] Propagate via `/bootstrap`
+- [x] Create `/ci-cd` compliant signed commits for repository changes
+- [x] Propagate via `/bootstrap` across all 4 host environments
+
 

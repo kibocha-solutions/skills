@@ -1,6 +1,6 @@
 # Tasks: Skills Deepening, References & Good vs Bad Examples
 
-State: IN_PROGRESS
+State: DONE
 
 ## Phase 1: Orchestration & Infrastructure Skills (Group A)
 - [x] Deepen `maestro/`: step-by-step directives, `examples/` for session lifecycle & threshold recovery
@@ -28,5 +28,6 @@ State: IN_PROGRESS
 - [x] Confirm pre-completion checklists on all 21 skills
 - [x] Verify line counts (< 500 lines) and zero em dashes
 - [x] Verify all linked references and examples exist
-- [/] Await user signing resolution to produce single `/ci-cd` compliant commit
+- [x] Produce single `/ci-cd` compliant signed commits and push to origin main
+
 

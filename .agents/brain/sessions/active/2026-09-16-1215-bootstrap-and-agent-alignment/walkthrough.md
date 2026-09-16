@@ -24,6 +24,14 @@
    - Rewrote `bootstrap/references/hook-registration.md` as cross-OS reference.
    - Refreshed `.agents/memory/skills-repo-deployment-workflow.md`.
 
+5. **Verification & Propagation**:
+   - Commits authored and signed via Bitwarden SSH signing relay (`fa218bb`, `9d9ffe3`, `936bd78`).
+   - Pushed successfully to `origin main` on GitHub.
+   - Executed `ensure-gemini-link.sh`, `ensure-claude-link.sh`, `ensure-codex-link.sh`, and `ensure-copilot-link.sh`.
+   - Confirmed all four host instruction files contain exact marker blocks.
+   - Confirmed 21 skills synchronized across all four hosts.
+
 ## Verification Evidence
 - Hook commands executed successfully with zero errors.
 - MCP configurations loaded and validated with Python scripts.
+- Multi-host synchronization script verified 21/21 skills across Gemini, Claude, Codex, and Copilot.

@@ -23,15 +23,19 @@
    - `webapp-testing`: Structured `references/playwright-test-architecture.md` and pre-completion checklist.
    - `communications`: Structured `references/external-correspondence-standards.md` and `examples/good-vs-bad-external-update.md`.
    - `discernment-nudge`: Structured `references/reflection-prompt-heuristics.md` and `examples/good-vs-bad-reflection-sets.md`.
+   - `documentation`: Integrated deliverable boundary discipline and contrasting good vs bad examples.
 
 4. **Verification & Checklists**:
    - Confirmed all 21 skills contain `Pre-completion checklist`.
    - Confirmed all 21 skills are under 500 lines.
    - Confirmed zero U+2014 em dashes in all skills, examples, and references.
    - Confirmed 100% of relative markdown links resolve to existing files on disk.
+   - Commits authored, signed, and pushed to `origin main`.
+   - Propagated across all four hosts.
 
 ## Verification Evidence
 - Line count check: 21/21 passed.
 - Pre-completion checklist check: 21/21 passed.
 - Relative markdown link validation: 0 broken links.
 - Em dash scan: 0 em dashes in working copy.
+- 21 skills verified active in Gemini, Claude, Codex, and Copilot.
