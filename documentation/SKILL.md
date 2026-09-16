@@ -145,9 +145,10 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 5. Check register, tense, mood, and voice.
 6. Check that each section owns its rules and definitions.
 7. Check that metadata contains structured values only.
-8. Check that the deliverable contains no internal path, drafting narration,
-   compliance narration, approval status, uncertainty marker, AI attribution,
-   or unrequested sensitive detail.
+8. Check that the deliverable contains no progress notes, self-disclaimers,
+   sample labels, internal paths, compliance narration, uncertainty markers,
+   hedging, unprompted sensitive identifiers, or AI attribution.
+
 9. Correct every defect in the Markdown source.
 10. Repeat the full read after each correction pass.
 

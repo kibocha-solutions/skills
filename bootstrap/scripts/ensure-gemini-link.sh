@@ -8,7 +8,7 @@
 # and ~/.gemini/GEMINI.md. Antigravity's own internal builtin directory
 # (~/.gemini/antigravity/builtin/) is left clean and never mutated.
 set -euo pipefail
-cat >/dev/null || true
+[ -t 0 ] || cat >/dev/null 2>&1 || true
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh

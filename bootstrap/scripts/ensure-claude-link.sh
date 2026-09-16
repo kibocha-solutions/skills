@@ -3,7 +3,7 @@
 # and ensure ~/.claude/skills/ is a git sparse checkout tracking this repo's
 # remote (not a local rsync copy) — see lib.sh's sync_skills_from_git.
 set -euo pipefail
-cat >/dev/null || true
+[ -t 0 ] || cat >/dev/null 2>&1 || true
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
