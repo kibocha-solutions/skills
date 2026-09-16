@@ -56,7 +56,7 @@ Target: `~/.gemini/config/hooks.json`
     "PreInvocation": [
       {
         "type": "command",
-        "command": "bash /home/vaelric/.gemini/skills/bootstrap/scripts/enforce-gemini-rules.sh"
+        "command": "bash \"$HOME/.gemini/skills/bootstrap/scripts/enforce-gemini-rules.sh\""
       }
     ]
   }

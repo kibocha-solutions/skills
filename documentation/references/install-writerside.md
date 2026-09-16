@@ -27,7 +27,7 @@ docker image inspect jetbrains/writerside-builder:2026.06.8817
 
 Expected result:
 
-- `command -v wrs` prints a path such as `/home/codelf/.local/bin/wrs`.
+- `command -v wrs` prints a path such as `~/.local/bin/wrs`.
 - `wrs doctor` finds `writerside.cfg`, lists the available instances, and
   reports Docker and image status as `ok`.
 - `docker image inspect` exits with status `0`.

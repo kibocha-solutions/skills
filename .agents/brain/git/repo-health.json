@@ -47,8 +47,8 @@
   },
   "signing": {
     "gpg_format": "ssh",
-    "signing_key": "/home/codelf/.ssh/SshSigningKey.pub",
-    "allowed_signers_file": "/home/codelf/.ssh/allowed_signers",
+    "signing_key": "~/.ssh/ssh-signing-key-universal.pub",
+    "allowed_signers_file": "~/.ssh/allowed_signers",
     "signing_expected": true,
     "signing_intentionally_disabled": false
   },

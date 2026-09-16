@@ -23,8 +23,7 @@ description: Draft, review, rewrite, and validate documentation, README files, g
    screenshot.
 9. Read `references/letterhead-and-pagination.md` before producing or
    reviewing fixed-page documents.
-10. Read `references/pbo-document-rules.md` for documentation work in the
-    `kibocha-solutions/PBOs` repository.
+10. Read `references/cso-document-rules.md` for documentation work in CSOs.
 
 ## 2. Gather sources
 

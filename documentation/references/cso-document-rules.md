@@ -1,8 +1,9 @@
-# PBO Document Rules
+# CSO Document Rules
 
 ## Activation
 
-Apply this reference to documentation work in the `kibocha-solutions/PBOs` repository.
+Apply this reference to documentation work in CSOs.
+
 
 ## ANCEM and SOP punctuation
 

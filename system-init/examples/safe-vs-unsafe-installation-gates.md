@@ -20,7 +20,7 @@ Defects:
 
 ```bash
 # GOOD: Direct uv tool installation in user space with verification
-/home/vaelric/.local/bin/uv tool install codegraphcontext
+~/.local/bin/uv tool install codegraphcontext
 
 # Verify executable presence and execution
 which cgc
