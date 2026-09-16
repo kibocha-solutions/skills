@@ -112,7 +112,24 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 7. Keep reusable snippets in the snippet library.
 8. Keep editable diagram sources with their exported documentation assets.
 
-## 5. Draft in Markdown
+## 5. Enforce deliverable boundaries
+
+1. Treat the delivery document as a separate canvas from the chat interface. Never place conversational deliberation, reservations, or internal notes in deliverables.
+2. Keep deliverables free of progress markers and workflow notes:
+   - Exclude progress markers and task notes (e.g. "pending promulgation", "pending determination of the user", "user will clarify").
+   - Exclude sample labels, self-disclaimers, and protective warnings (e.g. "template audit report", "do not rely on this", "draft", "provisional").
+   - Inspect existing repository documents for prerequisite instruments before drafting; if missing, stop and ask the user in chat before proceeding.
+3. Exclude uncertainty markers and hedging:
+   - Deliverables must be free of uncertainty markers (`[estimate]`, "to be confirmed") and quantity hedging ("about", "approximately", "roughly").
+   - Notify the user in chat of any concern, reservation, problem, or ambiguity, and abide by the user's decision.
+   - Where unsure whether background context belongs in the deliverable, ask the user in chat: "Did you intend for X to go into the document?"
+4. Exclude unprompted details, internal methodology, background directions, and sensitive identifiers:
+   - Deliverables must contain only what the document type expressly requires; omit unprompted information.
+   - Never disclose sensitive identifiers (e.g. national IDs, registration numbers, banking details) unless completing an authoritative form field or explicitly directed.
+   - Do not explain obvious context, donor restrictions, internal costing models, or governing directions (e.g. "We did this to comply with...", "As directed...").
+   - Do not state what an organization decided not to do.
+
+## 6. Draft in Markdown
 
 1. Draft or rewrite in Markdown before converting to another format.
 2. State the subject directly.
@@ -135,7 +152,7 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 14. Read `references/weak-ai-writing-patterns.md` for close rewrites,
     editorial review, or quality cleanup.
 
-## 6. Verify content
+## 7. Verify content
 
 1. Re-read the complete Markdown draft as the intended reader.
 2. Check every claim against its controlling source.
@@ -148,11 +165,10 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 8. Check that the deliverable contains no progress notes, self-disclaimers,
    sample labels, internal paths, compliance narration, uncertainty markers,
    hedging, unprompted sensitive identifiers, or AI attribution.
-
 9. Correct every defect in the Markdown source.
 10. Repeat the full read after each correction pass.
 
-## 7. Convert and validate
+## 8. Convert and validate
 
 1. Convert only after the Markdown source passes.
 2. Regenerate the output after every source change.
@@ -166,7 +182,7 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 8. Treat every nonzero validation or build status as failure.
 9. Report exact errors and log paths in chat.
 
-## 8. Inspect the final artifact
+## 9. Inspect the final artifact
 
 1. Open the exact final artifact.
 2. Read it from start to finish.
@@ -179,18 +195,20 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 7. Rebuild and repeat all checks after any correction.
 8. Deliver only the final verified artifact.
 
-## 9. Pre-completion checklist
+## 10. Pre-completion checklist
 
 Before delivering any documentation artifact, confirm evidence exists for each item:
 
 - [ ] Source documents and existing artifacts read manually in full from start to finish.
 - [ ] Motivation and rationale kept in Purpose and Scope; operative sections state direct rules or role-attributed steps only.
-- [ ] No compliance narration, drafting status ("draft", "WIP"), or internal workflow notes in deliverable prose.
-- [ ] No uncertainty markers (`[estimate]`, "provisional", "to be confirmed") in deliverable text.
-- [ ] No quantity hedges ("about", "around", "approximately", "roughly") around figures.
+- [ ] Deliverables free of progress markers, workflow notes ("pending promulgation"), and self-disclaimers ("template", "draft").
+- [ ] Deliverables free of uncertainty markers (`[estimate]`, "to be confirmed") and quantity hedging ("about", "roughly").
+- [ ] No unprompted sensitive identifiers (national IDs, registration numbers, banking details) or background methodology explanations included.
+- [ ] Doubts, concerns, and missing prerequisites raised directly to the user in chat before writing.
 - [ ] Documents referenced by title only; no internal repository paths, session filenames, memory files, or handoffs cited in external deliverables.
 - [ ] Zero AI attribution across all documents, deliverables, and metadata.
 - [ ] No U+2014 em dashes in normal prose.
 - [ ] Derived deliverables regenerated from clean sources after the final edit and visually verified.
 - [ ] All links, code symbols, commands, and cross-references verified against controlling code or authoritative sources.
+
 

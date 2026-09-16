@@ -66,3 +66,50 @@ Why this succeeds:
 - Written directly for external leadership readers without internal scaffolding.
 - States settled commitments and dates without hedging.
 - Zero AI attribution and zero internal session leaks.
+
+## 3. Deliverable Boundaries vs Context and Progress Leakage
+
+### Bad (Progress Notes, Disclaimers, Unprompted Details, and Explanations)
+
+```markdown
+# Standard Operating Procedure: Procurement [DRAFT - PENDING PROMULGATION]
+
+Disclaimer: This is a template audit report procedure and should not be relied upon without board review.
+
+1. Organizational Context
+AYCP is a national PBO established under the PBO Act 18 of 2013, registered under registration number P.O133.3399./2929. We operate under strict donor instructions that prohibit unrestricted funding over 2%.
+
+2. Thresholds
+Purchases over 50,000 KES require three quotes. As directed by the user, AYCP will not conduct interventions in Bungoma County. We used our internal costing model to establish the 50,000 KES ceiling. The user will clarify whether direct vendor selection applies to emergencies.
+```
+
+Why this fails:
+- Places progress markers in the deliverable title ("PENDING PROMULGATION"). Missing prerequisites must be resolved with the user in chat beforehand.
+- Includes protective self-disclaimers ("template audit report and should not be relied upon").
+- Discloses unprompted registration numbers and sensitive details not requested by the reader task.
+- Explains background donor rules ("prohibit unrestricted funding over 2%") and internal methodologies ("internal costing model").
+- Narrates user direction ("As directed by the user...") and states what the organization decided not to do ("will not conduct interventions in Bungoma").
+- Places unasked questions and task notes inside the deliverable ("The user will clarify whether direct vendor selection applies...").
+
+### Good (Clean, Focused Deliverable Meeting Express Requirements)
+
+```markdown
+# Standard Operating Procedure: Procurement
+
+## 1. Purpose
+
+This procedure establishes mandatory purchasing thresholds and competitive quotation requirements for all program operations.
+
+## 2. Procurement Thresholds
+
+1. Purchases up to 50,000 KES require one approved purchase requisition.
+2. Purchases exceeding 50,000 KES require three written competitive quotations before purchase order issuance.
+3. The finance officer must verify quotation compliance before disbursing funds.
+```
+
+Why this succeeds:
+- Contains zero progress markers, self-disclaimers, or protective warnings.
+- Contains only the operative content required by the document type.
+- Omits unprompted registration numbers, internal costing models, and donor constraint explanations.
+- Relies on chat for clarifying questions, keeping the deliverable canvas clean and production-ready.
+
