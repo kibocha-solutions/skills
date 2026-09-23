@@ -320,6 +320,15 @@ Classify technical documentation when sensitivity affects storage or audience:
 - Confidential: executive strategy, protected IP, financial or customer
   contract material
 
+Make instance trees cumulative: each tree lists every topic of the
+lower-sensitivity trees. A topic's tier is the lowest-sensitivity tree that
+lists it. A topic references topics at its own tier or a lower tier only. Never
+reference a higher-tier topic by link, title, description, or instance-filtered
+markup; remove the reference from the source.
+
+Link topics by topic filename or relative path. Never use absolute,
+machine-specific, or `file:///` paths.
+
 Add access notices only when they change handling behavior. Do not decorate
 every page with a banner if the repository access already makes the audience
 obvious.
@@ -333,10 +342,11 @@ Before handing off Writerside technical documentation:
 - confirm the topic is previewed in an instance that includes it; do not add
   internal, restricted, or confidential topics to a lower-sensitivity instance
   only to clear a preview warning
-- if a topic links to another local topic, include the target in the same
-  instance when the target content is safe for that audience; otherwise replace
-  the link with plain text or create a separate sanitized topic with a unique
-  filename
+- confirm every local link targets a topic at the same or a lower tier, and
+  that every tree publishing the linking topic also publishes the target
+- remove any reference from a lower-tier topic to a higher-tier topic; create
+  a separate sanitized topic with a unique filename when lower-tier readers
+  need the content
 - confirm tree `topic` and `start-page` attributes use basename-only topic
   filenames
 - confirm no two topic files share the same basename

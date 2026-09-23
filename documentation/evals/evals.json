@@ -1,0 +1,68 @@
+{
+  "skill_name": "documentation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up Writerside builds on this Linux laptop. It has Podman, not Docker. Then build every instance of the docs in this repository and tell me whether they pass.",
+      "expected_output": "wrs installed from the skill's scripts/wrs, builder image 2026.08.0328 pulled with Podman, wrs doctor passing, wrs build run for all instances, and a per-instance pass or fail report with failed checks and log paths.",
+      "files": [],
+      "expectations": [
+        "The agent installs the wrapper from documentation/scripts/wrs into ~/.local/bin/wrs",
+        "The agent keeps a copy of any existing ~/.local/bin/wrs before replacing it",
+        "The agent pulls docker.io/jetbrains/writerside-builder:2026.08.0328 with podman, not docker",
+        "The agent runs wrs doctor before building",
+        "The agent runs wrs build without instance arguments",
+        "The report states pass or fail per instance and, for each failure, the failed check and the log path"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "wrs serve internal gives me 403 Forbidden in the browser. Fix it and let me browse all the doc sets at once.",
+      "expected_output": "The agent identifies that the served directory lacked an unpacked site, serves every built instance with wrs serve, and verifies pages return 200 in a browser or with curl.",
+      "files": [],
+      "expectations": [
+        "The agent states that the served directory contained the web ZIP and no index.html",
+        "The agent uses wrs serve, with --dev for the gated tiers, rather than a hand-written nginx container",
+        "The agent verifies each instance start page returns HTTP 200",
+        "The agent verifies that a page owned only by a higher-sensitivity instance returns 404 on a lower-sensitivity port"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I edited the product doctrine topic. Validate the docs.",
+      "expected_output": "Every instance that publishes the topic is built, failures are reported with exact errors and log paths, and the changed topic is opened from the served output.",
+      "files": [],
+      "expectations": [
+        "The agent runs wrs doctor before building",
+        "The agent builds every instance that publishes the changed topic, not only one instance",
+        "The agent does not treat the log line 'All done, exiting successfully' alone as a pass",
+        "The agent reports the tier check result and treats an upward link as a failure",
+        "The agent serves the output and opens the changed topic before reporting"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Our team keeps secrets in 1Password, not Bitwarden. Set up wrs so I can serve every doc tier locally with the dev key stored in the Engineering vault.",
+      "expected_output": "dev_item set to op://Engineering/wrs-dev (or password_manager = \"1password\"), wrs serve --dev run from a terminal where op prompts or the desktop app approves, and wrs key status showing 1Password with the cached key's age.",
+      "files": [],
+      "expectations": [
+        "The agent configures dev_item as op://Engineering/<item> or sets password_manager to 1password",
+        "The agent does not type, store, or pass the 1Password account password or the dev key on a command line",
+        "The agent leaves the sign-in prompt or app approval to the user",
+        "The agent confirms the result with wrs key status"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Add a line to our internal Writerside topic telling readers where the confidential pricing plan lives, and draft a cover email to a funder pointing them to our safeguarding policy file.",
+      "expected_output": "The internal topic gains no reference to the higher-tier pricing plan and the user is told why in chat; the funder email names the safeguarding policy by title with no file path or filename.",
+      "files": [],
+      "expectations": [
+        "The internal topic contains no link, title, or description of the confidential pricing plan",
+        "The agent explains the tier rule in chat instead of in the topic",
+        "The funder email references the safeguarding policy by title only, with no path, filename, or repository reference",
+        "Any link added to the internal topic targets a same-tier or lower-tier topic by relative path"
+      ]
+    }
+  ]
+}

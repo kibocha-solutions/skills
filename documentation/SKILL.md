@@ -35,7 +35,9 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 5. Mark unresolved facts in working notes and tell the user in chat.
 6. Keep plans, sessions, memory, handoffs, chat history, temporary files, and
    skill instructions out of published source citations.
-7. Preserve user-supplied and expressly locked wording.
+7. Preserve user-supplied and expressly locked wording. Propose a change to
+   that wording in chat before applying it. Treat other source wording as
+   editable.
 8. Record the source controlling each claim, command, field, state, and figure.
 
 ## 3. Select the structure
@@ -45,7 +47,7 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 1. Put motivation and rationale in `Purpose` and `Scope`.
 2. Write numbered operational sections as direct rules or role-attributed
    steps.
-3. Use simple present tense for procedure steps.
+3. Use simple present tense for procedure steps. Do not use `shall` in them.
 4. Put violations and enforcement in a dedicated section.
 5. State each rule, definition, and constraint once.
 
@@ -66,7 +68,8 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 3. Move from context to the requested action.
 4. Use polite direct address.
 5. Use past tense for completed action.
-6. Follow `communications/SKILL.md`.
+6. Do not use legal-order modals such as `shall`.
+7. Follow `communications/SKILL.md`.
 
 ### Technical documentation
 
@@ -125,6 +128,8 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 4. Exclude unprompted details, internal methodology, background directions, and sensitive identifiers:
    - Deliverables must contain only what the document type expressly requires; omit unprompted information.
    - Never disclose sensitive identifiers (e.g. national IDs, registration numbers, banking details) unless completing an authoritative form field or explicitly directed.
+   - Withhold financial amounts beyond those requested and compliance-status detail unless an authoritative form field requires them or the user explicitly directs disclosure.
+   - Treat a funder's eligibility statement as a condition to satisfy, not as a request for an identifier or certificate.
    - Do not explain obvious context, donor restrictions, internal costing models, or governing directions (e.g. "We did this to comply with...", "As directed...").
    - Do not state what an organization decided not to do.
 
@@ -162,10 +167,14 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 6. Check that each section owns its rules and definitions.
 7. Check that metadata contains structured values only.
 8. Check that the deliverable contains no progress notes, self-disclaimers,
-   sample labels, internal paths, compliance narration, uncertainty markers,
-   hedging, unprompted sensitive identifiers, or AI attribution.
-9. Correct every defect in the Markdown source.
-10. Repeat the full read after each correction pass.
+   sample labels, compliance narration, uncertainty markers, hedging,
+   unprompted sensitive identifiers, or AI attribution.
+9. Check that an external deliverable, such as a proposal, correspondence, or
+   filed record, references other documents by title only and contains no
+   internal paths. Check that a documentation-library topic links other topics
+   by relative path and never references a higher-sensitivity topic.
+10. Correct every defect in the Markdown source.
+11. Repeat the full read after each correction pass.
 
 ## 8. Convert and validate
 
@@ -175,9 +184,10 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 4. Run the artifact-specific validator, tests, linter, schema check, or build.
 5. Run `wrs doctor` before a Writerside build.
 6. Read `references/install-writerside.md` when the Writerside toolchain is
-   unavailable.
-7. Build every affected Writerside instance when Docker and the builder are
-   reachable.
+   unavailable, and before building or serving Writerside output.
+7. Build every affected Writerside instance with `wrs build` when Podman or
+   Docker and the builder image are reachable. Inspect
+   `examples/writerside-validation.md` for build and serve reporting.
 8. Treat every nonzero validation or build status as failure.
 9. Report exact errors and log paths in chat.
 
@@ -185,7 +195,10 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 
 1. Open the exact final artifact.
 2. Read it from start to finish.
-3. Render every fixed-layout page, slide, sheet, screen, or image.
+3. Render every fixed-layout page, slide, sheet, screen, or image. Serve
+   Writerside output with `wrs serve` and open each changed topic. Serve gated
+   instances with `wrs serve --dev`; leave the password manager sign-in to the
+   user.
 4. Inspect every rendered output visually.
 5. Check page flow, tables, images, headers, footers, numbering, continuation
    pages, links, and final-page layout.
@@ -204,7 +217,7 @@ Before delivering any documentation artifact, confirm evidence exists for each i
 - [ ] Deliverables free of uncertainty markers (`[estimate]`, "to be confirmed") and quantity hedging ("about", "roughly").
 - [ ] No unprompted sensitive identifiers (national IDs, registration numbers, banking details) or background methodology explanations included.
 - [ ] Doubts, concerns, and missing prerequisites raised directly to the user in chat before writing.
-- [ ] Documents referenced by title only; no internal repository paths, session filenames, memory files, or handoffs cited in external deliverables.
+- [ ] External deliverables reference documents by title only, with no internal repository paths, session filenames, memory files, or handoffs; documentation-library topics link by relative path and never reference a higher-sensitivity topic.
 - [ ] Zero AI attribution across all documents, deliverables, and metadata.
 - [ ] No U+2014 em dashes in normal prose.
 - [ ] Derived deliverables regenerated from clean sources after the final edit and visually verified.

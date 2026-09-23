@@ -10,6 +10,7 @@ Check these components separately:
 | Kotlin | `kotlinc -version` |
 | Python | `python3 --version`, `pip3 --version`, `python3 -m venv --help` |
 | Docker | `docker --version`, `docker compose version` |
+| Podman | `podman --version`, `podman info` |
 | Node | `node --version`, `npm --version` |
 | Git | `git --version` |
 | GitHub CLI | `gh --version` |
@@ -24,7 +25,7 @@ Check these components separately:
 
 1. Use the official release page, support schedule, registry, or release API.
 2. Identify the current LTS line for Node and Java.
-3. Identify the current stable supported line for Python, Kotlin, Docker, Git, GitHub CLI, and GitLab CLI.
+3. Identify the current stable supported line for Python, Kotlin, Docker, Podman, Git, GitHub CLI, and GitLab CLI.
 4. Compare major and minor support status, not only patch numbers.
 5. Record the source and verification date.
 

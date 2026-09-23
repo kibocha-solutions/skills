@@ -47,11 +47,13 @@ Read [naming and responsibility](references/naming-and-responsibility.md).
 ## 5. Name components
 
 1. Use concise, familiar domain terms.
-2. Prefer names supported by local vocabulary and primary-source precedent.
-3. Avoid vague doctrine terms, clever abbreviations, generic `subject` fields, and names that encode an explanation.
-4. Use documentation for meaning that does not belong in the name.
-5. Preserve meaningful supplied spelling and multilingual terms.
-6. Ask before replacing a disputed name.
+2. Reuse the established name, meaning, type, and value convention when the concept already exists. Never reuse a name for an incompatible meaning.
+3. Search primary sources for naming precedent in comparable established products before presenting a name. Record the source, the observed names, and how the precedent applies.
+4. Use plural nouns for tables and the project's existing column style.
+5. Avoid vague doctrine terms, clever abbreviations, generic `subject` fields, and names that encode an explanation or a storage type.
+6. Use documentation for meaning that does not belong in the name.
+7. Preserve meaningful supplied spelling and multilingual terms.
+8. Ask before replacing a disputed name.
 
 ## 6. Design data and ERDs
 
@@ -66,11 +68,13 @@ Read [ERD design](references/erd-design.md).
 7. Verify dependency preservation.
 8. Test insert, update, and delete anomalies.
 9. Test lifecycle behavior before and after related entities exist.
-10. Prefer concrete foreign keys.
-11. Use polymorphic references only after documenting allowed targets, integrity enforcement, and query behavior.
-12. Mark derived summaries as caches, views, or materialized views rather than source truth.
-13. Use opaque non-guessable example identifiers.
-14. Include normal, edge, and failure example rows.
+10. Test rename, reassignment, repeated participation, revision, archival, and independent child creation. Verify uniqueness, tenant consistency, deletion behavior, and historical references.
+11. Prefer concrete foreign keys.
+12. Use polymorphic references only after documenting allowed targets, integrity enforcement, and query behavior.
+13. Mark derived summaries as caches, views, or materialized views rather than source truth.
+14. Use opaque non-guessable example identifiers.
+15. Include normal, edge, and failure example rows.
+16. Keep example values illustrative. Never invent facts about real organizations.
 
 ## 7. Design behavior
 

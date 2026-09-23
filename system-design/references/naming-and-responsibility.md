@@ -14,6 +14,29 @@ get a useful first guess from the name without learning in-house doctrine.
 Use the table, class, state, activity, or module documentation to explain the
 concept. Do not force the full explanation into the name.
 
+## Table and Column Names
+
+| Prefer | Over | Rule |
+| --- | --- | --- |
+| `applications` | `proposal_applications`, `call_for_proposals_applications` | Plural noun without an explanatory prefix. |
+| `created_by` | `created_by_user_id` | No encoded target or explanation. |
+| `metadata` (when established) | `metadata_jsonb` | Reuse the established name; no storage type in names. |
+| `organization_id` | `org` | Keep qualifiers that distinguish a real relationship. |
+
+Repeated column names across tables are expected when they carry the same
+concept.
+
+## Precedent Research
+
+1. Prefer vendor-maintained schemas, migrations, models, and official
+   documentation.
+2. Record the exact source, the observed names, and how the precedent applies.
+3. Distinguish database names from API properties and display labels.
+4. Do not infer a private schema or treat popularity as proof of good
+   normalization.
+5. Let local conventions control when outside products differ, and explain
+   each meaningful departure.
+
 ## Responsibility Text
 
 Each settled design artifact should carry a dense responsibility statement.

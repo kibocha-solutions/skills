@@ -1,0 +1,1787 @@
+#!/usr/bin/env python3
+"""wrs: build and serve JetBrains Writerside documentation with Podman or Docker.
+
+Builds every instance of a Writerside project in isolated builder containers,
+serves all instances at once through one nginx container with sensitivity-aware
+cross-instance routing, and reports progress and results for people and CI.
+
+Requires Python 3.11+ and Podman or Docker. Standard library only.
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import datetime as dt
+import getpass
+import concurrent.futures
+import hashlib
+import json
+import os
+import re
+import secrets
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import threading
+import time
+import tomllib
+import urllib.error
+import urllib.request
+import xml.etree.ElementTree as ET
+import zipfile
+from dataclasses import dataclass, field
+from pathlib import Path
+
+VERSION = "2.2.0"
+IMAGE_REPO = "docker.io/jetbrains/writerside-builder"
+DEFAULT_IMAGE_TAG = "2026.08.0328"
+NGINX_IMAGE = "docker.io/library/nginx:alpine"
+DEFAULT_SENSITIVITY = ["public", "internal", "restricted", "confidential"]
+DEFAULT_PORT_BASE = 44190
+DEFAULT_GATED_FROM = "restricted"
+DEFAULT_DEV_ITEM = "wrs-dev"
+DEV_KEY_DAYS = 21
+KEYRING_BW_SESSION = ["service", "vicinae-bitwarden", "key", "session"]  # shared with the recovery toolkit
+KEYRING_DEV_KEY = ["service", "wrs", "key", "dev-key"]
+HUB_TAGS_URL = (
+    "https://hub.docker.com/v2/repositories/jetbrains/writerside-builder/tags"
+    "?page_size=25&ordering=last_updated"
+)
+MODULE = "sources"  # the builder names the module after the SOURCE_DIR basename
+
+EXIT_OK, EXIT_FAIL, EXIT_USAGE, EXIT_INTERRUPT = 0, 1, 2, 130
+
+
+# --------------------------------------------------------------------------
+# Terminal output
+# --------------------------------------------------------------------------
+
+class UI:
+    """Color, symbols, and a live multi-row status board on terminals."""
+
+    FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    ASCII_FRAMES = "|/-\\"
+
+    def __init__(self, color: bool | None = None, plain: bool = False):
+        self.err = sys.stderr
+        self.tty = self.err.isatty() and os.environ.get("TERM") != "dumb"
+        if color is None:
+            color = self.tty and not os.environ.get("NO_COLOR") and not os.environ.get("WRS_NO_COLOR")
+        self.color = color and not plain
+        self.plain = plain
+        self.animate = self.tty and not plain
+        enc = (getattr(self.err, "encoding", None) or "").lower()
+        self.unicode = "utf" in enc and not plain
+        self.lock = threading.RLock()
+        self.board: Board | None = None
+        self.status_line = False
+
+    def c(self, text: str, *codes: str) -> str:
+        if not self.color:
+            return text
+        table = {"bold": "1", "dim": "2", "red": "31", "green": "32", "yellow": "33",
+                 "blue": "34", "magenta": "35", "cyan": "36", "gray": "90"}
+        seq = ";".join(table[x] for x in codes)
+        return f"\x1b[{seq}m{text}\x1b[0m"
+
+    def sym(self, name: str) -> str:
+        u = {"ok": "✔", "fail": "✖", "warn": "▲", "info": "●", "arrow": "→", "dot": "·"}
+        a = {"ok": "OK", "fail": "X", "warn": "!", "info": "*", "arrow": "->", "dot": "-"}
+        return (u if self.unicode else a)[name]
+
+    def frame(self, tick: int) -> str:
+        frames = self.FRAMES if self.unicode else self.ASCII_FRAMES
+        return frames[tick % len(frames)]
+
+    def emit(self, line: str = "") -> None:
+        with self.lock:
+            if self.status_line:
+                self.err.write("\r\x1b[2K")
+            if self.board and self.board.active:
+                self.board.clear()
+            print(line, file=self.err, flush=True)
+            if self.board and self.board.active:
+                self.board.draw()
+
+    def ok(self, msg: str) -> None:
+        self.emit(f"{self.c(self.sym('ok'), 'green')} {msg}")
+
+    def warn(self, msg: str) -> None:
+        self.emit(f"{self.c(self.sym('warn'), 'yellow')} {msg}")
+
+    def fail(self, msg: str) -> None:
+        self.emit(f"{self.c(self.sym('fail'), 'red')} {msg}")
+
+    def info(self, msg: str) -> None:
+        self.emit(f"{self.c(self.sym('info'), 'blue')} {msg}")
+
+    def hint(self, msg: str) -> None:
+        self.emit(self.c(f"  {msg}", "gray"))
+
+    def heading(self, msg: str) -> None:
+        self.emit(self.c(msg, "bold"))
+
+    def table(self, headers: list[str], rows: list[list[str]], out=None) -> None:
+        """Print an aligned table; ANSI codes are ignored for width."""
+        out = out or sys.stdout
+        strip = re.compile(r"\x1b\[[0-9;]*m")
+        widths = [len(h) for h in headers]
+        for r in rows:
+            for i, cell in enumerate(r):
+                widths[i] = max(widths[i], len(strip.sub("", cell)))
+
+        def fmt(cells: list[str]) -> str:
+            parts = []
+            for i, cell in enumerate(cells):
+                pad = widths[i] - len(strip.sub("", cell))
+                parts.append(cell + " " * pad)
+            return "  ".join(parts).rstrip()
+
+        with self.lock:
+            if self.board and self.board.active:
+                self.board.clear()
+            print(self.c(fmt(headers), "bold"), file=out)
+            for r in rows:
+                print(fmt(r), file=out)
+            out.flush()
+
+
+@dataclass
+class Row:
+    name: str
+    state: str = "queued"  # queued | running | ok | failed | stopped
+    detail: str = ""
+    started: float = 0.0
+    finished: float = 0.0
+
+    def elapsed(self) -> float:
+        if not self.started:
+            return 0.0
+        return (self.finished or time.monotonic()) - self.started
+
+
+class Board:
+    """Live rows redrawn in place on a TTY; state changes only elsewhere."""
+
+    def __init__(self, ui: UI, title: str):
+        self.ui = ui
+        self.title = title
+        self.rows: dict[str, Row] = {}
+        self.order: list[str] = []
+        self.tick = 0
+        self.drawn = 0
+        self.active = False
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+
+    def add(self, name: str) -> Row:
+        row = Row(name)
+        self.rows[name] = row
+        self.order.append(name)
+        return row
+
+    def update(self, name: str, state: str | None = None, detail: str | None = None) -> None:
+        with self.ui.lock:
+            row = self.rows[name]
+            changed = state is not None and state != row.state
+            if state:
+                if state == "running" and not row.started:
+                    row.started = time.monotonic()
+                if state in ("ok", "failed", "stopped"):
+                    row.finished = time.monotonic()
+                row.state = state
+            if detail is not None:
+                row.detail = detail
+            if not self.ui.animate and changed:
+                print(self._line(row, plain=True), file=self.ui.err, flush=True)
+
+    def _line(self, row: Row, plain: bool = False) -> str:
+        ui = self.ui
+        mark = {
+            "queued": ui.c(ui.sym("dot"), "gray"),
+            "running": ui.c(ui.frame(self.tick), "cyan"),
+            "ok": ui.c(ui.sym("ok"), "green"),
+            "failed": ui.c(ui.sym("fail"), "red"),
+            "stopped": ui.c(ui.sym("warn"), "yellow"),
+        }[row.state]
+        t = f"{row.elapsed():5.0f}s" if row.started else "      "
+        label = row.state
+        if plain:
+            return f"[{label}] {row.name} {row.detail}".rstrip()
+        width = max(len(n) for n in self.order)
+        return f"  {mark} {row.name:<{width}}  {ui.c(t, 'gray')}  {ui.c(row.detail, 'dim')}"
+
+    def clear(self) -> None:
+        if self.drawn:
+            self.ui.err.write(f"\x1b[{self.drawn}F\x1b[J")
+            self.drawn = 0
+
+    def draw(self) -> None:
+        lines = [self.ui.c(self.title, "bold")] + [self._line(self.rows[n]) for n in self.order]
+        self.ui.err.write("\n".join(lines) + "\n")
+        self.ui.err.flush()
+        self.drawn = len(lines)
+
+    def _loop(self) -> None:
+        while not self._stop.wait(0.1):
+            with self.ui.lock:
+                self.tick += 1
+                self.clear()
+                self.draw()
+
+    def __enter__(self) -> "Board":
+        self.ui.board = self
+        if self.ui.animate:
+            self.active = True
+            self.ui.err.write("\x1b[?25l")
+            with self.ui.lock:
+                self.draw()
+            self._thread = threading.Thread(target=self._loop, daemon=True)
+            self._thread.start()
+        else:
+            print(self.title, file=self.ui.err, flush=True)
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join()
+        with self.ui.lock:
+            if self.active:
+                self.clear()
+                self.draw()
+                self.ui.err.write("\x1b[?25h")
+                self.ui.err.flush()
+            self.active = False
+            self.ui.board = None
+
+
+class Spinner:
+    """A single-line spinner for short waits."""
+
+    def __init__(self, ui: UI, text: str):
+        self.ui, self.text = ui, text
+        self._stop = threading.Event()
+        self._t: threading.Thread | None = None
+
+    def __enter__(self) -> "Spinner":
+        if self.ui.animate:
+            self.ui.err.write("\x1b[?25l")
+            self._t = threading.Thread(target=self._loop, daemon=True)
+            self._t.start()
+        return self
+
+    def _loop(self) -> None:
+        tick = 0
+        while True:
+            with self.ui.lock:
+                self.ui.err.write(f"\r\x1b[2K{self.ui.c(self.ui.frame(tick), 'cyan')} {self.text}")
+                self.ui.err.flush()
+            tick += 1
+            if self._stop.wait(0.08):
+                break
+
+    def __exit__(self, *exc) -> None:
+        self._stop.set()
+        if self._t:
+            self._t.join()
+            self.ui.err.write("\r\x1b[2K\x1b[?25h")
+            self.ui.err.flush()
+
+
+# --------------------------------------------------------------------------
+# Project model
+# --------------------------------------------------------------------------
+
+@dataclass
+class Instance:
+    id: str
+    name: str
+    tree: Path
+    start_page: str
+    topics: list[str]
+    rank: int = 99
+
+    @property
+    def start_html(self) -> str:
+        return Path(self.start_page).with_suffix(".html").name if self.start_page else "index.html"
+
+
+@dataclass
+class Config:
+    runtime: str = ""
+    image_tag: str = DEFAULT_IMAGE_TAG
+    port_base: int = DEFAULT_PORT_BASE
+    jobs: int = 0
+    sensitivity: list[str] = field(default_factory=lambda: list(DEFAULT_SENSITIVITY))
+    gated_from: str = DEFAULT_GATED_FROM
+    dev_item: str = DEFAULT_DEV_ITEM
+    password_manager: str = ""
+    state_dir: Path = field(default_factory=lambda: Path(
+        os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local/share"))) / "wrs")
+
+    @property
+    def image(self) -> str:
+        return f"{IMAGE_REPO}:{self.image_tag}"
+
+
+@dataclass
+class Project:
+    root: Path  # directory holding writerside.cfg
+    instances: list[Instance]
+    config: Config
+
+    @property
+    def display_name(self) -> str:
+        return self.root.parent.name if self.root.name in ("docs", "Writerside", "writerside") else self.root.name
+
+    @property
+    def slug(self) -> str:
+        base = self.root.parent.name if self.root.name in ("docs", "Writerside") else self.root.name
+        digest = hashlib.sha1(str(self.root.resolve()).encode()).hexdigest()[:8]
+        return f"{re.sub(r'[^a-z0-9]+', '-', base.lower()).strip('-')}-{digest}"
+
+    @property
+    def home(self) -> Path:
+        return self.config.state_dir / "projects" / self.slug
+
+    def dir(self, *parts: str) -> Path:
+        p = self.home.joinpath(*parts)
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+    @property
+    def gate_rank(self) -> int:
+        """Instances at or above this rank need the dev gate."""
+        g = self.config.gated_from
+        return self.config.sensitivity.index(g) if g in self.config.sensitivity else 10_000
+
+    def gated(self, inst: "Instance") -> bool:
+        return inst.rank >= self.gate_rank
+
+    def topic_tiers(self) -> dict[str, int]:
+        """Each topic's tier: the lowest rank of any instance that publishes it."""
+        tiers: dict[str, int] = {}
+        for inst in self.instances:
+            for topic in inst.topics:
+                html = Path(topic).with_suffix(".html").name
+                tiers[html] = min(tiers.get(html, inst.rank), inst.rank)
+        return tiers
+
+    def get(self, name: str) -> Instance:
+        for inst in self.instances:
+            if inst.id == name:
+                return inst
+        raise WrsError(f"unknown instance '{name}'",
+                       f"available: {', '.join(i.id for i in self.instances)}")
+
+
+class WrsError(Exception):
+    def __init__(self, msg: str, hint: str = "", code: int = EXIT_FAIL):
+        super().__init__(msg)
+        self.hint, self.code = hint, code
+
+
+def find_cfg_root(start: Path) -> Path:
+    here = start.resolve()
+    for d in [here, *here.parents]:
+        if (d / "writerside.cfg").is_file():
+            return d
+    for sub in ("docs", "Writerside", "writerside"):
+        if (here / sub / "writerside.cfg").is_file():
+            return here / sub
+    raise WrsError("no writerside.cfg found",
+                   "run wrs inside a Writerside project, or pass -C <dir>", EXIT_USAGE)
+
+
+def load_config(root: Path, args: argparse.Namespace) -> Config:
+    cfg = Config()
+    file_values: dict = {}
+    for candidate in (Path.home() / ".config/wrs/config.toml", root / ".wrs.toml"):
+        if candidate.is_file():
+            with candidate.open("rb") as fh:
+                file_values.update(tomllib.load(fh))
+    env = os.environ
+    cfg.runtime = getattr(args, "runtime", None) or env.get("WRS_RUNTIME") or file_values.get("runtime", "")
+    cfg.image_tag = getattr(args, "image_tag", None) or env.get("WRS_IMAGE_TAG") or file_values.get(
+        "image_tag", DEFAULT_IMAGE_TAG)
+    cfg.port_base = int(getattr(args, "port_base", None) or env.get("WRS_PORT_BASE") or file_values.get(
+        "port_base", DEFAULT_PORT_BASE))
+    cfg.jobs = int(getattr(args, "jobs", None) or env.get("WRS_JOBS") or file_values.get("jobs", 0))
+    if "sensitivity" in file_values:
+        cfg.sensitivity = list(file_values["sensitivity"])
+    cfg.gated_from = env.get("WRS_GATED_FROM") or file_values.get("gated_from", DEFAULT_GATED_FROM)
+    cfg.dev_item = env.get("WRS_DEV_ITEM") or file_values.get("dev_item", DEFAULT_DEV_ITEM)
+    cfg.password_manager = (getattr(args, "password_manager", None) or env.get("WRS_PASSWORD_MANAGER")
+                            or file_values.get("password_manager", ""))
+    if env.get("WRS_STATE_DIR"):
+        cfg.state_dir = Path(env["WRS_STATE_DIR"])
+    return cfg
+
+
+def load_project(args: argparse.Namespace) -> Project:
+    root = find_cfg_root(Path(args.project) if args.project else Path.cwd())
+    cfg = load_config(root, args)
+    tree_cfg = ET.parse(root / "writerside.cfg").getroot()
+    instances: list[Instance] = []
+    for el in tree_cfg.findall("instance"):
+        tree = root / el.get("src", "")
+        if not tree.is_file():
+            raise WrsError(f"tree file missing: {tree.name}", "check writerside.cfg")
+        prof = ET.parse(tree).getroot()
+        topics = [t.get("topic") for t in prof.iter("toc-element") if t.get("topic")]
+        iid = prof.get("id") or tree.stem
+        rank = cfg.sensitivity.index(iid) if iid in cfg.sensitivity else len(cfg.sensitivity)
+        instances.append(Instance(iid, prof.get("name", iid), tree, prof.get("start-page", ""), topics, rank))
+    if not instances:
+        raise WrsError("writerside.cfg declares no instances")
+    instances.sort(key=lambda i: (i.rank, i.id))
+    return Project(root, instances, cfg)
+
+
+# --------------------------------------------------------------------------
+# Container runtime
+# --------------------------------------------------------------------------
+
+class Runtime:
+    def __init__(self, preferred: str = ""):
+        order = [preferred] if preferred else ["podman", "docker"]
+        self.cmd = next((c for c in order if c and shutil.which(c)), "")
+        if not self.cmd:
+            raise WrsError("no container runtime found",
+                           "install Podman (recommended) or Docker, or set WRS_RUNTIME", EXIT_USAGE)
+        self.podman = self.is_podman()
+
+    def is_podman(self) -> bool:
+        try:
+            out = subprocess.run([self.cmd, "--version"], capture_output=True, text=True, timeout=15).stdout
+        except (OSError, subprocess.TimeoutExpired):
+            return False
+        return "podman" in out.lower()
+
+    def run(self, *args: str, check: bool = False, timeout: float | None = 60) -> subprocess.CompletedProcess:
+        return subprocess.run([self.cmd, *args], capture_output=True, text=True, check=check, timeout=timeout)
+
+    def version(self) -> str:
+        r = self.run("--version")
+        return r.stdout.strip().splitlines()[-1] if r.returncode == 0 else "unavailable"
+
+    def reachable(self) -> bool:
+        return self.run("info", timeout=30).returncode == 0
+
+    def image_digest(self, image: str) -> str:
+        r = self.run("image", "inspect", image, "--format", "{{json .RepoDigests}}")
+        if r.returncode != 0:
+            return ""
+        try:
+            digests = json.loads(r.stdout.strip() or "[]")
+        except json.JSONDecodeError:
+            return "present"
+        return next((d.split("@", 1)[1] for d in digests if "@" in d), "present")
+
+    def relabel(self) -> str:
+        return ":Z" if sys.platform.startswith("linux") else ""
+
+    def platform_args(self) -> list[str]:
+        machine = os.uname().machine.lower()
+        return ["--platform", "linux/amd64"] if machine in ("arm64", "aarch64") else []
+
+    def containers(self, label: str) -> list[tuple[str, str]]:
+        r = self.run("ps", "-a", "--filter", f"label={label}", "--format", "{{.Names}}|{{.Status}}")
+        rows = []
+        for line in r.stdout.splitlines():
+            if "|" in line:
+                name, status = line.split("|", 1)
+                rows.append((name, status))
+        return rows
+
+    def remove(self, name: str) -> None:
+        self.run("rm", "-f", name, timeout=60)
+
+
+# --------------------------------------------------------------------------
+# Dev gate (Bitwarden)
+# --------------------------------------------------------------------------
+
+def now_utc() -> dt.datetime:
+    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+
+
+class VaultItem:
+    """The dev key item, normalized across password managers."""
+
+    def __init__(self, ref: str, key: str, created: str, raw: dict):
+        self.ref, self.key, self.created, self.raw = ref, key, created, raw
+
+
+class Vault:
+    """A password manager CLI that holds the dev key item."""
+
+    name = ""
+    label = ""
+    cli = ""
+
+    def __init__(self, ui: UI, item: str, gate: "DevGate"):
+        self.ui, self.item, self.gate = ui, item, gate
+        self.fresh = False  # True once this run authenticated with the master password
+
+    def spin(self, text: str) -> Spinner:
+        return Spinner(self.ui, text)
+
+    def missing(self) -> WrsError:
+        return WrsError(f"{self.label} CLI ({self.cli}) not found", self.install_hint, EXIT_USAGE)
+
+
+class BitwardenVault(Vault):
+    name, label, cli = "bitwarden", "Bitwarden", "bw"
+    install_hint = "install it (snap install bw), then run: bw login"
+
+    def __init__(self, ui: UI, item: str, gate: "DevGate"):
+        super().__init__(ui, item, gate)
+        self.bin = os.environ.get("WRS_BW") or shutil.which("bw") or ""
+        self.session = os.environ.get("BW_SESSION", "")
+
+    def _bw(self, *args: str, stdin: str | None = None, check: bool = True,
+            extra_env: dict | None = None) -> subprocess.CompletedProcess:
+        env = dict(os.environ)
+        if self.session:
+            env["BW_SESSION"] = self.session
+        env.update(extra_env or {})
+        r = subprocess.run([self.bin, *args], input=stdin, capture_output=True, text=True, env=env, timeout=120)
+        if check and r.returncode != 0:
+            raise WrsError(f"bw {' '.join(args[:2])} failed", (r.stderr or r.stdout).strip()[-300:])
+        return r
+
+    def _status(self) -> str:
+        r = self._bw("status", check=False)
+        try:
+            return json.loads(r.stdout).get("status", "")
+        except json.JSONDecodeError:
+            return ""
+
+    def _unlock(self, reason: str) -> None:
+        try:
+            password = getpass.getpass(f"Bitwarden master password ({reason}): ")
+        except (EOFError, OSError):
+            raise WrsError("the vault unlock needs a terminal",
+                           "run wrs in a terminal, or export BW_SESSION=$(bw unlock --raw)", EXIT_USAGE)
+        if not password:
+            raise WrsError("no master password entered", code=EXIT_USAGE)
+        with self.spin("Unlocking the Bitwarden vault"):
+            r = self._bw("unlock", "--passwordenv", "WRS_BW_MASTER", "--raw", check=False,
+                         extra_env={"WRS_BW_MASTER": password})
+        password = ""
+        if r.returncode != 0 or not r.stdout.strip():
+            raise WrsError("Bitwarden unlock failed", "check the master password and try again")
+        self.session = r.stdout.strip()
+        self.fresh = True
+        self.gate.kr("store", KEYRING_BW_SESSION, self.session, "Bitwarden CLI session")
+
+    def ready(self) -> None:
+        if not self.bin:
+            raise self.missing()
+        if not self.session:
+            self.session = self.gate.kr("lookup", KEYRING_BW_SESSION)
+        with self.spin("Checking the Bitwarden session"):
+            status = self._status()
+        if status == "locked":
+            self._unlock("unlock the vault")
+        elif status != "unlocked":
+            raise WrsError(f"Bitwarden CLI is not logged in (status: {status or 'unknown'})", "run: bw login",
+                           EXIT_USAGE)
+        with self.spin("Syncing the Bitwarden vault"):
+            self._bw("sync", check=False)
+
+    def reauthenticate(self) -> None:
+        if self.fresh:
+            return
+        self._bw("lock", check=False)
+        self.session = ""
+        self._unlock("rotate the dev key")
+        with self.spin("Syncing the Bitwarden vault"):
+            self._bw("sync", check=False)
+
+    def get(self) -> VaultItem | None:
+        with self.spin(f"Reading Bitwarden item '{self.item}'"):
+            r = self._bw("get", "item", self.item, check=False)
+        if r.returncode != 0:
+            if "not found" in (r.stderr + r.stdout).lower():
+                return None
+            raise WrsError(f"could not read Bitwarden item '{self.item}'", (r.stderr or r.stdout).strip()[-300:])
+        raw = json.loads(r.stdout)
+        login = raw.get("login") or {}
+        created = next((f.get("value", "") for f in raw.get("fields") or []
+                        if f.get("name") == "WRS_DEV_KEY_CREATED"), "")
+        return VaultItem(raw["id"], login.get("password") or "", created, raw)
+
+    def save(self, item: VaultItem | None, key: str, created: str) -> None:
+        if item is None:
+            raw = json.loads(self._bw("get", "template", "item").stdout)
+            raw.update(type=1, name=self.item, notes="Local development gate for wrs --dev.",
+                       login={"username": "wrs-dev", "password": key, "totp": None, "uris": []}, fields=[])
+            op = ("create", "item")
+        else:
+            raw = item.raw
+            raw.setdefault("login", {})["password"] = key
+            op = ("edit", "item", item.ref)
+        fields = [f for f in raw.get("fields") or [] if f.get("name") != "WRS_DEV_KEY_CREATED"]
+        fields.append({"name": "WRS_DEV_KEY_CREATED", "value": created, "type": 0})
+        raw["fields"] = fields
+        # The encoded item travels on stdin; an argument would expose the key to other processes.
+        encoded = self._bw("encode", stdin=json.dumps(raw)).stdout.strip()
+        self._bw(*op, stdin=encoded)
+
+
+class OnePasswordVault(Vault):
+    """1Password CLI. The item is a title, or an op://<vault>/<item> reference."""
+
+    name, label, cli = "1password", "1Password", "op"
+    install_hint = "install the 1Password CLI, then run: op account add (or enable app integration)"
+
+    def __init__(self, ui: UI, item: str, gate: "DevGate"):
+        super().__init__(ui, item, gate)
+        self.bin = os.environ.get("WRS_OP") or shutil.which("op") or ""
+        self.env: dict[str, str] = {}
+        ref = item[len("op://"):] if item.startswith("op://") else ""
+        self.vault, _, self.title = ref.partition("/") if ref else ("", "", item)
+        self.title = self.title.split("/")[0] or DEFAULT_DEV_ITEM
+
+    def _op(self, *args: str, stdin: str | None = None, check: bool = True) -> subprocess.CompletedProcess:
+        env = {**os.environ, **self.env}
+        r = subprocess.run([self.bin, *args], input=stdin, capture_output=True, text=True, env=env, timeout=120)
+        if check and r.returncode != 0:
+            raise WrsError(f"op {' '.join(args[:2])} failed", (r.stderr or r.stdout).strip()[-300:])
+        return r
+
+    def _vault_args(self) -> list[str]:
+        return ["--vault", self.vault] if self.vault else []
+
+    def _signin(self) -> None:
+        # op prompts on the terminal itself (or through the desktop app); only the export lines are captured.
+        env = {**os.environ, **self.env}
+        try:
+            r = subprocess.run([self.bin, "signin"], stdout=subprocess.PIPE, text=True, env=env, timeout=300)
+        except subprocess.TimeoutExpired:
+            raise WrsError("1Password sign-in timed out", code=EXIT_USAGE)
+        if r.returncode != 0:
+            raise WrsError("1Password sign-in failed", "check the account password or app approval, then retry")
+        for line in r.stdout.splitlines():
+            m = re.match(r'^\s*export\s+(OP_SESSION\w*)="?([^"]*)"?\s*$', line)
+            if m:
+                self.env[m.group(1)] = m.group(2)
+        self.fresh = True
+
+    def ready(self) -> None:
+        if not self.bin:
+            raise self.missing()
+        with self.spin("Checking the 1Password session"):
+            signed_in = self._op("whoami", check=False).returncode == 0
+        if not signed_in:
+            self._signin()
+
+    def reauthenticate(self) -> None:
+        if self.fresh:
+            return
+        self._op("signout", check=False)
+        self.env = {}
+        self._signin()
+
+    def get(self) -> VaultItem | None:
+        with self.spin(f"Reading 1Password item '{self.title}'"):
+            r = self._op("item", "get", self.title, *self._vault_args(), "--format", "json", check=False)
+        if r.returncode != 0:
+            text = (r.stderr + r.stdout).lower()
+            if "isn't an item" in text or "not found" in text:
+                return None
+            raise WrsError(f"could not read 1Password item '{self.title}'", (r.stderr or r.stdout).strip()[-300:])
+        raw = json.loads(r.stdout)
+        fields = raw.get("fields") or []
+        key = next((f.get("value", "") for f in fields if f.get("purpose") == "PASSWORD"), "")
+        created = next((f.get("value", "") for f in fields if f.get("label") == "WRS_DEV_KEY_CREATED"), "")
+        return VaultItem(raw["id"], key or "", created or "", raw)
+
+    def save(self, item: VaultItem | None, key: str, created: str) -> None:
+        # Values travel as a JSON template on stdin; assignment arguments would expose the key to other processes.
+        stamp = {"id": "wrs_dev_key_created", "type": "STRING", "label": "WRS_DEV_KEY_CREATED", "value": created}
+        if item is None:
+            raw = {"title": self.title, "category": "LOGIN", "fields": [
+                {"id": "username", "type": "STRING", "purpose": "USERNAME", "label": "username", "value": "wrs-dev"},
+                {"id": "password", "type": "CONCEALED", "purpose": "PASSWORD", "label": "password", "value": key},
+                {"id": "notesPlain", "type": "STRING", "purpose": "NOTES", "label": "notesPlain",
+                 "value": "Local development gate for wrs --dev."},
+                stamp]}
+            self._op("item", "create", *self._vault_args(), "-", stdin=json.dumps(raw))
+            return
+        raw = item.raw
+        fields = [f for f in raw.get("fields") or [] if f.get("label") != "WRS_DEV_KEY_CREATED"]
+        for f in fields:
+            if f.get("purpose") == "PASSWORD":
+                f["value"] = key
+        raw["fields"] = fields + [stamp]
+        self._op("item", "edit", item.ref, "--template", "/dev/stdin", stdin=json.dumps(raw))
+
+
+VAULTS = {v.name: v for v in (BitwardenVault, OnePasswordVault)}
+
+
+def pick_vault(requested: str, item: str) -> str:
+    """The configured manager, else an op:// item, else the installed CLI (Bitwarden first)."""
+    if requested:
+        if requested not in VAULTS:
+            raise WrsError(f"unknown password manager '{requested}'", f"use one of: {', '.join(VAULTS)}", EXIT_USAGE)
+        return requested
+    if item.startswith("op://"):
+        return "1password"
+    if os.environ.get("WRS_BW") or shutil.which("bw"):
+        return "bitwarden"
+    if os.environ.get("WRS_OP") or shutil.which("op"):
+        return "1password"
+    return "bitwarden"
+
+
+class DevGate:
+    """Local compound gate: one key, held in a password manager login item, cached in the login keyring.
+
+    Session tokens and the dev key are never written to files.
+    """
+
+    def __init__(self, ui: UI, item: str, manager: str = ""):
+        self.ui, self.item = ui, item
+        self.st = os.environ.get("WRS_SECRET_TOOL") or shutil.which("secret-tool") or ""
+        self.vault: Vault = VAULTS[pick_vault(manager, item)](ui, item, self)
+
+    # keyring -------------------------------------------------------------
+    def kr(self, action: str, attrs: list[str], value: str | None = None, label: str = "") -> str:
+        if not self.st:
+            return ""
+        cmd = [self.st, action] + ([f"--label={label}"] if action == "store" else []) + attrs
+        r = subprocess.run(cmd, input=value, capture_output=True, text=True, timeout=30)
+        return r.stdout.strip() if r.returncode == 0 else ""
+
+    def cached(self) -> dict | None:
+        raw = self.kr("lookup", KEYRING_DEV_KEY)
+        try:
+            data = json.loads(raw) if raw else None
+        except json.JSONDecodeError:
+            return None
+        if not data or data.get("item") != self.item or not data.get("key"):
+            return None
+        return data if data.get("manager", "bitwarden") == self.vault.name else None
+
+    @staticmethod
+    def age_days(created: str) -> float:
+        try:
+            then = dt.datetime.fromisoformat(created)
+        except ValueError:
+            return float("inf")
+        if then.tzinfo is None:
+            then = then.replace(tzinfo=dt.timezone.utc)
+        return (now_utc() - then).total_seconds() / 86400
+
+    def _rotate(self, item: VaultItem | None) -> tuple[str, str]:
+        vault = self.vault
+        if item is not None:
+            self.ui.warn(f"Rotating the dev key. Rotation needs a fresh {vault.label} sign-in.")
+            vault.reauthenticate()
+        verb = "Creating" if item is None else "Rotating"
+        with vault.spin(f"{verb} the dev key in {vault.label} item '{self.item}'"):
+            key, created = secrets.token_urlsafe(32), now_utc().isoformat()
+            vault.save(item, key, created)
+        return key, created
+
+    def key(self, force_rotate: bool = False) -> str:
+        vault = self.vault
+        cached = self.cached()
+        if cached and not force_rotate and self.age_days(cached.get("created", "")) < DEV_KEY_DAYS:
+            left = DEV_KEY_DAYS - self.age_days(cached["created"])
+            self.ui.ok(f"Dev gate open ({vault.label} key, {left:.0f} days until rotation)")
+            return cached["key"]
+        vault.ready()
+        item = vault.get()
+        key, created = (item.key, item.created) if item else ("", "")
+        if item is None or force_rotate or not key or self.age_days(created) >= DEV_KEY_DAYS:
+            key, created = self._rotate(item)
+            self.ui.ok(f"Dev key {'created' if item is None else 'rotated'} in {vault.label} item '{self.item}'")
+        self.kr("store", KEYRING_DEV_KEY,
+                json.dumps({"manager": vault.name, "item": self.item, "key": key, "created": created}), "wrs dev key")
+        self.ui.ok("Dev gate open (key cached in the login keyring)")
+        return key
+
+    def lock(self) -> None:
+        self.kr("clear", KEYRING_DEV_KEY)
+
+
+def htpasswd_entry(user: str, password: str) -> str:
+    salt = os.urandom(8)
+    digest = hashlib.sha1(password.encode() + salt).digest()
+    return f"{user}:{{SSHA}}{base64.b64encode(digest + salt).decode()}\n"
+
+
+def cmd_key(args: argparse.Namespace, ui: UI) -> int:
+    try:
+        cfg = load_project(args).config
+    except WrsError:
+        cfg = load_config(Path.cwd(), args)
+    gate = DevGate(ui, cfg.dev_item, cfg.password_manager)
+    vault = gate.vault
+    if args.action == "status":
+        cli = vault.bin or f"{vault.cli} not installed"
+        ui.info(f"Password manager: {vault.label} ({cli}), item '{cfg.dev_item}'")
+        cached = gate.cached()
+        if not cached:
+            ui.info("No dev key in this session. The next `wrs serve --dev` opens the gate.")
+        else:
+            age = gate.age_days(cached["created"])
+            ui.info(f"Dev key created {cached['created']}, {max(0, DEV_KEY_DAYS - age):.0f} days until rotation")
+    elif args.action == "rotate":
+        gate.key(force_rotate=True)
+    elif args.action == "lock":
+        gate.lock()
+        ui.ok("Dev key removed from the login keyring")
+    return EXIT_OK
+
+
+# --------------------------------------------------------------------------
+# Build
+# --------------------------------------------------------------------------
+
+PHASES = [
+    (re.compile(r"Get release map|Compile config"), "preparing"),
+    (re.compile(r"Compile article"), "compiling topics"),
+    (re.compile(r"Articles are compiled"), "topics compiled"),
+    (re.compile(r"Write resources|Write map"), "writing site"),
+    (re.compile(r'Building "webHelp'), "packaging"),
+    (re.compile(r"Saving Algolia"), "indexing search"),
+    (re.compile(r"Checking: (.+?) started"), "checking {0}"),
+    (re.compile(r"All done, exiting successfully"), "finishing"),
+]
+
+
+@dataclass
+class BuildResult:
+    instance: str
+    ok: bool
+    seconds: float
+    exit_code: int
+    errors: int = 0
+    warnings: int = 0
+    checks: int = 0
+    pages: int = 0
+    problems: list[str] = field(default_factory=list)
+    log: str = ""
+    site: str = ""
+    message: str = ""
+
+
+def parse_log(log_text: str) -> tuple[bool, list[str]]:
+    completed = "All done, exiting successfully" in log_text
+    problems: list[str] = []
+    in_list = False
+    for line in log_text.splitlines():
+        if line.startswith("Problems list:"):
+            in_list = True
+            continue
+        if in_list:
+            if line.startswith("\t"):
+                problems.append(line.strip())
+                continue
+            if line.startswith("File "):
+                continue
+            in_list = False
+        if line.startswith(("Test failed:", "Inspection failed:")):
+            problems.append(line.strip())
+    seen, unique = set(), []
+    for p in problems:
+        if p not in seen:
+            seen.add(p)
+            unique.append(p)
+    return completed, unique
+
+
+def build_instance(project: Project, rt: Runtime, inst: Instance, board: Board | None,
+                   keep_src: bool, cancel: threading.Event) -> BuildResult:
+    ts = time.strftime("%Y%m%d-%H%M%S")
+    src = project.dir("src") / f"{ts}-{inst.id}"
+    log_path = project.dir("logs") / f"{ts}-build-{inst.id}.log"
+    xdg = project.dir("xdg-runtime")
+    xdg.chmod(0o700)
+    name = f"wrs-build-{project.slug}-{inst.id}"
+    started = time.monotonic()
+
+    def status(detail: str) -> None:
+        if board:
+            board.update(inst.id, detail=detail)
+
+    if board:
+        board.update(inst.id, state="running", detail="copying sources")
+    shutil.copytree(project.root, src, ignore=shutil.ignore_patterns("output", ".idea", ".git", "CLAUDE.md"))
+    rt.remove(name)
+    z = rt.relabel()
+    cmd = [rt.cmd, "run", "--rm", "--name", name,
+           "--label", "wrs.managed=1", "--label", f"wrs.project={project.slug}", "--label", "wrs.role=build",
+           *rt.platform_args(),
+           "-v", f"{src}:/opt/sources{z}", "-v", f"{xdg}:/tmp/xdg-runtime{z}",
+           "-e", "SOURCE_DIR=/opt/sources", "-e", f"MODULE_INSTANCE={MODULE}/{inst.id}",
+           "-e", "OUTPUT_DIR=/opt/sources/output", "-e", "RUNNER=other",
+           "-e", "XDG_RUNTIME_DIR=/tmp/xdg-runtime", project.config.image]
+    status("starting builder")
+    with log_path.open("w") as log:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+        assert proc.stdout
+        for line in proc.stdout:
+            log.write(line)
+            if cancel.is_set():
+                rt.run("stop", "-t", "2", name)
+                break
+            for rx, label in PHASES:
+                m = rx.search(line)
+                if m:
+                    status(label.format(*(m.group(1).lower(),) if m.groups() else ()))
+                    break
+        exit_code = proc.wait()
+
+    seconds = time.monotonic() - started
+    text = log_path.read_text(errors="replace")
+    completed, problems = parse_log(text)
+    result = BuildResult(inst.id, False, seconds, exit_code, log=str(log_path), problems=problems)
+    if cancel.is_set():
+        result.message = "cancelled"
+        return result
+
+    out = src / "output"
+    report = out / "report.json"
+    if report.is_file():
+        data = json.loads(report.read_text())
+        result.errors = int(data.get("testsErrorsCount", 0))
+        result.warnings = int(data.get("testsWarningsCount", 0))
+        result.checks = int(data.get("testsTotal", 0))
+    inspection_failures = [p for p in problems if p.startswith("Inspection failed:")]
+    result.ok = completed and exit_code == 0 and result.errors == 0 and not inspection_failures
+    failures = result.errors + len(inspection_failures)
+    if failures:
+        result.message = plural(failures, "check failure")
+    elif not completed:
+        result.message = "builder did not complete"
+    elif exit_code != 0:
+        result.message = f"builder exited with status {exit_code}"
+
+    zips = sorted(out.glob("webHelp*.zip"))
+    if zips:
+        artifacts = project.dir("artifacts", inst.id)
+        for f in out.iterdir():
+            if f.is_file():
+                shutil.copy2(f, artifacts / f.name)
+        site = project.dir("site")
+        staging = site / f".{inst.id}.new"
+        shutil.rmtree(staging, ignore_errors=True)
+        with zipfile.ZipFile(zips[0]) as zf:
+            zf.extractall(staging)
+        target = site / inst.id
+        old = site / f".{inst.id}.old"
+        shutil.rmtree(old, ignore_errors=True)
+        if target.exists():
+            target.rename(old)
+        staging.rename(target)
+        shutil.rmtree(old, ignore_errors=True)
+        result.site = str(target)
+        result.pages = sum(1 for t in inst.topics if (target / Path(t).with_suffix(".html").name).is_file())
+    elif result.ok:
+        result.ok, result.message = False, "no web archive produced"
+
+    meta = {k: v for k, v in result.__dict__.items()}
+    meta.update(finished=time.strftime("%Y-%m-%dT%H:%M:%S"), image=project.config.image)
+    (project.dir("artifacts", inst.id) / "build.json").write_text(json.dumps(meta, indent=2))
+    if result.ok and not keep_src:
+        shutil.rmtree(src, ignore_errors=True)
+    return result
+
+
+def plural(n: int, word: str) -> str:
+    return f"{n} {word}" + ("" if n == 1 else "s")
+
+
+def default_jobs() -> int:
+    try:
+        with open("/proc/meminfo") as fh:
+            info = {l.split(":")[0]: int(l.split()[1]) for l in fh if ":" in l}
+        avail_gb = info.get("MemAvailable", 0) / 1_048_576
+    except OSError:
+        avail_gb = 8
+    cpus = os.cpu_count() or 2
+    return max(1, min(cpus // 2, int(avail_gb // 3), 4))
+
+
+ARTICLE_RX = re.compile(r'<article class="article".*?(?=<div class="navigation-links|</article>)', re.S)
+HREF_RX = re.compile(r'href="([A-Za-z0-9][A-Za-z0-9._-]*\.html)(?:#[^"]*)?"')
+H1_RX = re.compile(r"<h1[^>]*>(.*?)</h1>", re.S)
+TAG_RX = re.compile(r"<[^>]+>")
+
+
+@dataclass
+class TierReport:
+    pages: int = 0
+    links: list[dict] = field(default_factory=list)
+    mentions: list[dict] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        return not self.links
+
+
+def check_tiers(project: Project) -> TierReport:
+    """Find lower-tier pages that link to, or name, higher-tier pages in any built site."""
+    tiers = project.topic_tiers()
+    rank_name = {i.rank: i.id for i in project.instances}
+    site_root = project.home / "site"
+    titles: dict[str, str] = {}
+    bodies: dict[tuple[str, str], str] = {}
+    for inst in project.instances:
+        site = site_root / inst.id
+        if not site.is_dir():
+            continue
+        for page in site.glob("*.html"):
+            if page.name not in tiers:
+                continue
+            html = page.read_text(errors="replace")
+            m = ARTICLE_RX.search(html)
+            body = m.group(0) if m else ""
+            bodies[(inst.id, page.name)] = body
+            h = H1_RX.search(body)
+            if h and page.name not in titles:
+                titles[page.name] = " ".join(TAG_RX.sub(" ", h.group(1)).split())
+    report = TierReport(pages=len({name for _, name in bodies}))
+    seen_links: dict[tuple[str, str], list[str]] = {}
+    seen_mentions: dict[tuple[str, str], list[str]] = {}
+    for (book, name), body in bodies.items():
+        src = tiers[name]
+        for target in set(HREF_RX.findall(body)):
+            if tiers.get(target, -1) > src:
+                seen_links.setdefault((name, target), []).append(book)
+        text = " ".join(TAG_RX.sub(" ", body).split())
+        for target, title in titles.items():
+            if tiers[target] > src and len(title) >= 12 and re.search(rf"\b{re.escape(title)}\b", text):
+                seen_mentions.setdefault((name, target), []).append(book)
+    for (name, target), books in sorted(seen_links.items()):
+        report.links.append({"page": name, "page_tier": rank_name.get(tiers[name], "?"), "target": target,
+                             "target_tier": rank_name.get(tiers[target], "?"), "books": sorted(books)})
+    for (name, target), books in sorted(seen_mentions.items()):
+        report.mentions.append({"page": name, "page_tier": rank_name.get(tiers[name], "?"), "title": titles[target],
+                                "target_tier": rank_name.get(tiers[target], "?"), "books": sorted(books)})
+    return report
+
+
+def print_tier_report(ui: UI, report: TierReport) -> None:
+    if report.ok:
+        ui.ok(f"Tier check: {plural(report.pages, 'page')}, no lower-tier page links to a higher tier")
+    else:
+        ui.fail(f"Tier check: {plural(len(report.links), 'upward link')}")
+        for v in report.links:
+            ui.hint(f"{v['page']} ({v['page_tier']}) links to {v['target']} ({v['target_tier']}) "
+                    f"in {', '.join(v['books'])}")
+    for m in report.mentions:
+        ui.warn(f"{m['page']} ({m['page_tier']}) names \"{m['title']}\" ({m['target_tier']})")
+
+
+def cmd_check(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    report = check_tiers(project)
+    if not report.pages:
+        raise WrsError("no built sites to check", "run: wrs build")
+    if args.json:
+        print(json.dumps({"pages": report.pages, "links": report.links, "mentions": report.mentions}, indent=2))
+    else:
+        print_tier_report(ui, report)
+    return EXIT_OK if report.ok else EXIT_FAIL
+
+
+def cmd_build(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    rt = Runtime(project.config.runtime)
+    targets = [project.get(n) for n in args.instances] if args.instances else project.instances
+    if not rt.image_digest(project.config.image):
+        raise WrsError(f"builder image not present: {project.config.image}",
+                       f"run: wrs update --pull  (or {rt.cmd} pull {project.config.image})")
+    jobs = args.jobs or project.config.jobs or default_jobs()
+    jobs = min(jobs, len(targets))
+    ui.info(f"Building {plural(len(targets), 'instance')} of {ui.c(project.display_name, 'bold')} "
+            f"with {rt.cmd} {ui.sym('dot')} {jobs} parallel {ui.sym('dot')} image {project.config.image_tag}")
+
+    cancel = threading.Event()
+    results: list[BuildResult] = []
+    board = Board(ui, "Build")
+    for inst in targets:
+        board.add(inst.id)
+
+    def on_sigint(signum, frame):
+        if cancel.is_set():
+            raise KeyboardInterrupt
+        cancel.set()
+        ui.warn("Stopping builds (press Ctrl-C again to force)")
+
+    previous = signal.signal(signal.SIGINT, on_sigint)
+    try:
+        with board:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
+                futures = {pool.submit(build_instance, project, rt, inst, board, args.keep_src, cancel): inst
+                           for inst in targets}
+                for fut in concurrent.futures.as_completed(futures):
+                    inst = futures[fut]
+                    try:
+                        res = fut.result()
+                    except Exception as exc:  # noqa: BLE001 - reported per instance
+                        res = BuildResult(inst.id, False, 0, -1, message=str(exc))
+                    results.append(res)
+                    state = "ok" if res.ok else ("stopped" if res.message == "cancelled" else "failed")
+                    detail = (f"{plural(res.checks, 'check')}, {plural(res.pages, 'page')}" if res.ok else res.message)
+                    board.update(inst.id, state=state, detail=detail)
+    finally:
+        signal.signal(signal.SIGINT, previous)
+
+    results.sort(key=lambda r: project.get(r.instance).rank)
+    tier = check_tiers(project) if all(r.ok for r in results) and not cancel.is_set() else None
+    if args.json:
+        print(json.dumps({"instances": [r.__dict__ for r in results],
+                          "tiers": ({"pages": tier.pages, "links": tier.links, "mentions": tier.mentions}
+                                    if tier else None)}, indent=2))
+    else:
+        print(file=sys.stderr)
+        rows = []
+        for r in results:
+            status = ui.c("ok", "green") if r.ok else ui.c("failed", "red")
+            rows.append([r.instance, status, f"{r.checks - r.errors}/{r.checks}", str(r.warnings),
+                         str(r.pages), f"{r.seconds:.0f}s"])
+        ui.table(["INSTANCE", "STATUS", "CHECKS", "WARN", "PAGES", "TIME"], rows)
+        for r in results:
+            if not r.ok and r.message != "cancelled":
+                ui.emit()
+                ui.fail(f"{r.instance}: {r.message}")
+                for p in r.problems[:12]:
+                    ui.hint(p)
+                if len(r.problems) > 12:
+                    ui.hint(f"... {len(r.problems) - 12} more")
+                ui.hint(f"log: {r.log}")
+        ui.emit()
+        if cancel.is_set():
+            ui.warn("Build cancelled")
+        elif all(r.ok for r in results):
+            ui.ok(f"{plural(len(results), 'instance')} built")
+            if tier:
+                print_tier_report(ui, tier)
+            ui.hint("next: wrs serve" if not tier or tier.ok else "remove the upward links, then rebuild")
+        else:
+            ui.hint("fix the problems above, then run: wrs build " +
+                    " ".join(r.instance for r in results if not r.ok))
+    if cancel.is_set():
+        return EXIT_INTERRUPT
+    if not all(r.ok for r in results):
+        return EXIT_FAIL
+    return EXIT_OK if tier is None or tier.ok else EXIT_FAIL
+
+
+# --------------------------------------------------------------------------
+# Serve
+# --------------------------------------------------------------------------
+
+def port_free(host: str, port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            s.bind((host, port))
+        except OSError:
+            return False
+    return True
+
+
+def page_404(title: str, instance_name: str) -> str:
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>
+<style>body{{font:16px/1.5 system-ui,sans-serif;max-width:40rem;margin:15vh auto;padding:0 1rem;color:#1f2328}}
+h1{{font-size:1.4rem}}a{{color:#0d6763}}</style></head><body>
+<h1>Page not found</h1><p>This page is not part of <strong>{instance_name}</strong>.</p>
+<p><a href="/">Go to the start page</a></p></body></html>"""
+
+
+def portal_page(project: Project, plan: list[dict]) -> str:
+    items = "\n".join(
+        f'<li><a data-port="{p["port"]}" href="#">{p["name"]}</a> '
+        f'<span>{p["id"]} · port {p["port"]} · {"loopback only" if p["bind"] == "127.0.0.1" else "LAN"}</span></li>' for p in plan)
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>wrs · {project.display_name}</title>
+<style>body{{font:16px/1.5 system-ui,sans-serif;max-width:44rem;margin:10vh auto;padding:0 1rem;color:#1f2328}}
+li{{margin:.6rem 0}}span{{color:#6e7781;font-size:.9rem;margin-left:.5rem}}a{{color:#0d6763;font-weight:600}}</style>
+</head><body><h1>{project.display_name} documentation</h1><ul>
+{items}
+</ul><script>
+for (const a of document.querySelectorAll('a[data-port]')) {{
+  a.href = location.protocol + '//' + location.hostname + ':' + a.dataset.port + '/';
+}}
+</script></body></html>"""
+
+
+def nginx_conf(project: Project, plan: list[dict]) -> str:
+    pages = {p["id"]: set(p["pages"]) for p in plan}
+    by_id = {p["id"]: p for p in plan}
+    blocks = []
+    for p in plan:
+        routes = []
+        others = set().union(*(pages[o] for o in pages if o != p["id"])) - pages[p["id"]]
+        for page in sorted(others):
+            lower = [by_id[o] for o in pages if o != p["id"] and page in pages[o] and by_id[o]["rank"] <= p["rank"]]
+            if not lower:
+                continue  # owned by a higher tier: the normal 404 answers, so its existence stays hidden
+            target = max(lower, key=lambda o: o["rank"])
+            routes.append(f"        location = /{page} {{ return 302 $scheme://$host:{target['port']}/{page}$is_args$args; }}")
+        auth = ('        auth_basic "wrs dev";\n        auth_basic_user_file /srv/wrs/htpasswd;\n'
+                if p.get("auth") else "")
+        blocks.append(f"""    server {{
+        listen {p['port']};
+        server_name _;
+        root /srv/site/{p['id']};
+        index index.html;
+        absolute_redirect off;
+{auth}        add_header X-Wrs-Instance {p['id']} always;
+        add_header Cache-Control "no-store" always;
+        error_page 404 /__wrs/404.html;
+        location = /__wrs/404.html {{ internal; alias /srv/wrs/{p['id']}-404.html; }}
+        location = /__wrs/health {{ auth_basic off; access_log off; default_type text/plain; return 200 "ok {p['id']}\\n"; }}
+{chr(10).join(routes)}
+        location / {{ try_files $uri $uri/ $uri.html =404; }}
+    }}""")
+    blocks.append(f"""    server {{
+        listen {project.config.port_base};
+        server_name _;
+        root /srv/wrs/portal;
+        add_header Cache-Control "no-store" always;
+        location = /__wrs/health {{ access_log off; default_type text/plain; return 200 "ok portal\\n"; }}
+        location / {{ try_files $uri /index.html; }}
+    }}""")
+    return ("worker_processes 1;\nevents { worker_connections 256; }\n"
+            "http {\n    include /etc/nginx/mime.types;\n    default_type application/octet-stream;\n"
+            "    sendfile on;\n"
+            '    log_format wrs \'$server_port $status $request_method $request_uri\';\n'
+            "    access_log /dev/stdout wrs;\n    error_log /dev/stderr warn;\n"
+            + "\n".join(blocks) + "\n}\n")
+
+
+def serve_state_path(project: Project) -> Path:
+    return project.dir("serve") / "state.json"
+
+
+def cmd_serve(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    rt = Runtime(project.config.runtime)
+    if args.instances:
+        targets = [project.get(n) for n in args.instances]
+        locked = [t.id for t in targets if project.gated(t) and not args.dev]
+        if locked:
+            raise WrsError(f"{', '.join(locked)} is behind the dev gate", "add --dev (-d) to open it", EXIT_USAGE)
+    else:
+        targets = [t for t in project.instances if args.dev or not project.gated(t)]
+    if args.lan_all and not args.dev:
+        raise WrsError("--lan-all exposes gated instances and needs --dev", code=EXIT_USAGE)
+    key = DevGate(ui, project.config.dev_item, project.config.password_manager).key() if args.dev else ""
+
+    site = project.dir("site")
+    missing = [t.id for t in targets if not (site / t.id / "index.html").is_file()]
+    to_build = [t.id for t in targets] if args.build else missing
+    if to_build:
+        if not args.build:
+            ui.info(f"Building {plural(len(to_build), 'missing site')} first: {', '.join(to_build)}")
+        sub = argparse.Namespace(**{**vars(args), "instances": to_build, "keep_src": False, "json": False})
+        code = cmd_build(sub, ui)
+        if code != EXIT_OK:
+            return code
+    if not rt.image_digest(NGINX_IMAGE):
+        with Spinner(ui, f"Pulling {NGINX_IMAGE}"):
+            r = rt.run("pull", NGINX_IMAGE, timeout=600)
+        if r.returncode != 0:
+            raise WrsError("could not pull nginx image", r.stderr.strip()[-300:])
+
+    name = f"wrs-serve-{project.slug}"
+    rt.remove(name)
+    base = project.config.port_base
+    plan = []
+    for inst in targets:
+        port = base + 1 + (inst.rank if inst.rank < 10 else 9 + targets.index(inst))
+        gated = project.gated(inst)
+        exposed = args.lan_all or (args.lan and not gated)
+        plan.append({"id": inst.id, "name": inst.name, "rank": inst.rank, "port": port,
+                     "bind": "0.0.0.0" if exposed else "127.0.0.1", "gated": gated,
+                     "auth": bool(exposed and gated), "start": inst.start_html,
+                     "pages": sorted(p.name for p in (site / inst.id).glob("*.html"))})
+    portal_bind = "0.0.0.0" if (args.lan or args.lan_all) else "127.0.0.1"
+    busy = [str(p["port"]) for p in plan if not port_free(p["bind"], p["port"])]
+    if not port_free(portal_bind, base):
+        busy.insert(0, str(base))
+    if busy:
+        raise WrsError(f"port(s) in use: {', '.join(busy)}", "stop the other server or pass --port-base N")
+
+    wrsdir = project.dir("serve", "www")
+    portal = wrsdir / "portal"
+    portal.mkdir(exist_ok=True)
+    (portal / "index.html").write_text(portal_page(project, plan))
+    for p in plan:
+        (wrsdir / f"{p['id']}-404.html").write_text(page_404("Not found", p["name"]))
+    htpasswd = wrsdir / "htpasswd"
+    if any(p["auth"] for p in plan):
+        htpasswd.write_text(htpasswd_entry("wrs-dev", key))
+        htpasswd.chmod(0o644)
+    elif htpasswd.exists():
+        htpasswd.unlink()
+    conf = project.dir("serve") / "nginx.conf"
+    conf.write_text(nginx_conf(project, plan))
+
+    z = rt.relabel()
+    publish = [f"-p{portal_bind}:{base}:{base}"] + [f"-p{p['bind']}:{p['port']}:{p['port']}" for p in plan]
+    cmd = ["run", "-d", "--name", name, "--label", "wrs.managed=1", "--label", f"wrs.project={project.slug}",
+           "--label", "wrs.role=serve", *publish,
+           "-v", f"{site}:/srv/site:ro{',Z' if z else ''}",
+           "-v", f"{wrsdir}:/srv/wrs:ro{',Z' if z else ''}",
+           "-v", f"{conf}:/etc/nginx/nginx.conf:ro{',Z' if z else ''}", NGINX_IMAGE]
+    with Spinner(ui, "Starting server"):
+        r = rt.run(*cmd)
+        if r.returncode != 0:
+            raise WrsError("server failed to start", r.stderr.strip()[-400:])
+        healthy = wait_healthy([("127.0.0.1", base)] + [("127.0.0.1", p["port"]) for p in plan], 20)
+    if not healthy:
+        logs = rt.run("logs", name)
+        rt.remove(name)
+        raise WrsError("server did not become healthy", (logs.stdout + logs.stderr).strip()[-600:])
+
+    state = {"container": name, "runtime": rt.cmd, "portal": base, "started": time.time(), "dev": args.dev,
+             "instances": [{k: p[k] for k in ("id", "name", "port", "bind", "start", "rank", "gated", "auth")}
+                           for p in plan]}
+    serve_state_path(project).write_text(json.dumps(state, indent=2))
+    print_serve_table(ui, state, len(plan))
+    if not args.dev and any(project.gated(i) for i in project.instances):
+        hidden = [i.id for i in project.instances if project.gated(i)]
+        ui.hint(f"behind the dev gate: {', '.join(hidden)} (serve them with --dev)")
+    if args.background:
+        ui.hint("stop with: wrs stop   ·   status: wrs status   ·   open: wrs open <instance>")
+        return EXIT_OK
+    return follow_server(ui, rt, name, state)
+
+
+def wait_healthy(endpoints: list[tuple[str, int]], seconds: float) -> bool:
+    deadline = time.monotonic() + seconds
+    pending = list(endpoints)
+    while pending and time.monotonic() < deadline:
+        host, port = pending[0]
+        try:
+            with urllib.request.urlopen(f"http://{host}:{port}/__wrs/health", timeout=2) as resp:
+                if resp.status == 200:
+                    pending.pop(0)
+                    continue
+        except (urllib.error.URLError, OSError):
+            pass
+        time.sleep(0.3)
+    return not pending
+
+
+def print_serve_table(ui: UI, state: dict, count: int) -> None:
+    ui.ok(f"Serving {plural(count, 'instance')}")
+    rows = [["portal", "", f"http://localhost:{state['portal']}/", ""]]
+    for p in state["instances"]:
+        where = "loopback" if p["bind"] == "127.0.0.1" else ui.c("LAN" + (" + auth" if p.get("auth") else ""), "yellow")
+        rows.append([p["id"], p["name"], f"http://localhost:{p['port']}/{p['start']}", where])
+    ui.table(["INSTANCE", "TITLE", "URL", "EXPOSED"], rows)
+    ui.hint("routing: pages owned by a lower tier redirect to it; pages owned by a higher tier answer 404")
+
+
+def follow_server(ui: UI, rt: Runtime, name: str, state: dict) -> int:
+    ports = {str(p["port"]): p["id"] for p in state["instances"]}
+    ports[str(state["portal"])] = "portal"
+    proc = subprocess.Popen([rt.cmd, "logs", "-f", "--since", "1s", name], stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, bufsize=1)
+    counts = {"requests": 0}
+    stop = threading.Event()
+    started = time.monotonic()
+
+    def reader() -> None:
+        assert proc.stdout
+        for line in proc.stdout:
+            parts = line.split()
+            if len(parts) >= 4 and parts[0].isdigit() and parts[1].isdigit():
+                counts["requests"] += 1
+                status = int(parts[1])
+                color = "green" if status < 300 else "cyan" if status < 400 else "yellow" if status < 500 else "red"
+                ui.emit(f"  {ui.c(parts[1], color)} {ui.c(ports.get(parts[0], parts[0]), 'gray'):<12} "
+                        f"{parts[2]} {parts[3]}")
+            elif "[emerg]" in line or "[error]" in line:
+                ui.warn(line.strip())
+
+    t = threading.Thread(target=reader, daemon=True)
+    t.start()
+    ui.emit(ui.c("  press Ctrl-C to stop", "gray"))
+    tick = 0
+    ui.status_line = ui.animate
+    try:
+        while not stop.is_set():
+            if ui.animate:
+                up = int(time.monotonic() - started)
+                with ui.lock:
+                    ui.err.write(f"\r\x1b[2K{ui.c(ui.frame(tick), 'green')} serving "
+                                 f"{ui.c(str(len(state['instances'])), 'bold')} instances "
+                                 f"{ui.sym('dot')} up {up // 3600:02d}:{up % 3600 // 60:02d}:{up % 60:02d} "
+                                 f"{ui.sym('dot')} {counts['requests']} requests")
+                    ui.err.flush()
+                tick += 1
+            if proc.poll() is not None and rt.run("inspect", name).returncode != 0:
+                ui.fail("server container exited")
+                return EXIT_FAIL
+            time.sleep(0.12)
+    except KeyboardInterrupt:
+        if ui.tty:
+            ui.err.write("\r\x1b[2K")
+        ui.info("Stopping server")
+    finally:
+        ui.status_line = False
+        proc.terminate()
+        rt.remove(name)
+    ui.ok("Server stopped")
+    return EXIT_OK
+
+
+# --------------------------------------------------------------------------
+# Other commands
+# --------------------------------------------------------------------------
+
+def cmd_status(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    rt = Runtime(project.config.runtime)
+    running = dict(rt.containers(f"wrs.project={project.slug}"))
+    state_file = serve_state_path(project)
+    serving = state_file.is_file() and any(n.startswith("wrs-serve-") and s.lower().startswith("up")
+                                          for n, s in running.items())
+    rows, data = [], []
+    for inst in project.instances:
+        meta_file = project.home / "artifacts" / inst.id / "build.json"
+        meta = json.loads(meta_file.read_text()) if meta_file.is_file() else {}
+        url = ""
+        if serving:
+            st = json.loads(state_file.read_text())
+            port = next((p["port"] for p in st["instances"] if p["id"] == inst.id), None)
+            url = f"http://localhost:{port}/" if port else ""
+        built = meta.get("finished", "never").replace("T", " ")
+        result = ("ok" if meta.get("ok") else "failed") if meta else "-"
+        colored = ui.c(result, "green" if result == "ok" else "red" if result == "failed" else "gray")
+        rows.append([inst.id, inst.name, colored, built, str(meta.get("pages", "")), url or "-"])
+        data.append({"instance": inst.id, "build": result, "built": built, "pages": meta.get("pages"),
+                     "url": url})
+    if args.json:
+        print(json.dumps({"project": str(project.root), "serving": serving, "instances": data}, indent=2))
+        return EXIT_OK
+    ui.heading(f"{project.display_name}  {ui.c(str(project.root), 'gray')}  ({rt.cmd}, image {project.config.image_tag})")
+    ui.table(["INSTANCE", "TITLE", "BUILD", "BUILT", "PAGES", "SERVED AT"], rows)
+    ui.emit()
+    ui.info(("server running: " + next(n for n in running if n.startswith("wrs-serve-"))) if serving
+            else "server not running (start with: wrs serve)")
+    return EXIT_OK
+
+
+def cmd_stop(args: argparse.Namespace, ui: UI) -> int:
+    rt = Runtime(os.environ.get("WRS_RUNTIME", ""))
+    label = "wrs.role=serve"
+    if not args.all:
+        project = load_project(args)
+        names = [n for n, _ in rt.containers(f"wrs.project={project.slug}") if n.startswith("wrs-serve-")]
+    else:
+        names = [n for n, _ in rt.containers(label)]
+    if not names:
+        ui.info("No wrs server running")
+        return EXIT_OK
+    with Spinner(ui, "Stopping"):
+        for n in names:
+            rt.remove(n)
+    for n in names:
+        ui.ok(f"Stopped {n}")
+    return EXIT_OK
+
+
+def cmd_open(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    state_file = serve_state_path(project)
+    if not state_file.is_file():
+        raise WrsError("server not running", "start it with: wrs serve")
+    st = json.loads(state_file.read_text())
+    if args.instance:
+        p = next((p for p in st["instances"] if p["id"] == args.instance), None)
+        if not p:
+            raise WrsError(f"instance '{args.instance}' is not being served")
+        url = f"http://localhost:{p['port']}/{p['start']}"
+    else:
+        url = f"http://localhost:{st['portal']}/"
+    opener = "open" if sys.platform == "darwin" else "xdg-open"
+    if shutil.which(opener):
+        subprocess.Popen([opener, url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    print(url)
+    return EXIT_OK
+
+
+def cmd_logs(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    if args.serve:
+        rt = Runtime(project.config.runtime)
+        name = f"wrs-serve-{project.slug}"
+        return subprocess.call([rt.cmd, "logs", *(["-f"] if args.follow else []), name])
+    logs = sorted(project.dir("logs").glob("*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if args.instance:
+        logs = [p for p in logs if p.stem.endswith(f"-{args.instance}")]
+    if not logs:
+        ui.info("No build logs yet")
+        return EXIT_OK
+    if args.instance or args.last:
+        latest = logs[0]
+        ui.hint(str(latest))
+        if args.follow:
+            return subprocess.call(["tail", "-f", str(latest)])
+        sys.stdout.write(latest.read_text(errors="replace"))
+        return EXIT_OK
+    ui.table(["LOG", "MODIFIED"], [[str(p), time.strftime("%Y-%m-%d %H:%M", time.localtime(p.stat().st_mtime))]
+                                   for p in logs[:15]])
+    return EXIT_OK
+
+
+def cmd_clean(args: argparse.Namespace, ui: UI) -> int:
+    project = load_project(args)
+    rt = Runtime(project.config.runtime)
+    removed = []
+    for n, s in rt.containers(f"wrs.project={project.slug}"):
+        if not s.lower().startswith("up") or args.all:
+            rt.remove(n)
+            removed.append(n)
+    src = project.home / "src"
+    if src.is_dir():
+        for d in src.iterdir():
+            shutil.rmtree(d, ignore_errors=True)
+        removed.append(f"{src}/*")
+    if args.all:
+        for sub in ("site", "artifacts", "logs", "serve"):
+            target = project.home / sub
+            if target.exists():
+                shutil.rmtree(target, ignore_errors=True)
+                removed.append(str(target))
+    else:
+        logs = sorted((project.home / "logs").glob("*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+        for old in logs[40:]:
+            old.unlink()
+    for r in removed:
+        ui.ok(f"removed {r}")
+    if not removed:
+        ui.info("Nothing to clean")
+    return EXIT_OK
+
+
+def latest_tag() -> tuple[str, str]:
+    req = urllib.request.Request(HUB_TAGS_URL, headers={"User-Agent": f"wrs/{VERSION}"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        data = json.load(resp)
+    tags = [t for t in data.get("results", []) if re.fullmatch(r"\d{4}\.\d{2}\.\d+", t["name"])]
+    if not tags:
+        raise WrsError("could not find a versioned builder tag on Docker Hub")
+    tags.sort(key=lambda t: t["last_updated"], reverse=True)
+    return tags[0]["name"], tags[0].get("digest", "")
+
+
+def cmd_update(args: argparse.Namespace, ui: UI) -> int:
+    try:
+        project = load_project(args)
+        cfg = project.config
+    except WrsError:
+        project, cfg = None, load_config(Path.cwd(), args)
+    rt = Runtime(cfg.runtime)
+    with Spinner(ui, "Checking Docker Hub for the latest Writerside builder"):
+        tag, digest = latest_tag()
+    current = cfg.image_tag
+    ui.info(f"configured {current}  {ui.sym('arrow')}  latest {tag}")
+    if args.pull or tag != current:
+        target = f"{IMAGE_REPO}:{tag}"
+        if not rt.image_digest(target) or args.pull:
+            with Spinner(ui, f"Pulling {target}"):
+                r = rt.run("pull", target, timeout=1800)
+            if r.returncode != 0:
+                raise WrsError("pull failed", r.stderr.strip()[-400:])
+        local = rt.image_digest(target)
+        if digest and local and local != "present" and local != digest:
+            raise WrsError("digest mismatch between Docker Hub and the pulled image",
+                           f"hub {digest}\nlocal {local}")
+        ui.ok(f"{target} present ({local or digest})")
+    if tag != current:
+        where = project.root / ".wrs.toml" if project else Path.home() / ".config/wrs/config.toml"
+        ui.hint(f'pin it for the team: add image_tag = "{tag}" to {where}')
+    else:
+        ui.ok("Builder image is current")
+    return EXIT_OK
+
+
+def cmd_doctor(args: argparse.Namespace, ui: UI) -> int:
+    checks: list[tuple[str, bool, str]] = []
+    checks.append(("python", sys.version_info >= (3, 11), sys.version.split()[0]))
+    try:
+        project = load_project(args)
+        cfg = project.config
+        checks.append(("writerside.cfg", True, str(project.root / "writerside.cfg")))
+        checks.append(("instances", True, ", ".join(f"{i.id}({len(i.topics)})" for i in project.instances)))
+    except WrsError as exc:
+        project, cfg = None, load_config(Path.cwd(), args)
+        checks.append(("writerside.cfg", False, str(exc)))
+    try:
+        rt = Runtime(cfg.runtime)
+        checks.append(("runtime", rt.reachable(), f"{rt.cmd} ({rt.version()})"))
+        digest = rt.image_digest(cfg.image)
+        checks.append(("builder image", bool(digest), f"{cfg.image} {digest[:19] if digest else 'missing'}"))
+        checks.append(("nginx image", True,
+                       NGINX_IMAGE + ("" if rt.image_digest(NGINX_IMAGE) else " (pulled on first serve)")))
+    except WrsError as exc:
+        checks.append(("runtime", False, str(exc)))
+    try:
+        cfg.state_dir.mkdir(parents=True, exist_ok=True)
+        checks.append(("state dir", os.access(cfg.state_dir, os.W_OK), str(cfg.state_dir)))
+    except OSError as exc:
+        checks.append(("state dir", False, str(exc)))
+    ports = [cfg.port_base + i for i in range(0, 1 + (len(project.instances) if project else 4))]
+    busy = [str(p) for p in ports if not port_free("127.0.0.1", p)]
+    checks.append(("ports", not busy, f"{ports[0]}-{ports[-1]}" + (f" busy: {', '.join(busy)}" if busy else " free")))
+    if args.online:
+        try:
+            tag, _ = latest_tag()
+            checks.append(("latest image", tag == cfg.image_tag,
+                           tag + ("" if tag == cfg.image_tag else " (run: wrs update --pull)")))
+        except (urllib.error.URLError, OSError, WrsError) as exc:
+            checks.append(("latest image", False, f"lookup failed: {exc}"))
+    if args.json:
+        print(json.dumps([{"check": n, "ok": ok, "detail": d} for n, ok, d in checks], indent=2))
+    else:
+        for name, ok, detail in checks:
+            mark = ui.c(ui.sym("ok"), "green") if ok else ui.c(ui.sym("fail"), "red")
+            ui.emit(f"{mark} {name:<15} {ui.c(detail, 'gray')}")
+    return EXIT_OK if all(ok for _, ok, _ in checks) else EXIT_FAIL
+
+
+# --------------------------------------------------------------------------
+# CLI
+# --------------------------------------------------------------------------
+
+EPILOG = """examples:
+  wrs build                 build every instance
+  wrs build internal        build one instance
+  wrs serve                 build what is missing, serve ungated instances, follow requests
+  wrs serve --dev           open the dev gate (Bitwarden or 1Password) and serve every tier
+  wrs serve -d -b           dev mode in the background (stop with: wrs stop)
+  wrs check                 confirm no lower-tier page references a higher tier
+  wrs status                builds, pages, and URLs at a glance
+  wrs update --pull         fetch the latest builder image
+
+configuration (highest first): flags, WRS_* environment variables,
+.wrs.toml beside writerside.cfg, ~/.config/wrs/config.toml.
+keys: runtime, image_tag, port_base, jobs, sensitivity (list, lowest first),
+gated_from (first gated tier, default restricted), dev_item (default wrs-dev;
+op://<vault>/<item> selects 1Password), password_manager (bitwarden or 1password;
+default: from dev_item, else the installed CLI, Bitwarden first).
+"""
+
+
+def parser() -> argparse.ArgumentParser:
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("-C", "--project", metavar="DIR", help="Writerside project directory")
+    common.add_argument("--runtime", choices=["podman", "docker"], help="container runtime")
+    common.add_argument("--json", action="store_true", help="machine-readable output on stdout")
+    common.add_argument("--no-color", action="store_true", help="disable color (NO_COLOR also works)")
+    common.add_argument("--plain", action="store_true", help="no color, animation, or symbols")
+
+    p = argparse.ArgumentParser(prog="wrs", description="Build and serve Writerside documentation.",
+                                epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--version", action="version", version=f"wrs {VERSION}")
+    sub = p.add_subparsers(dest="command", metavar="COMMAND")
+
+    b = sub.add_parser("build", parents=[common], help="build instances (default: all)")
+    b.add_argument("instances", nargs="*")
+    b.add_argument("-j", "--jobs", type=int, help="parallel builds (default: from CPU and memory)")
+    b.add_argument("--image-tag", help="builder image tag")
+    b.add_argument("--keep-src", action="store_true", help="keep the temporary source copy")
+    b.set_defaults(func=cmd_build)
+
+    s = sub.add_parser("serve", parents=[common], help="serve built instances (default: all)")
+    s.add_argument("instances", nargs="*")
+    s.add_argument("-d", "--dev", action="store_true",
+                   help="open the dev gate and serve every tier locally")
+    s.add_argument("-b", "--background", action="store_true", help="run in the background")
+    s.add_argument("--build", action="store_true", help="rebuild before serving (missing sites always build)")
+    s.add_argument("-j", "--jobs", type=int, help="parallel builds with --build")
+    s.add_argument("--image-tag", help="builder image tag with --build")
+    s.add_argument("--port-base", type=int, help=f"portal port; instances use the next ports (default {DEFAULT_PORT_BASE})")
+    s.add_argument("--lan", action="store_true", help="expose ungated instances on all interfaces")
+    s.add_argument("--lan-all", action="store_true",
+                   help="with --dev, also expose gated instances on all interfaces behind the dev key")
+    s.add_argument("--password-manager", choices=sorted(VAULTS), help="dev key store with --dev (default: auto)")
+    s.set_defaults(func=cmd_serve)
+
+    st = sub.add_parser("status", parents=[common], help="show builds and server state")
+    st.set_defaults(func=cmd_status)
+
+    ck = sub.add_parser("check", parents=[common], help="check that no lower-tier page references a higher tier")
+    ck.set_defaults(func=cmd_check)
+
+    k = sub.add_parser("key", parents=[common], help="dev gate key: status, rotate, or lock")
+    k.add_argument("action", choices=["status", "rotate", "lock"])
+    k.add_argument("--password-manager", choices=sorted(VAULTS), help="dev key store (default: auto)")
+    k.set_defaults(func=cmd_key)
+
+    so = sub.add_parser("stop", parents=[common], help="stop the server")
+    so.add_argument("--all", action="store_true", help="stop wrs servers for every project")
+    so.set_defaults(func=cmd_stop)
+
+    o = sub.add_parser("open", parents=[common], help="open the portal or an instance in the browser")
+    o.add_argument("instance", nargs="?")
+    o.set_defaults(func=cmd_open)
+
+    lg = sub.add_parser("logs", parents=[common], help="list or show build logs")
+    lg.add_argument("instance", nargs="?")
+    lg.add_argument("--last", action="store_true", help="print the newest log")
+    lg.add_argument("-f", "--follow", action="store_true")
+    lg.add_argument("--serve", action="store_true", help="server access log")
+    lg.set_defaults(func=cmd_logs)
+
+    c = sub.add_parser("clean", parents=[common], help="remove temporary sources and stale containers")
+    c.add_argument("--all", action="store_true", help="also remove sites, artifacts, and logs")
+    c.set_defaults(func=cmd_clean)
+
+    u = sub.add_parser("update", parents=[common], help="check for and pull the latest builder image")
+    u.add_argument("--pull", action="store_true", help="pull even when the tag is unchanged")
+    u.set_defaults(func=cmd_update)
+
+    d = sub.add_parser("doctor", parents=[common], help="check the environment")
+    d.add_argument("--online", action="store_true", help="also compare with the latest image on Docker Hub")
+    d.set_defaults(func=cmd_doctor)
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = parser()
+    args = p.parse_args(argv)
+    if not getattr(args, "command", None):
+        p.print_help(sys.stderr)
+        return EXIT_USAGE
+    ui = UI(color=False if args.no_color else None, plain=args.plain)
+    try:
+        return args.func(args, ui)
+    except WrsError as exc:
+        ui.fail(str(exc))
+        if exc.hint:
+            for line in exc.hint.splitlines():
+                ui.hint(line)
+        return exc.code
+    except KeyboardInterrupt:
+        ui.err.write("\x1b[?25h")
+        ui.warn("Interrupted")
+        return EXIT_INTERRUPT
+    except subprocess.TimeoutExpired as exc:
+        ui.fail(f"timed out: {' '.join(exc.cmd) if isinstance(exc.cmd, list) else exc.cmd}")
+        return EXIT_FAIL
+
+
+if __name__ == "__main__":
+    sys.exit(main())

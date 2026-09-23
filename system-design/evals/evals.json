@@ -18,7 +18,20 @@
       "prompt": "We need an activity diagram for account invitation and first login. Before drawing, help reason through the actors, states, traps, and where to store the accepted brainstorm so documentation and technical-diagrams can use it later.",
       "expected_output": "A design workflow response that brainstorms in chat, uses standard recognizable activity/state names, identifies traps, records accepted notes under .agents/brain, and routes drawing to technical-diagrams only after the flow is settled.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Propose a table for grant applications that organizations submit against funder calls. Our existing tables use created_by and metadata.",
+      "expected_output": "A chat proposal for an `applications` table that reuses `created_by` and `metadata`, cites vendor-maintained precedent with the observed names, states row responsibility, keys, dependencies, and normal-form argument, and tests rename, reassignment, repeated participation, revision, archival, and independent child creation with illustrative examples.",
+      "files": [],
+      "expectations": [
+        "The table is named `applications`, not a prefixed or explanatory name",
+        "The proposal reuses `created_by` and `metadata` rather than introducing `created_by_user_id` or `metadata_jsonb`",
+        "The response records at least one vendor-maintained precedent source with the names observed there",
+        "The response tests rename, reassignment, repeated participation, revision, archival, and independent child creation",
+        "Example rows use opaque identifiers and invent no facts about a named real organization",
+        "No migration or adjacent schema change is written"
+      ]
     }
   ]
 }
-
