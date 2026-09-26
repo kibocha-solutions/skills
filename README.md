@@ -17,7 +17,9 @@ references without project-specific residue.
     rollback guidance. This skill controls this repo's Git and commit
     conventions.
   - `docx`, `pdf`, `pptx`, `xlsx`: file-format skills for Office and PDF work
-  - `frontend-design`: distinctive frontend implementation guidance
+  - `interface-design`: master interface design, taste dials, token contracts, and platform selection
+  - `web-design`: website and responsive web application implementation, modern CSS, and fluid layout
+  - `mobile-app-design`: touch-first mobile and tablet app design across portrait and landscape
   - `webapp-testing`: Playwright-based local web application testing
   - `communications`: external correspondence (default) and internal update
     guidance, gated by confirmed audience
