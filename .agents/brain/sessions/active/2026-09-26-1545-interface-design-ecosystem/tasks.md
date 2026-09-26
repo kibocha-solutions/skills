@@ -1,6 +1,6 @@
 # Tasks: Interface Design & Engineering Ecosystem
 
-STATE: IN_PROGRESS
+STATE: DONE
 
 ## Phase 1: Master Entry Skill (`interface-design`)
 - [x] Create `interface-design/SKILL.md` with entry workflow, brief definition, Taste dials, HIG/M3 selection, anti-slop rules, and routing
@@ -37,4 +37,4 @@ STATE: IN_PROGRESS
 - [x] Verify all markdown links resolve correctly
 - [x] Record walkthrough in `walkthrough.md`
 - [x] Save checkpoint commit using `ci-cd` standards (single-scope, imperative title, <= 72 words body)
-- [/] Request user permission to execute `bootstrap`
+- [x] Request user permission to execute `bootstrap`
