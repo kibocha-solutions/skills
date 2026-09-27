@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-14T12:17:46+03:00",
+  "captured_at": "2026-09-27T12:20:00+03:00",
   "branch": "main",
   "identity": {
     "user_name": "JohnKibocha",
@@ -11,10 +11,10 @@
     "full_log_command": "git log --show-signature -2 --date=iso-strict --format=fuller",
     "entries": [
       {
-        "raw": "commit 587f1c67788012436f0e5c480dc7ba54be67a47b\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-08-13T18:08:38+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-08-13T18:08:38+03:00\n\n    chore(repo): archive generalize-pbo-doctrine session\n\n    Session covered the documentation/legalese doctrine split, the graphify MCP\n    uvx fix, and the bootstrap memory correction shipped in the three preceding\n    commits. All tasks complete; archived per Maestro session lifecycle."
+        "raw": "commit 36f03aa68dc397390cd7ea584015b6364785d4bf\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-27T12:13:45+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-27T12:13:45+03:00\n\n    feat(standards): elevate pull request issue and correspondence requirements\n\n    Establish rigorous standards for pull requests, issues, and formal external correspondence across letters and emails. Prohibit personal identifying information across publication surfaces, enforce ordered list structures, and isolate contrasting implementations into dedicated examples. Require commit messages and pull requests to be written for a new reader by highlighting durable outcomes and behavioral changes."
       },
       {
-        "raw": "commit d7ea137b547469366233abebda28ca8e594e5a9e\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-08-13T18:06:19+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-08-13T18:06:19+03:00\n\n    fix(bootstrap): correct stale rsync reference in deployment memory\n\n    skills-repo-deployment-workflow.md still described tool skills/ mirrors as\n    plain rsync copies; the mechanism changed to a real git sparse-checkout\n    tracking this repo's remote in 22e61fb. Updated the memory entry to match\n    so it stops giving agents an outdated mental model of how the mirror works."
+        "raw": "commit 7afa0d295cb2d198c1965c18ea265c10e84c70f2\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-26T16:15:14+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-26T16:15:14+03:00\n\n    chore(session): complete interface design ecosystem transition\n\n    Record final task completion and bootstrap synchronization across agent mirrors for the interface design ecosystem session. All acceptance criteria and verification gates passed cleanly."
       }
     ],
     "inferred_convention": "conventional-commits"
@@ -29,8 +29,10 @@
     "auth_handshake_ok": true
   },
   "ssh_signing_path": {
-    "path": "unknown",
+    "path": "bitwarden-linux",
     "evidence": [
+      "core.sshCommand=~/.ssh/ssh-keygen-bitwarden.sh (global ~/.gitconfig)",
+      "gpg.ssh.program=~/.ssh/ssh-keygen-bitwarden.sh (global ~/.gitconfig)",
       "SSH_AUTH_SOCK uses the Bitwarden desktop agent socket",
       "GitHub authentication succeeds with the configured github.com identity",
       "the signing public-key fingerprint matches the trusted signer entry"
@@ -42,7 +44,7 @@
     "cli": "gh",
     "installed": true,
     "authenticated": true,
-    "auth_checked_at": "2026-09-14T12:06:08+03:00",
+    "auth_checked_at": "2026-09-27T12:20:00+03:00",
     "preferred_for_remote_operations": true
   },
   "signing": {
