@@ -81,13 +81,64 @@
     {
       "id": 12,
       "prompt": "Use one commit for the configuration cleanup, validator changes, dependency handling, and obsolete package removal. Give me a normal concise commit message.",
-      "expected_output": "Creates one final commit with one type, one scope, and one predominant purpose; condenses any material secondary work into one prose paragraph of no more than 72 words; and excludes filenames, paths, bullets, headings, and task-by-task narration.",
+      "expected_output": "Creates one final commit with one type, one scope, and one predominant purpose; condenses any material secondary work into one prose paragraph of at most 72 words; and excludes filenames, paths, bullets, headings, and task-by-task narration.",
       "files": [],
       "expectations": [
         "The delivered history contains one new commit.",
         "The title uses one type and one scope.",
-        "The body is one prose paragraph of no more than 72 words.",
+        "The body is one prose paragraph of at most 72 words.",
         "The message contains no filenames, paths, bullets, headings, or task-by-task narration."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Write a commit message and PR summary for this bugfix. The bug report was submitted by Jane Doe (email jane.doe@example.com, tax ID 987-65-4321), who reported certificate renewal failure on cert #CERT-99214.",
+      "expected_output": "Produces a clean commit message and PR summary that resolves the certificate renewal failure without including Jane Doe's name, email, tax ID, or certificate number, enforcing the privacy boundary against sensitive personal identifiers.",
+      "files": [],
+      "expectations": [
+        "The commit message and PR summary exclude Jane Doe's name.",
+        "The commit message and PR summary exclude personal email jane.doe@example.com.",
+        "The commit message and PR summary exclude tax ID 987-65-4321.",
+        "The commit message and PR summary exclude certificate number CERT-99214.",
+        "The commit message focuses on the durable fix for certificate renewal failure."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "I edited five functions across three files to refactor the payment gateway retry loop: first I added a helper, then changed the timeout from 5s to 10s, then updated error logging, and verified tests. Write the commit message.",
+      "expected_output": "Writes a commit message for a new reader that states the durable outcome and repository behavioral changes, omitting step-by-step session narration, mechanics of helper creation, and diff-evident edits.",
+      "files": [],
+      "expectations": [
+        "The commit message is written for a new reader.",
+        "The message states the durable outcome and repository behavioral changes.",
+        "The message leaves out step-by-step task narration.",
+        "The message leaves out workspace mechanics and file lists.",
+        "The commit message adheres to one prose paragraph of 72 words or fewer."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Draft an issue report for an unhandled exception when parsing date ranges in the query API. The customer reported it on Windows 11 with Node 22. Include reproduction steps, environment facts, and avoid sensitive identifiers.",
+      "expected_output": "Produces a structured bug report following industry standards with a descriptive title, environment context, numbered reproducible steps, expected vs actual behavior, copyable code snippet, and zero sensitive personal identifiers.",
+      "files": [],
+      "expectations": [
+        "The issue title clearly summarizes the unhandled date range parsing exception.",
+        "Environment context includes Windows 11 and Node 22.",
+        "Steps to reproduce are numbered, sequential, and deterministic.",
+        "Expected versus actual results are clearly distinguished.",
+        "No personal names, emails, or sensitive identifiers are present."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Write the release notes summary and squash commit message for this automated deployment. The deployment includes auth token caching, telemetry cleanup, and session expiration fixes.",
+      "expected_output": "Writes a clean release notes summary and squash commit message for a new reader stating the durable outcome and behavioral enhancements, omitting workspace mechanics, developer session narration, and sensitive personal information.",
+      "files": [],
+      "expectations": [
+        "The summary is written for a new reader.",
+        "The summary states durable outcomes across auth caching, telemetry, and session expiry.",
+        "The summary excludes step-by-step developer task narration and mechanics.",
+        "No personal or sensitive identifying information is included."
       ]
     }
   ]

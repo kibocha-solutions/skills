@@ -75,23 +75,23 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 
 1. Write for a careful new contributor unless the repository specifies another
    audience.
-2. Read:
-   - `references/technical-documentation-routing.md`
-   - `references/technical-documentation-library.md`
-   - `references/writerside-technical-documentation.md`
+2. Read the following routing references:
+   1. `references/technical-documentation-routing.md`
+   2. `references/technical-documentation-library.md`
+   3. `references/writerside-technical-documentation.md`
 3. Read the matching document-family reference:
-   - architecture: `references/technical-architecture-documentation.md`
-   - ADR: `references/adr-documentation.md`
-   - API: `references/api-documentation.md`
-   - deployment: `references/deployment-documentation.md`
-   - documentation delivery: `references/documentation-deployment.md`
-   - operations: `references/operations-runbook-documentation.md`
-   - database: `references/database-documentation.md`
-   - security: `references/security-documentation.md`
-   - configuration: `references/configuration-documentation.md`
-   - testing: `references/testing-documentation.md`
-   - user guide: `references/user-guide-documentation.md`
-   - changelog: `references/changelog-documentation.md`
+   1. architecture: `references/technical-architecture-documentation.md`
+   2. ADR: `references/adr-documentation.md`
+   3. API: `references/api-documentation.md`
+   4. deployment: `references/deployment-documentation.md`
+   5. documentation delivery: `references/documentation-deployment.md`
+   6. operations: `references/operations-runbook-documentation.md`
+   7. database: `references/database-documentation.md`
+   8. security: `references/security-documentation.md`
+   9. configuration: `references/configuration-documentation.md`
+   10. testing: `references/testing-documentation.md`
+   11. user guide: `references/user-guide-documentation.md`
+   12. changelog: `references/changelog-documentation.md`
 4. Use `references/access-level-classification.md` for audience classification.
 5. Give each independently meaningful contract, schema, state model, interface,
    lifecycle, or responsibility its own focused page.
@@ -107,8 +107,8 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 3. Select the target path through
    `references/technical-documentation-library.md`.
 4. Use these assets for a new library:
-   - `assets/technical-docs-required-tree.md`
-   - `assets/technical-docs-optional-tree.md`
+   1. `assets/technical-docs-required-tree.md`
+   2. `assets/technical-docs-optional-tree.md`
 5. Select the Writerside tree for the intended audience.
 6. Include each topic in the correct tree.
 7. Keep reusable snippets in the snippet library.
@@ -118,20 +118,20 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 
 1. Treat the delivery document as a separate canvas from the chat interface. Never place conversational deliberation, reservations, or internal notes in deliverables.
 2. Keep deliverables free of progress markers and workflow notes:
-   - Exclude progress markers and task notes (e.g. "pending promulgation", "pending determination of the user", "user will clarify").
-   - Exclude sample labels, self-disclaimers, and protective warnings (e.g. "template audit report", "do not rely on this", "draft", "provisional").
-   - Inspect existing repository documents for prerequisite instruments before drafting; if missing, stop and ask the user in chat before proceeding.
+   1. Exclude workflow markers such as "pending promulgation", "pending determination", and "user will clarify".
+   2. Exclude sample labels and protective warnings such as "template audit report", "do not rely on this", "draft", and "provisional".
+   3. Inspect existing repository documents for prerequisite instruments before drafting; if missing, stop and ask the user in chat before proceeding.
 3. Exclude uncertainty markers and hedging:
-   - Deliverables must be free of uncertainty markers (`[estimate]`, "to be confirmed") and quantity hedging ("about", "approximately", "roughly").
-   - Notify the user in chat of any concern, reservation, problem, or ambiguity, and abide by the user's decision.
-   - Where unsure whether background context belongs in the deliverable, ask the user in chat: "Did you intend for X to go into the document?"
+   1. Deliverables must be free of uncertainty markers such as `[estimate]` and "to be confirmed", as well as quantity hedging such as "about", "approximately", and "roughly".
+   2. Notify the user in chat of any concern, reservation, problem, or ambiguity, and abide by the user's decision.
+   3. Where unsure whether background context belongs in the deliverable, ask the user in chat: "Did you intend for X to go into the document?"
 4. Exclude unprompted details, internal methodology, background directions, and sensitive identifiers:
-   - Deliverables must contain only what the document type expressly requires; omit unprompted information.
-   - Never disclose sensitive identifiers (e.g. national IDs, registration numbers, banking details) unless completing an authoritative form field or explicitly directed.
-   - Withhold financial amounts beyond those requested and compliance-status detail unless an authoritative form field requires them or the user explicitly directs disclosure.
-   - Treat a funder's eligibility statement as a condition to satisfy, not as a request for an identifier or certificate.
-   - Do not explain obvious context, donor restrictions, internal costing models, or governing directions (e.g. "We did this to comply with...", "As directed...").
-   - Do not state what an organization decided not to do.
+   1. Deliverables must contain only what the document type expressly requires; omit unprompted information.
+   2. Never disclose sensitive identifiers such as national identity numbers, registration numbers, or banking details unless completing an authoritative form field or explicitly directed.
+   3. Withhold financial amounts beyond those requested and compliance-status detail unless an authoritative form field requires them or the user explicitly directs disclosure.
+   4. Treat a funder's eligibility statement as a condition to satisfy, not as a request for an identifier or certificate.
+   5. Do not explain obvious context, donor restrictions, internal costing models, or governing directions such as "We did this to comply with..." or "As directed...".
+   6. Do not state what an organization decided not to do.
 
 ## 6. Draft in Markdown
 
@@ -146,7 +146,7 @@ description: Draft, review, rewrite, and validate documentation, README files, g
    conclusions.
 7. Remove diminish-to-elevate constructions and their paraphrases.
 8. Remove purposeless references to the report, document, guide, or section.
-9. Remove U+2014 em dashes from normal prose.
+9. Do not use U+2014 em dashes in normal prose, except when introducing a list.
 10. Remove chatbot phrases, placeholders, malformed markup, tracking
     parameters, citation residue, and broken references.
 11. Use headings, lists, tables, emphasis, and code fences only when they
@@ -213,13 +213,13 @@ Before delivering any documentation artifact, confirm evidence exists for each i
 
 - [ ] Source documents and existing artifacts read manually in full from start to finish.
 - [ ] Motivation and rationale kept in Purpose and Scope; operative sections state direct rules or role-attributed steps only.
-- [ ] Deliverables free of progress markers, workflow notes ("pending promulgation"), and self-disclaimers ("template", "draft").
-- [ ] Deliverables free of uncertainty markers (`[estimate]`, "to be confirmed") and quantity hedging ("about", "roughly").
-- [ ] No unprompted sensitive identifiers (national IDs, registration numbers, banking details) or background methodology explanations included.
+- [ ] Deliverables free of progress markers, workflow notes, sample labels, and self-disclaimers.
+- [ ] Deliverables free of uncertainty markers and quantity hedging.
+- [ ] No unprompted sensitive identifiers, background methodology explanations, or donor context explanations included.
 - [ ] Doubts, concerns, and missing prerequisites raised directly to the user in chat before writing.
 - [ ] External deliverables reference documents by title only, with no internal repository paths, session filenames, memory files, or handoffs; documentation-library topics link by relative path and never reference a higher-sensitivity topic.
 - [ ] Zero AI attribution across all documents, deliverables, and metadata.
-- [ ] No U+2014 em dashes in normal prose.
+- [ ] No U+2014 em dashes in normal prose, except when introducing a list.
 - [ ] Derived deliverables regenerated from clean sources after the final edit and visually verified.
 - [ ] All links, code symbols, commands, and cross-references verified against controlling code or authoritative sources.
 

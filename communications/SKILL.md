@@ -28,32 +28,53 @@ license: Complete terms in LICENSE.txt
    and unrequested sensitive information.
 6. Preserve user-supplied wording.
 
-## 3. Draft an external communication
+## 3. Draft formal external correspondence
 
 Read [external correspondence standards](references/external-correspondence-standards.md).
+Inspect [external correspondence examples](examples/external-correspondence-examples.md) for contrasting good versus bad implementations.
 
 1. Use a formal tone.
 2. Address the recipient directly.
 3. State the necessary context.
 4. State the requested action, decision, or information.
 5. State the deadline or response method when required.
-6. Refer to documents by their full reader-facing titles.
-7. Present referenced documents as attachments or formal citations.
-8. Follow `documentation/references/ngo-and-donor-narrative.md` for report or
-   proposal citations.
-9. Follow `documentation/references/letterhead-and-pagination.md` for a
-   multi-page or letterheaded communication.
-10. Close with the sender's required name, title, and contact fields.
-11. Do not include a bare repository link or internal file reference.
+6. Format subjects and reference lines in Title Case with periods separating
+   distinct clauses, never sentence case or colons replacing em dashes.
+7. Follow `documentation/references/letterhead-and-pagination.md` when drafting
+   formal letters with letterhead, including date of dispatch, recipient legal
+   name and institutional address, reference line, salutation, operative
+   narrative, recommendations, closing, and full signature block.
+8. Never use tables in email correspondence; format structured data as ordered
+   text items to prevent rendering defects. In formal letters, format tables
+   cleanly per pagination standards.
+9. Use a U+2014 em dash `—` specifically to introduce a list; do not use em
+   dashes in normal flowing prose.
+10. Prefer ordered lists over bulleted lists.
+11. Never use "Next steps" as a communication header; use "Recommendations" or
+    "Action Requested".
+12. Introduce attachments in the opening or body text when reader attention is
+    required; do not place a detached attachments block at the bottom of
+    correspondence.
+13. Exclude personal or sensitive identifying information such as national ID,
+    tax, passport, or registration numbers, personal email addresses, and
+    private names unless expressly authorized by the user.
+14. Completely decouple deliverables from internal agent deliberation,
+    verification tallies, repository paths, and workspace mechanics.
+15. Refer to documents by their full reader-facing titles.
+16. Present referenced documents as attachments or formal citations.
+17. Follow `documentation/references/ngo-and-donor-narrative.md` for report or
+    proposal citations.
+18. Close with the sender's required name, title, and contact fields.
+19. Do not include a bare repository link or internal file reference.
 
 ## 4. Draft an internal communication
 
 1. Read [leadership and incident formats](references/leadership-and-incident-formats.md) when preparing executive briefings or incident notices.
 2. Select the matching template:
-   - 3P update: `examples/3p-updates.md`
-   - company newsletter: `examples/company-newsletter.md`
-   - FAQ: `examples/faq-answers.md`
-   - other internal communication: `examples/general-comms.md`
+   1. 3P update: `examples/3p-updates.md`
+   2. company newsletter: `examples/company-newsletter.md`
+   3. FAQ: `examples/faq-answers.md`
+   4. other internal communication: `examples/general-comms.md`
 3. Read the selected template from start to finish.
 4. Gather every field the template requires.
 5. Follow its structure, tone, and formatting.
@@ -77,11 +98,19 @@ Read [external correspondence standards](references/external-correspondence-stan
 Before delivering any communication, confirm evidence exists for each item:
 
 - [ ] Source material and context read manually in full from start to finish.
-- [ ] Audience register confirmed (external formal by default; internal only when confirmed).
+- [ ] Audience register confirmed: external formal by default, internal only when confirmed.
+- [ ] Subjects and reference lines in Title Case with period separators; no colons replacing em dashes.
+- [ ] Formal letters conform to letterhead and pagination standards.
+- [ ] No tables in email correspondence; structured data formatted as ordered text.
+- [ ] No U+2014 em dashes in normal prose, except when introducing a list.
+- [ ] Ordered lists preferred over bulleted lists.
+- [ ] No "Next steps" headers used; "Recommendations" or context-appropriate headers used.
+- [ ] No detached attachments block at the bottom of correspondence.
 - [ ] Recipient, purpose, deadlines, and requested actions stated directly.
 - [ ] Referenced documents cited by reader-facing title only; no repository paths or hashes leaked.
+- [ ] No personal or sensitive identifying information included without express authorization.
+- [ ] Completely decoupled from agent thoughts, workspace mechanics, or verification logs.
 - [ ] Zero AI attribution across all messages, documents, and sign-offs.
 - [ ] Zero uncertainty markers or quantity hedges in deliverable text.
-- [ ] No U+2014 em dashes in normal prose.
 - [ ] Full review completed as the recipient.
 

@@ -38,3 +38,15 @@ STATE: DONE
 - [x] Record walkthrough in `walkthrough.md`
 - [x] Save checkpoint commit using `ci-cd` standards (single-scope, imperative title, <= 72 words body)
 - [x] Request user permission to execute `bootstrap`
+
+## Phase 6: Standards Elevation & Comprehensive Rule Audit
+- [x] Integrate PII prohibition and new-reader standards into `ci-cd/SKILL.md`
+- [x] Ingest authoritative research from Google and Microsoft into `ci-cd/references/research/`
+- [x] Create authoritative issue standards in `ci-cd/references/issue-standards.md`
+- [x] Update pull request standards in `ci-cd/references/pull-request-messages.md`
+- [x] Relocate contrasting examples from `references/` to dedicated `examples/` across `ci-cd` and `communications`
+- [x] Update formal external correspondence standards across letters and emails in `communications/` and `AGENTS.md`
+- [x] Audit and eliminate all explanatory / hedging parentheses across touched files
+- [x] Convert all bulleted lists across documentation, skills, and references to ordered lists
+- [x] Eliminate diminish-to-elevate phrasing and quantity hedging across files
+- [x] Perform full manual read of all modified non-code artifacts from start to finish

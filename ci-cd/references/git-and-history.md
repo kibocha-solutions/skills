@@ -15,12 +15,12 @@
 
 ## History gates
 
-- Never rewrite shared history without live user approval.
-- Never force-push without live user approval.
-- Never delete a collaborator-used branch without live user approval.
-- Treat uncertain ownership as shared.
-- Preserve commit boundaries the user requests.
-- Keep one coherent final commit when independent boundaries add no review value.
+1. Never rewrite shared history without live user approval.
+2. Never force-push without live user approval.
+3. Never delete a collaborator-used branch without live user approval.
+4. Treat uncertain ownership as shared.
+5. Preserve commit boundaries the user requests.
+6. Keep one coherent final commit when independent boundaries add no review value.
 
 ## Branch procedure
 
@@ -43,31 +43,32 @@
 
 ## Pull request checks
 
-- Keep one coherent goal.
-- State user or operator impact.
-- State material implementation boundaries.
-- List exact tests and results.
-- State material risks and the rollback command or procedure.
-- Follow the repository merge method and merge queue.
-- Preserve multiple commits only when their boundaries are intentional and useful.
+1. Keep one coherent goal.
+2. State user or operator impact.
+3. State material implementation boundaries.
+4. List exact tests and results.
+5. State material risks and the rollback command or procedure.
+6. Follow the repository merge method and merge queue.
+7. Preserve multiple commits only when their boundaries are intentional and useful.
 
 ## Handoff fields
 
 Record:
 
-- current branch
-- intended base
-- branch purpose
-- shared or isolated status
-- temporary or durable status
-- history-cleanup status
-- safest next Git action
+1. current branch
+2. intended base
+3. branch purpose
+4. shared or isolated status
+5. temporary or durable status
+6. history-cleanup status
+7. safest next Git action
 
 ## Prohibited outcomes
 
-- Final commits named `wip`, `misc fixes`, or `address feedback`
-- Commit messages that narrate the work session
-- New commits that should have been fixups
-- Unapproved shared-history rewrites
-- Unrelated changes in one commit
-- Ancestry assumptions based only on a branch name
+1. Final commits named `wip`, `misc fixes`, or `address feedback`
+2. Commit messages that narrate the work session or repeat what the diff shows instead of stating durable outcomes for a new reader
+3. Personal or sensitive identifying information in commit messages or pull requests without express authorization
+4. New commits that should have been fixups
+5. Unapproved shared-history rewrites
+6. Unrelated changes in one commit
+7. Ancestry assumptions based only on a branch name
