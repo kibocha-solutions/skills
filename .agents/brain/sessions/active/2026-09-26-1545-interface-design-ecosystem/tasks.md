@@ -50,3 +50,11 @@ STATE: DONE
 - [x] Convert all bulleted lists across documentation, skills, and references to ordered lists
 - [x] Eliminate diminish-to-elevate phrasing and quantity hedging across files
 - [x] Perform full manual read of all modified non-code artifacts from start to finish
+
+## Phase 7: Bootstrap Propagation & Workspace Git Health Audit
+- [x] Audit and normalize git parameters across `.agents/brain/git/` cache files in `/mnt/data/workspace/`
+- [x] Normalize paths to portable `~/` across `~/.gitconfig`, `~/.gemini/config/hooks.json`, and repository caches
+- [x] Verify Bitwarden Linux SSH signing key and public key configurations
+- [x] Preserve `dhanush` identity and alias in `kibocha-solutions/clients/dhanush/lnp-dataset/` and disable conflicting local `commit.gpgsign`
+- [x] Execute `/bootstrap` alignment scripts across installed hosts (`~/.gemini`, `~/.claude`, `~/.codex`, `~/.copilot`)
+- [x] Verify rule block markers, sparse-checkout mirrors matching `origin/main` at commit `36e29ac`, and absence of deleted skills
