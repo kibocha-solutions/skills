@@ -65,16 +65,17 @@ python scripts/office/unpack.py document.docx unpacked/
 8. Use `HeadingLevel` on table-of-contents headings.
 9. Use separate `Paragraph` elements instead of newline characters.
 10. Use numbering configuration for bullets and numbered lists.
-11. Use a new numbering reference when a sequence must restart.
-12. Put every `PageBreak` inside a `Paragraph`.
-13. Add page headers, footers, and numbering through section definitions.
-14. Use paragraph borders for divider rules.
-15. Use tab stops for aligned header or footer text.
-16. Use `ExternalHyperlink`, `Bookmark`, and `InternalHyperlink` for
+11. When generating instruments (legislative, prescriptive, or declaratory), apply the list and spacing rules from AGENTS.md §9.11: use ordered lists, separate items with blank lines, nest with (a), (b), then (i), (ii), and verify rendered spacing.
+12. Use a new numbering reference when a sequence must restart.
+13. Put every `PageBreak` inside a `Paragraph`.
+14. Add page headers, footers, and numbering through section definitions.
+15. Use paragraph borders for divider rules.
+16. Use tab stops for aligned header or footer text.
+17. Use `ExternalHyperlink`, `Bookmark`, and `InternalHyperlink` for
     links.
-17. Use `FootnoteReferenceRun` with document-level footnotes.
-18. Use `Column` and `SectionType.NEXT_COLUMN` for multi-column layouts.
-19. Write the output through `Packer.toBuffer`.
+18. Use `FootnoteReferenceRun` with document-level footnotes.
+19. Use `Column` and `SectionType.NEXT_COLUMN` for multi-column layouts.
+20. Write the output through `Packer.toBuffer`.
 
 ## 4. Build tables
 

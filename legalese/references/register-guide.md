@@ -4,7 +4,7 @@
 
 | Dimension | Standard | Formal | Sovereign | Archaic |
 |---|---|---|---|---|
-| Obligation | must, will | shall | shall | shall, doth |
+| Obligation | must (duty), will (declared effect) | shall | shall | shall, doth |
 | Permission | may | may | sovereign grant | archaic sovereign grant |
 | Latin | universal terms of art | established domain terms | precise classical terms | classical and rare terms |
 | Conflict opener | direct conflict rule | notwithstanding for identified conflict | notwithstanding | extended classical opener |
@@ -17,15 +17,15 @@
 
 Use:
 
-- must
-- will
-- may
+- must (obligations)
+- will (scope, application, and declared legal effects)
+- may (options)
 - agrees to
 - is entitled to
-- does not apply
-- is void and unenforceable
-- has no legal effect
-- remains in effect
+- will not apply (prescriptive invalidity)
+- will be void and unenforceable (prescriptive invalidity)
+- will have no legal effect (prescriptive invalidity)
+- will remain in effect (prescriptive survival)
 - subject to
 - in accordance with
 
@@ -35,7 +35,8 @@ Do not use:
 - sovereign finality
 - unexplained Latin
 - nested clauses deeper than two levels
-- `shall` unless a controlling convention requires it
+- `shall` (reserved for legislative instruments)
+- bare present tense for declared legal effects (use `will` instead)
 
 Structure:
 
@@ -48,7 +49,8 @@ Structure:
 
 Use:
 
-- shall for obligations
+- shall for obligations and declared legal effects in legislative instruments
+- must for obligations, and will for declared legal effects, in prescriptive instruments (AGENTS.md §9.2)
 - may for permissions
 - must for conditions precedent
 - hereby
@@ -57,13 +59,15 @@ Use:
 - pursuant to
 - identified notwithstanding clauses
 - null and void
-- of no force or effect
+- of no force or effect (or 'shall be of no force or effect' in legislative instruments; 'will be of no force or effect' in prescriptive instruments)
 
 Do not use:
 
 - archaic verb forms
 - facial-death metaphors
 - sovereign claims beyond the parties' lawful authority
+- `shall` in prescriptive instruments (use `must` for obligations and `will` for declared effects)
+- bare present tense for declared legal effects (use `shall` or `will` per instrument class)
 
 Structure:
 
@@ -132,7 +136,7 @@ Structure:
 
 Standard:
 
-> If any part of this Agreement is unenforceable, that part will not apply. The rest of the Agreement remains in effect.
+> If any part of this Agreement is unenforceable, that part will not apply. The rest of the Agreement will remain in effect.
 
 Formal:
 

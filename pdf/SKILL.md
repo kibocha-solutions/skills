@@ -132,9 +132,10 @@ Inspect [PDF generation examples](examples/good-vs-bad-pdf-generation.md) for fl
 5. Render every page to PNG or JPEG at a readable resolution.
 6. Inspect every rendered page.
 7. Check clipping, overlap, blank pages, dead gaps, orphaned headings, split tables, image scaling, headers, footers, folios, letterhead, signatures, and form values.
-8. Reopen encrypted output with the intended credentials.
-9. Re-run verification after every correction.
-10. Deliver only the verified final PDF.
+8. When the PDF contains a legislative, prescriptive, or declaratory instrument, verify rendered list spacing per AGENTS.md §9.11.
+9. Reopen encrypted output with the intended credentials.
+10. Re-run verification after every correction.
+11. Deliver only the verified final PDF.
 
 ## 13. Pre-completion checklist
 

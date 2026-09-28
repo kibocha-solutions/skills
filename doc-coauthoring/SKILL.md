@@ -65,22 +65,23 @@ license: Apache-2.0, adapted from the upstream skill of the same name
 Repeat this sequence for every section:
 
 1. Name the section being drafted.
-2. Ask five to ten section-specific questions.
-3. Generate five to twenty numbered content options.
-4. Include relevant context that has not yet been placed.
-5. Ask the user which options to keep, remove, combine, or change.
-6. Accept numbered or freeform curation.
-7. Ask for a brief reason when a choice changes later sections.
-8. Ask whether an important point is missing.
-9. Replace the section placeholder with drafted content.
-10. Edit the stored document directly.
-11. Show the location of the updated draft.
-12. Ask for targeted change instructions.
-13. Apply targeted edits without reprinting the complete document.
-14. Record the user's style and structure preferences.
-15. Continue until the user accepts the section.
-16. After three refinement passes, test whether any content can be removed.
-17. Move to the next section only after confirming the transition.
+2. When the document is a legal instrument, apply the modal register, definition format, list rules, and background/recitals rules from AGENTS.md §9.2–9.12.
+3. Ask five to ten section-specific questions.
+4. Generate five to twenty numbered content options.
+5. Include relevant context that has not yet been placed.
+6. Ask the user which options to keep, remove, combine, or change.
+7. Accept numbered or freeform curation.
+8. Ask for a brief reason when a choice changes later sections.
+9. Ask whether an important point is missing.
+10. Replace the section placeholder with drafted content.
+11. Edit the stored document directly.
+12. Show the location of the updated draft.
+13. Ask for targeted change instructions.
+14. Apply targeted edits without reprinting the complete document.
+15. Record the user's style and structure preferences.
+16. Continue until the user accepts the section.
+17. After three refinement passes, test whether any content can be removed.
+18. Move to the next section only after confirming the transition.
 
 ## 5. Review the complete draft
 

@@ -47,7 +47,7 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 1. Put motivation and rationale in `Purpose` and `Scope`.
 2. Write numbered operational sections as direct rules or role-attributed
    steps.
-3. Use simple present tense for procedure steps. Do not use `shall` in them.
+3. Select the modal register by instrument class as defined in AGENTS.md §9.2. Use the imperative mood for procedure steps. Route legal instruments to `legalese/SKILL.md`.
 4. Put violations and enforcement in a dedicated section.
 5. State each rule, definition, and constraint once.
 
@@ -67,8 +67,8 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 2. Apply the external register until the user confirms an internal audience.
 3. Move from context to the requested action.
 4. Use polite direct address.
-5. Use past tense for completed action.
-6. Do not use legal-order modals such as `shall`.
+5. Apply the declaratory register (AGENTS.md §9.2): simple present for a stated position or present fact, past tense for a completed event, and `will` for a future event.
+6. Do not use command modals such as `shall` or `must`.
 7. Follow `communications/SKILL.md`.
 
 ### Technical documentation
@@ -151,9 +151,11 @@ description: Draft, review, rewrite, and validate documentation, README files, g
     parameters, citation residue, and broken references.
 11. Use headings, lists, tables, emphasis, and code fences only when they
     improve retrieval or execution.
-12. Use prose and tables for narrative or persuasive documents.
-13. Use Writerside components where the repository convention requires them.
-14. Read `references/weak-ai-writing-patterns.md` for close rewrites,
+12. In legislative, prescriptive, and declaratory instruments, do not use bullet lists. Use ordered lists. Separate list items with blank lines. Nest with (a), (b), then (i), (ii). These list rules do not apply to technical documentation.
+13. State every definition as "A **Term** is ...", never "means", per AGENTS.md §9.3.
+14. Use prose and tables for narrative or persuasive documents.
+15. Use Writerside components where the repository convention requires them.
+16. Read `references/weak-ai-writing-patterns.md` for close rewrites,
     editorial review, or quality cleanup.
 
 ## 7. Verify content

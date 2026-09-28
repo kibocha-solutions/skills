@@ -14,6 +14,10 @@ It does not apply to ordinary reports, word-processing documents, letters,
 strategy memos, research writeups, or other non-technical prose unless the user
 explicitly asks for Writerside.
 
+The instrument-class modal register (AGENTS.md §9.2), definition format (§9.3),
+and list rules (§9.11) govern governance, legal, policy, and procedural instruments.
+Technical-documentation conventions govern technical pages, so neither bleeds into the other.
+
 ## Writerside Rule
 
 All new technical documentation artifacts use Writerside-compatible Markdown.
@@ -64,6 +68,8 @@ validation concerns, and required facts.
 | Diagrams and visual documentation | Use the `technical-diagrams` skill. |
 
 ## Technical Documentation Procedure
+
+The instrument-class modal register (AGENTS.md §9.2), definition format (§9.3), and list rules (§9.11) do not apply to technical documentation. Technical documentation uses the register, tense, and list conventions appropriate to its audience and document family.
 
 1. Identify the documentation type before drafting.
 2. Read `technical-documentation-library.md` to choose the default path,

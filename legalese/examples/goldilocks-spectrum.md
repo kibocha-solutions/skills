@@ -12,7 +12,7 @@
 
 ### Standard
 
-> If any law, regulation, or rule conflicts with this Constitution, it does not apply to the extent of the conflict. The remainder remains in effect.
+> If any law, regulation, or rule conflicts with this Constitution, it shall not apply to the extent of the conflict. The remainder shall remain in effect.
 
 ### Formal
 
@@ -30,7 +30,7 @@
 
 ### Standard
 
-> This Article may not be amended, repealed, or modified. No person or body has authority to change it.
+> This Article shall not be amended, repealed, or modified. No person or body shall have authority to change it.
 
 ### Formal
 
@@ -48,7 +48,7 @@
 
 ### Standard
 
-> If an instrument conflicts with this Article or is reasonably likely to produce a prohibited outcome, the conflicting parts do not apply. The remaining parts remain in effect.
+> If an instrument conflicts with this Article or is reasonably likely to produce a prohibited outcome, the conflicting parts shall not apply. The remaining parts shall remain in effect.
 
 ### Formal
 
@@ -66,7 +66,7 @@
 
 ### Standard
 
-> No person may recognise, enforce, or give effect to any outcome not expressly listed in this Article. Any attempt has no legal effect.
+> No person shall recognise, enforce, or give effect to any outcome not expressly listed in this Article. Any attempt shall have no legal effect.
 
 ### Formal
 
@@ -84,7 +84,7 @@
 
 ### Standard
 
-> A court may invalidate an instrument under this Article only through Clause 4. No other legal principle, doctrine, or standard may supplement, bypass, or override that process.
+> A court may invalidate an instrument under this Article only through Clause 4. No other legal principle, doctrine, or standard shall supplement, bypass, or override that process.
 
 ### Formal
 

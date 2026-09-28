@@ -76,7 +76,37 @@ Test:
 
 Close every verified loophole within scope. Report unresolved conflicts to the user.
 
-## 10. Structural fidelity
+## 10. Modal register by instrument class
+
+- [ ] The instrument class is identified: legislative, prescriptive, declaratory, or procedure.
+- [ ] Modal verbs match the instrument class per AGENTS.md §9.2.
+- [ ] Legislative instruments use `shall` for obligations and declared effects.
+- [ ] Prescriptive instruments use `will` for declared effects and `must` for obligations.
+- [ ] Declaratory instruments use no command modals.
+- [ ] Procedure steps use the imperative mood.
+- [ ] No legal effect is left in bare present tense in a legislative or prescriptive instrument.
+- [ ] No duty is assigned to a thing, document, agreement, system, or passive subject.
+
+## 11. Definitions
+
+- [ ] Every definition uses the form "A **Term** is ...", not "means".
+- [ ] Terms already defined in a controlling instrument are adopted by reference, not redefined.
+
+## 12. Lists and spacing
+
+- [ ] No bullet lists appear in the instrument.
+- [ ] Ordered lists are used throughout.
+- [ ] List items are separated by blank lines.
+- [ ] Nesting uses (a), (b), then (i), (ii).
+- [ ] Roman numerals are used where Arabic numerals would create ambiguity.
+- [ ] Rendered list spacing is verified in fixed-page artifacts.
+
+## 13. Background and recitals
+
+- [ ] Purpose and Background state only the occasion and controlling facts.
+- [ ] No argument, explanation, or deliberation appears in recitals.
+
+## 14. Structural fidelity
 
 - [ ] User wording is unchanged unless the user approved a revision.
 - [ ] Locked structure is unchanged.
@@ -84,7 +114,7 @@ Close every verified loophole within scope. Report unresolved conflicts to the u
 - [ ] Approved changes do not alter unrelated text.
 - [ ] Definitions and cross-references remain synchronized.
 
-## 11. Economy
+## 15. Economy
 
 - [ ] Every word carries legal effect, structure, or necessary context.
 - [ ] Redundant adverbs are removed.
@@ -92,7 +122,7 @@ Close every verified loophole within scope. Report unresolved conflicts to the u
 - [ ] Recitals do not repeat operative provisions.
 - [ ] Rationale and drafting narration are absent from operative text.
 
-## 12. Exact final read
+## 16. Exact final read
 
 - [ ] Read the complete final instrument.
 - [ ] Verify names, dates, numbers, thresholds, parties, offices, and jurisdiction.

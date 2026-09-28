@@ -39,7 +39,7 @@ Read every non-code artifact manually in full from start to finish before acting
 
 ## 4. Continuity and planning
 
-1. Before substantial work, read repository `AGENTS.md`, `.agents/MEMORY.md`, linked memory files, handoffs, and active sessions in full.
+1. Before substantial work, discover the repository's agent instruction and state directories. Names vary across tools: look for `AGENTS.md`, `CLAUDE.md`, and hidden directories such as `.agents/`, `.claude/`, `.cursor/`, or `.github/`, plus any memory index, handoff folder, or sessions folder they reference. Read every discovered instruction file, memory index, and relevant memory entry in full.
 2. Do not substitute searches, excerpts, or summaries for full reads.
 3. Preserve deliberate duplication across memory stores; read each independently.
 4. Use `maestro` for multi-step work. Resume matching active sessions and record added scope before performing it.
@@ -81,29 +81,44 @@ Read every non-code artifact manually in full from start to finish before acting
 ## 9. Drafting and deliverables
 
 1. Read and obey `documentation/SKILL.md` for documentation and `legalese/SKILL.md` for legal instruments.
-2. Match mood, tense, voice, structure, citation form, and authority register to the document type.
-3. Keep purpose and rationale out of operative text:
+2. Select the modal register by instrument class:
+   1. Legislative instruments (constitution, charter, by-law, standing orders, resolution, administrative order): `shall` for obligations and declared effects, `shall not` or "no Person shall" for prohibitions, and `may` for permissions.
+   2. Prescriptive instruments (policy, code, framework, standard, procedure, SOP, manual, protocol, guideline): `will` for scope, application, and declared legal effects; `must` for obligations; `must not` or "no Person may" for prohibitions; `may` for options. Never `shall`, except in a passage reproduced verbatim.
+   3. Declaratory instruments (circular, advisory, notice, certificate, determination, minutes, correspondence): no command modals; the simple present for a stated position or present fact, the past tense for a completed event, and `will` for a future event.
+   4. Procedure, SOP, manual, and protocol steps: the imperative mood, opening with the responsible position.
+   5. Never leave a legal effect in the bare present tense in a legislative or prescriptive instrument. Use the instrument's assigned modal.
+   6. Never assign a duty to a thing, document, agreement, system, or passive subject. Name the responsible position.
+   7. Severability: ordinary severability in prescriptive instruments (with `will`); sovereign-core severability (with `shall`) only in supreme governing instruments.
+   8. Technical documentation, code comments, API prose, README files, and developer guides are not legal instruments. These rules do not apply to them.
+3. State every definition as "A **Term** is ...", never "means". Adopt a term already defined in a controlling instrument by reference, without redefining it.
+4. Keep purpose and rationale out of operative text:
    1. Legal clauses: command only.
    2. Procedures and SOPs: Purpose and Scope carry rationale; numbered steps state rules only.
    3. Proposals: Background carries context; Objectives state outcomes directly.
-4. Keep deliverables free of progress notes, disclaimers, and self-labels:
+5. Keep deliverables free of progress notes, disclaimers, and self-labels:
    1. Exclude workflow markers such as "pending promulgation", "pending determination", and "user will clarify".
    2. Exclude sample labels and protective warnings such as "template audit report", "do not rely on this", "draft", and "provisional".
    3. Inspect existing repository documents for prerequisite instruments before drafting; if missing, ask the user in chat.
-5. Do not place concerns, reservations, uncertainty markers, or quantity hedges in deliverables:
+6. Do not place concerns, reservations, uncertainty markers, or quantity hedges in deliverables:
    1. Exclude uncertainty markers such as `[estimate]` or "to be confirmed", and quantity hedging such as "about", "approximately", or "roughly".
    2. The delivery document is not the chat canvas; report doubts, defects, or ambiguities in chat and abide by the user's decision.
    3. Where unsure whether context belongs in the deliverable, ask in chat: "Did you intend for X to go into the document?"
-6. Exclude unprompted details, internal methodology, background directions, and sensitive identifiers:
+7. Exclude unprompted details, internal methodology, background directions, and sensitive identifiers:
    1. Contain only what the document type expressly requires; omit unprompted information.
    2. Do not explain obvious context, donor restrictions, internal costing models, or directions such as "We did this to comply with..." or "As directed...".
    3. Do not state what an organization decided not to do.
-7. Restrict frontmatter and metadata to short structured values. Exclude rationale, working notes, verification commentary, and process narration.
-8. Every sentence must narrow, contextualize, instruct, verify, warn, or connect. Remove decorative contrast, diminish-to-elevate phrasing, promotional claims, filler, chatbot language, and placeholders.
-9. Do not use U+2014 em dashes in normal prose, except when introducing a list.
-10. Lists should prefer ordered lists over bulleted lists.
-11. Do not use "Next steps" as a header in deliverables or correspondence; use professional, context-appropriate headings such as "Recommendations" or "Action Requested".
-12. When drafting formal external correspondence across letters and emails:
+8. Restrict frontmatter and metadata to short structured values. Exclude rationale, working notes, verification commentary, and process narration.
+9. Every sentence must narrow, contextualize, instruct, verify, warn, or connect. Remove decorative contrast, diminish-to-elevate phrasing, promotional claims, filler, chatbot language, and placeholders.
+10. Do not use U+2014 em dashes in normal prose, except when introducing a list.
+11. Lists and spacing in instruments:
+    1. Do not use bullet lists in legislative, prescriptive, or declaratory instruments. Use ordered lists.
+    2. Separate list items with blank lines for rendered spacing.
+    3. Nest with (a), (b), then (i), (ii). Use Roman numerals where Arabic numerals would create ambiguity with nearby numeric references.
+    4. Verify rendered list spacing in every fixed-page artifact.
+    5. These list rules do not apply to technical documentation, code comments, README files, or developer guides.
+12. The Purpose and Background of an administrative order or circular, and the recitals of a resolution, state only the occasion for the instrument and the facts that control it, without argument, explanation, or deliberation.
+13. Do not use "Next steps" as a header in deliverables or correspondence; use professional, context-appropriate headings such as "Recommendations" or "Action Requested".
+14. When drafting formal external correspondence across letters and emails:
     1. Subjects and reference lines must use Title Case with periods separating distinct clauses, never sentence case or colons replacing em dashes.
     2. Formal letters must follow institutional letterhead and pagination standards: include sender letterhead, formal date of dispatch, recipient legal name and full institutional address, formal reference line, formal salutation, operative narrative, recommendations or action requested, formal closing, and full signature block.
     3. In email correspondence, never use tables; format structured data with ordered text items to prevent email client rendering failures. In formal letters, format tables cleanly per pagination standards.

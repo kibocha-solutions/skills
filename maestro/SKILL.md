@@ -7,7 +7,7 @@ description: Plan, track, resume, verify, and archive substantial or multi-sessi
 
 ## 1. Orient
 
-1. Identify the project root.
+1. Identify the project root. Discover the repository's agent instruction and state directories. Names vary across tools: look for `AGENTS.md`, `CLAUDE.md`, and hidden directories such as `.agents/`, `.claude/`, `.cursor/`, or `.github/`, plus any memory index, handoff folder, or sessions folder they reference.
 2. Read `.agents/MEMORY.md` in full when it exists.
 3. Read every topic file linked from relevant memory entries.
 4. Read relevant files in `.agents/brain/handoffs/`.

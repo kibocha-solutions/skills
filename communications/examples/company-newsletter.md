@@ -1,3 +1,6 @@
+> [!NOTE] Internal Communication Carve-Out
+> This example applies exclusively to informal internal company newsletters. The instrument-class list rules (AGENTS.md §9.11 and Rule C) and formal correspondence standards govern formal external correspondence, official notices, letters, and instruments, which prohibit bullet lists. Bullets in this example are permitted solely for internal informal digest purposes.
+
 ## Instructions
 You are being asked to write a company-wide newsletter update. You are meant to summarize the past week/month of a company in the form of a newsletter that the entire company will read. It should be maybe ~20-25 bullet points long. It will be sent via Slack and email, so make it consumable for that.
 

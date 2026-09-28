@@ -24,7 +24,11 @@ Read [the register guide](references/register-guide.md).
 2. Detect the existing register when editing supplied text.
 3. Preserve the existing register unless the user requests elevation or the supplied instructions require another register.
 4. State a material register mismatch before changing it.
-5. Use the instrument type to select a register when no text or tier is supplied.
+5. Use the instrument class (AGENTS.md §9.2) and instrument type to select an authority register and modal set when no text or tier is supplied:
+   1. Legislative instruments (constitution, charter, by-law, standing orders, resolution, administrative order): Formal, Sovereign, or Archaic register using `shall`.
+   2. Prescriptive instruments (policy, code, framework, standard, procedure, SOP, manual, protocol, guideline): Standard or Formal register using `must` for obligations and `will` for scope, application, and declared legal effects.
+   3. Declaratory instruments (circular, advisory, notice, certificate, determination, minutes, correspondence): Standard or Formal register without command modals.
+   4. Procedure, SOP, manual, and protocol steps: imperative mood, opening with the responsible position.
 6. Use Standard for accessible policies, notices, terms, and simple agreements.
 7. Use Formal for commercial contracts, resolutions, deeds, and institutional agreements.
 8. Use Sovereign for constitutions, charters, treaties, and foundational instruments.
@@ -84,9 +88,15 @@ Read [the register guide](references/register-guide.md).
 1. State obligations as commands.
 2. State permissions and rights as grants.
 3. Do not make the instrument beg, hope, encourage, or request compliance.
-4. Use `must` for Standard obligations unless the governing convention requires another modal.
-5. Use `shall` for Formal, Sovereign, and Archaic obligations.
+4. Select the modal by instrument class as defined in AGENTS.md §9.2:
+   1. Legislative instruments: `shall` for obligations and declared effects.
+   2. Prescriptive instruments: `will` for declared effects; `must` for obligations.
+   3. Declaratory instruments: no command modals.
+   4. Procedure steps: imperative mood.
+5. Use `shall` for Formal, Sovereign, and Archaic obligations when the instrument is legislative.
 6. Use `may` for permissions.
+7. Never leave a legal effect in the bare present tense in a legislative or prescriptive instrument.
+8. Never assign a duty to a thing, document, agreement, system, or passive subject. Name the responsible position.
 
 ### Doctrine 5: Supremacy and subordination
 
@@ -105,9 +115,9 @@ Read [the register guide](references/register-guide.md).
 
 ### Doctrine 7: Application severability
 
-1. Use ordinary severability for Standard and Formal instruments.
+1. Use ordinary severability for prescriptive instruments (with `will` for declared effects per AGENTS.md §9.2).
 2. Preserve unaffected provisions when severance is legally possible.
-3. Use sovereign-core protection for Sovereign and Archaic instruments when severance would defeat the instrument's essential intent.
+3. Use sovereign-core protection (with `shall`) for supreme governing instruments when severance would defeat the instrument's essential intent.
 4. Distinguish partial invalidity, total invalidity, prospective effect, and retroactive effect.
 
 ### Doctrine 8: Sentinel audit
@@ -129,15 +139,16 @@ Read [the register guide](references/register-guide.md).
 ## 6. Draft the instrument
 
 1. Draft definitions before provisions that depend on them.
-2. Draft powers, rights, duties, and prohibitions before procedures and remedies.
-3. Draft triggers before consequences.
-4. Draft exceptions immediately after the rule they qualify.
-5. Draft conflict, amendment, severability, survival, commencement, and execution provisions in the instrument's required order.
-6. Use direct role-attributed commands.
-7. Use the fewest words that preserve legal effect.
-8. Remove redundant flourish, synonym stacks, generic recitals, and duplicated safeguards.
-9. Keep drafting rationale, compliance narration, status language, and unresolved questions out of the instrument.
-10. Keep titles human-readable. Do not expose internal file paths or production notes.
+2. State every definition as "A **Term** is ...", never "means". Adopt a term already defined in a controlling instrument by reference, without redefining it.
+3. Draft powers, rights, duties, and prohibitions before procedures and remedies.
+4. Draft triggers before consequences.
+5. Draft exceptions immediately after the rule they qualify.
+6. Draft conflict, amendment, severability, survival, commencement, and execution provisions in the instrument's required order.
+7. Use direct role-attributed commands.
+8. Use the fewest words that preserve legal effect.
+9. Remove redundant flourish, synonym stacks, generic recitals, and duplicated safeguards.
+10. Keep drafting rationale, compliance narration, status language, and unresolved questions out of the instrument.
+11. Keep titles human-readable. Do not expose internal file paths or production notes.
 
 ## 7. Verify the draft
 

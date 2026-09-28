@@ -55,6 +55,13 @@ Use these rules for Word, PDF, printed slides, and other fixed-page outputs.
 1. Suppress the visible folio on page 1.
 2. Show Arabic numbering from page 2 onward.
 
+## Lists and spacing in instruments
+
+1. Do not use bullet lists in legislative, prescriptive, or declaratory instruments. Use ordered lists.
+2. Separate list items and numbered steps with blank lines to preserve rendered paragraph spacing in Word and PDF outputs.
+3. Nest items with (a), (b), then (i), (ii). Use upper-case Roman numerals (I., II., III.) where Arabic numerals would create ambiguity with nearby numeric references.
+4. Verify rendered list indentation, numbering hierarchy, and blank-line spacing in every fixed-page artifact per AGENTS.md §9.11.
+
 ## Final procedure
 
 1. Freeze the source.

@@ -17,7 +17,7 @@ External correspondence represents the organization to outside stakeholders, reg
    2. Avoid casual greetings such as `Hi`, `Hello`, or `Greetings`.
 
 3. **Operative Narrative**:
-   1. State the primary purpose in the opening paragraph.
+   1. State the primary purpose in the opening paragraph using the declaratory register (AGENTS.md §9.2): simple present for a stated position or present fact, past tense for a completed event, and `will` for a future event. Do not use command modals (`shall`, `must`).
    2. Provide necessary context concisely without speculation or hedge words.
    3. Group information into logical subsections with descriptive titles when correspondence exceeds one page.
    4. Refer to external documents by formal reader-facing title only. Never leak file paths or internal git hashes.
@@ -42,7 +42,7 @@ External correspondence represents the organization to outside stakeholders, reg
 
 3. **List Punctuation and Structure**:
    1. Use a U+2014 em dash `—` specifically at the end of an introductory clause to introduce a list.
-   2. Prefer ordered lists over bulleted lists.
+   2. Follow Rule C (AGENTS.md §9.11): do not use bullet lists in formal correspondence or attached instruments; use ordered lists with a blank line after every list item; nest with (a), (b), then (i), (ii).
    3. End list items with proper punctuation such as periods or semicolons.
 
 4. **Attachments**:

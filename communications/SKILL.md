@@ -33,7 +33,7 @@ license: Complete terms in LICENSE.txt
 Read [external correspondence standards](references/external-correspondence-standards.md).
 Inspect [external correspondence examples](examples/external-correspondence-examples.md) for contrasting good versus bad implementations.
 
-1. Use a formal tone.
+1. Use a formal tone and the declaratory register (AGENTS.md §9.2): simple present for a stated position or present fact, past tense for a completed event, and `will` for a future event. Do not use command modals (`shall`, `must`).
 2. Address the recipient directly.
 3. State the necessary context.
 4. State the requested action, decision, or information.
@@ -49,7 +49,7 @@ Inspect [external correspondence examples](examples/external-correspondence-exam
    cleanly per pagination standards.
 9. Use a U+2014 em dash `—` specifically to introduce a list; do not use em
    dashes in normal flowing prose.
-10. Prefer ordered lists over bulleted lists.
+10. In formal external correspondence and any attached or governing instruments, follow Rule C (AGENTS.md §9.11): do not use bullet lists; use ordered lists with a blank line after every list item; nest with (a), (b), then (i), (ii).
 11. Never use "Next steps" as a communication header; use "Recommendations" or
     "Action Requested".
 12. Introduce attachments in the opening or body text when reader attention is
@@ -103,7 +103,7 @@ Before delivering any communication, confirm evidence exists for each item:
 - [ ] Formal letters conform to letterhead and pagination standards.
 - [ ] No tables in email correspondence; structured data formatted as ordered text.
 - [ ] No U+2014 em dashes in normal prose, except when introducing a list.
-- [ ] Ordered lists preferred over bulleted lists.
+- [ ] No bullet lists in formal external correspondence or attached instruments; ordered lists used with blank-line spacing per Rule C (AGENTS.md §9.11).
 - [ ] No "Next steps" headers used; "Recommendations" or context-appropriate headers used.
 - [ ] No detached attachments block at the bottom of correspondence.
 - [ ] Recipient, purpose, deadlines, and requested actions stated directly.

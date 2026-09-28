@@ -150,3 +150,14 @@ Remove:
 - [ ] No rhetorical contrast survives under altered wording.
 - [ ] No chatbot, placeholder, citation, or tracking residue remains.
 - [ ] The final full read passes.
+
+## Drafting-language residue
+
+Check for these patterns that signal incorrect modal register or definition format:
+
+1. **`means` definitions**: Search for the word "means" used to introduce a defined term. Correct form: "A **Term** is ...", never "means".
+2. **Bare present-tense legal effects in prescriptive instruments**: Search for phrases such as "does not apply", "is void", "has no legal effect", "remains in effect" in policies, codes, frameworks, standards, procedures, SOPs, manuals, protocols, and guidelines. The correct prescriptive modal is `will`: "will not apply", "will be void", "will have no legal effect", "will remain in effect".
+3. **`shall` in prescriptive instruments**: Search for `shall` in policies, procedures, SOPs, manuals, protocols, and guidelines. Prescriptive instruments use `must` for obligations and `will` for declared effects. Reserve `shall` for legislative instruments.
+4. **Bullet lists in instruments**: Search for unordered (bullet) lists in legislative, prescriptive, or declaratory instruments. Replace with ordered lists separated by blank lines.
+5. **Duties assigned to things**: Search for constructions where a document, agreement, system, policy, or other inanimate subject is given a duty. Reattribute to the responsible position.
+6. **Argument in Background or recitals**: Check that Purpose, Background, and recital sections state only the occasion and controlling facts, without argument, explanation, or deliberation.

@@ -26,14 +26,16 @@ This policy establishes key rotation schedules to secure system access.
 
 ## 2. Key Rotation Procedure
 
-1. Engineers must rotate SSH access keys every 90 calendar days.
-2. The platform team invalidates any active key exceeding 90 days of age.
-3. Replace expired keys through the identity portal before requesting production access.
+1. Engineers: rotate SSH access keys every 90 calendar days.
+
+2. Platform engineers: invalidate active keys exceeding 90 days of age.
+
+3. System administrators: replace expired keys through the identity portal before requesting production access.
 ```
 
 Why this succeeds:
 - Separates rationale into Purpose.
-- Operational steps are numbered, imperative, and role-attributed.
+- Operational steps are numbered, imperative, and role-attributed, with blank lines between steps.
 - No compliance narration or internal path leaks.
 - Uses exact numbers without hedging.
 
@@ -102,8 +104,10 @@ This procedure establishes mandatory purchasing thresholds and competitive quota
 
 ## 2. Procurement Thresholds
 
-1. Purchases up to 50,000 KES require one approved purchase requisition.
-2. Purchases exceeding 50,000 KES require three written competitive quotations before purchase order issuance.
+1. The procurement officer must obtain one approved purchase requisition for any purchase up to 50,000 KES.
+
+2. The procurement officer must obtain three written competitive quotations before issuing any purchase order exceeding 50,000 KES.
+
 3. The finance officer must verify quotation compliance before disbursing funds.
 ```
 
@@ -111,5 +115,57 @@ Why this succeeds:
 - Contains zero progress markers, self-disclaimers, or protective warnings.
 - Contains only the operative content required by the document type.
 - Omits unprompted registration numbers, internal costing models, and donor constraint explanations.
+- Assigns duties to responsible positions, not inanimate things.
+- Separates list items with blank lines per Rule C.
 - Relies on chat for clarifying questions, keeping the deliverable canvas clean and production-ready.
+
+## 4. Definitions and Prescriptive Modals
+
+### Bad (Present-Tense Legal Effects and "Means" Definitions)
+
+```markdown
+# Data Protection Policy
+
+## 1. Definitions
+
+1. Personal Data means any information relating to an identified or identifiable natural person.
+2. Breach means a breach of security leading to accidental or unlawful destruction of data.
+
+## 2. Scope and Application
+
+1. This Policy applies to all staff and contractors.
+2. Any violation constitutes serious misconduct.
+3. If any provision is invalid, it does not apply. The remainder remains in effect.
+```
+
+Why this fails:
+- Uses "means" instead of "A **Term** is ...".
+- Leaves legal effects in bare present tense ("applies", "constitutes", "does not apply", "remains in effect").
+- Fails to separate list items with blank lines.
+
+### Good (Standard Definition Format and Prescriptive Modals)
+
+```markdown
+# Data Protection Policy
+
+## 1. Definitions
+
+1. A **Personal Data Record** is any recorded information relating to an identified or identifiable natural person.
+
+2. A **Security Breach** is any incident leading to accidental or unlawful destruction, loss, alteration, or unauthorized disclosure of protected data.
+
+## 2. Scope and Application
+
+1. This Policy will apply to all staff, contractors, and institutional affiliates.
+
+2. Any violation will constitute serious misconduct subject to formal disciplinary proceedings.
+
+3. If any provision of this Policy is determined invalid or unenforceable, that provision will be severed, and the remaining provisions will continue in full force and effect.
+```
+
+Why this succeeds:
+- Uses the standard definition formula: "A **Term** is ...", never "means".
+- Uses `will` for scope, application, and declared legal effects per AGENTS.md §9.2.
+- Uses `must` for obligations and role attribution.
+- Separates ordered list items with blank lines per Rule C.
 
