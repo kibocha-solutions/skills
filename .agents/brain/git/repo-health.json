@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-28T19:28:00+03:00",
+  "captured_at": "2026-09-28T19:50:00+03:00",
   "branch": "main",
   "identity": {
     "user_name": "JohnKibocha",
@@ -11,10 +11,10 @@
     "full_log_command": "git log --show-signature -2 --date=iso-strict --format=fuller",
     "entries": [
       {
-        "raw": "commit 1c5ab3292c14bff18a7aea3f72b119f743a67151\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-27T12:24:58+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-27T12:24:58+03:00\n\n    chore(session): record bootstrap propagation and git health audit completion\n\n    Record completion of the bootstrap synchronization and workspace git health audit within the active session tasks file. Tracks parameter normalization across repository caches and verification of agent mirrors."
+        "raw": "commit fff85e968657a712e28b7d37f868b33d080b7829\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-28T19:29:10+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-28T19:29:10+03:00\n\n    fix(drafting): establish instrument-class modal register, definition format, and list rules\n\n    Establish explicit modal registers for legislative, prescriptive, and declaratory instruments across governance and drafting standards. Replace present-tense legal effects and means formulas with designated command modals and standard definition syntax. Enforce ordered list structures with blank-line spacing in instruments and formal correspondence, while isolating technical documentation conventions from legal drafting requirements."
       },
       {
-        "raw": "commit 36e29acc3cc2d05371594297634838d5fb82d8f6\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-27T12:22:01+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-27T12:22:01+03:00\n\n    chore(repo): update repository health cache with current commits and signing path\n\n    Record current signed commit entries and verify workstation Bitwarden signing parameters in the git health cache. This aligns cache metadata with active repository state and ensures consistent verification across development environments."
+        "raw": "commit 1c5ab3292c14bff18a7aea3f72b119f743a67151\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-27T12:24:58+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-27T12:24:58+03:00\n\n    chore(session): record bootstrap propagation and git health audit completion\n\n    Record completion of the bootstrap synchronization and workspace git health audit within the active session tasks file. Tracks parameter normalization across repository caches and verification of agent mirrors."
       }
     ],
     "inferred_convention": "conventional-commits"

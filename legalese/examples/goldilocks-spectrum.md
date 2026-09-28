@@ -34,7 +34,7 @@
 
 ### Formal
 
-> This Article shall not be subject to amendment, repeal, or modification by any person, body, or instrument. Any purported amendment is null and void.
+> This Article shall not be subject to amendment, repeal, or modification by any person, body, or instrument. Any purported amendment shall be null and void.
 
 ### Sovereign
 

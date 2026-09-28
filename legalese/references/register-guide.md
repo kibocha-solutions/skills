@@ -1,10 +1,12 @@
 # Authority Register Guide
 
+Instrument class selects the modal verb (per the global rules, section 9.2) and register tier selects diction and structure, so a Standard-tier legislative clause uses `shall`.
+
 ## Register table
 
 | Dimension | Standard | Formal | Sovereign | Archaic |
 |---|---|---|---|---|
-| Obligation | must (duty), will (declared effect) | shall | shall | shall, doth |
+| Obligation | must (duty), will (declared effect) in prescriptive instruments; shall in legislative instruments | shall | shall | shall, doth |
 | Permission | may | may | sovereign grant | archaic sovereign grant |
 | Latin | universal terms of art | established domain terms | precise classical terms | classical and rare terms |
 | Conflict opener | direct conflict rule | notwithstanding for identified conflict | notwithstanding | extended classical opener |
@@ -17,11 +19,12 @@
 
 Use:
 
-- must (obligations)
-- will (scope, application, and declared legal effects)
+- shall for obligations and declared legal effects in legislative instruments
+- must (obligations in prescriptive instruments)
+- will (scope, application, and declared legal effects in prescriptive instruments)
 - may (options)
 - agrees to
-- is entitled to
+- will be entitled to for prescriptive instruments
 - will not apply (prescriptive invalidity)
 - will be void and unenforceable (prescriptive invalidity)
 - will have no legal effect (prescriptive invalidity)
@@ -35,8 +38,8 @@ Do not use:
 - sovereign finality
 - unexplained Latin
 - nested clauses deeper than two levels
-- `shall` (reserved for legislative instruments)
-- bare present tense for declared legal effects (use `will` instead)
+- `shall` in prescriptive or declaratory instruments (instrument class selects the modal, so a Standard-tier legislative clause uses `shall`)
+- bare present tense for declared legal effects (use `shall` or `will` per instrument class)
 
 Structure:
 
