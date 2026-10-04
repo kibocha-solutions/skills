@@ -35,7 +35,7 @@ import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-VERSION = "2.2.0"
+VERSION = "2.3.0"
 IMAGE_REPO = "docker.io/jetbrains/writerside-builder"
 DEFAULT_IMAGE_TAG = "2026.08.0328"
 NGINX_IMAGE = "docker.io/library/nginx:alpine"
@@ -1359,10 +1359,10 @@ def cmd_serve(args: argparse.Namespace, ui: UI) -> int:
     if not args.dev and any(project.gated(i) for i in project.instances):
         hidden = [i.id for i in project.instances if project.gated(i)]
         ui.hint(f"behind the dev gate: {', '.join(hidden)} (serve them with --dev)")
-    if args.background:
-        ui.hint("stop with: wrs stop   ·   status: wrs status   ·   open: wrs open <instance>")
-        return EXIT_OK
-    return follow_server(ui, rt, name, state)
+    if args.follow:
+        return follow_server(ui, rt, name, state)
+    ui.hint("stop with: wrs stop   ·   status: wrs status   ·   open: wrs open <instance>")
+    return EXIT_OK
 
 
 def wait_healthy(endpoints: list[tuple[str, int]], seconds: float) -> bool:
@@ -1668,9 +1668,9 @@ def cmd_doctor(args: argparse.Namespace, ui: UI) -> int:
 EPILOG = """examples:
   wrs build                 build every instance
   wrs build internal        build one instance
-  wrs serve                 build what is missing, serve ungated instances, follow requests
+  wrs serve                 build what is missing, serve ungated instances in the background
   wrs serve --dev           open the dev gate (Bitwarden or 1Password) and serve every tier
-  wrs serve -d -b           dev mode in the background (stop with: wrs stop)
+  wrs serve -f              serve and follow request logs in the foreground
   wrs check                 confirm no lower-tier page references a higher tier
   wrs status                builds, pages, and URLs at a glance
   wrs update --pull         fetch the latest builder image
@@ -1708,7 +1708,9 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("instances", nargs="*")
     s.add_argument("-d", "--dev", action="store_true",
                    help="open the dev gate and serve every tier locally")
-    s.add_argument("-b", "--background", action="store_true", help="run in the background")
+    s.add_argument("-b", "--background", action="store_true", help="run in the background (default)")
+    s.add_argument("-f", "--follow", action="store_true",
+                   help="follow server logs in foreground until stopped")
     s.add_argument("--build", action="store_true", help="rebuild before serving (missing sites always build)")
     s.add_argument("-j", "--jobs", type=int, help="parallel builds with --build")
     s.add_argument("--image-tag", help="builder image tag with --build")
