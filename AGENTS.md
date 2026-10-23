@@ -47,6 +47,14 @@ Read every non-code artifact manually in full from start to finish before acting
 3. Preserve deliberate duplication across memory stores; read each independently.
 4. Use `maestro` for multi-step work. Resume matching active sessions and record added scope before performing it.
 5. Keep plans, memory, handoffs, sessions, and state under `.agents/`. Keep native entrypoint files where hosts require them.
+6. Revertability requirement: Ensure every active project maintains clean rollback capability before modifying files.
+7. Uninitialized repository procedure: When a project directory has no Git repository:
+   1. Stop and notify the user that no Git repository is initialized.
+   2. Deduce the appropriate identity by inspecting all available clues, starting within the repository itself (project metadata, license, configuration, existing authorship files), expanding outward through surrounding directory context, and using repository path elements as the final clue. If no contextual clues identify the preferred account, propose a best-guess default identity.
+   3. Ask the user to confirm the proposed identity and whether commits must be signed before creating any commit.
+8. Baseline snapshot: Once Git is configured, stage the entire project (excluding build artifacts, dependencies, and gitignored files) and commit an initial baseline checkpoint to enable clean rollback.
+9. Checkpoint isolation: Record intermediate rollback states using explicit checkpoint prefixes on a dedicated working branch, separating volatile working states from durable commits.
+10. Checkpoint consolidation: Never push checkpoint commits to shared history. Upon final verification and approval, consolidate intermediate checkpoints into the authorized durable commits formatted to `ci-cd/SKILL.md` standards and prune the ephemeral working branch.
 
 ## 5. Permission and scope
 
@@ -131,7 +139,7 @@ Read every non-code artifact manually in full from start to finish before acting
 
 ## 10. Usage monitoring and quota continuity
 
-1. Periodic quota tracking: Use available platform tools, commands, or metadata to track active usage windows periodically throughout execution.
+1. Periodic quota tracking: Use available platform tools, commands, or metadata to track active usage windows periodically throughout execution (checking at least once every 30 minutes during active work) to avoid being caught unprepared as limits approach exhaustion.
 2. Window classifications: Classify active quota limits into two operational tiers:
    1. Short windows: Any quota window resetting in less than 3 days (such as rolling minute, hourly, 5-hour, 24-hour, or 48-hour periods).
    2. Long windows: Any quota window lasting 3 days or longer (such as 3-day, 5-day, 7-day, 14-day, or 30-day periods).
