@@ -43,7 +43,7 @@ Target: `~/.claude/settings.json`
 ```
 
 Behavior:
-- `enforce-claude-rules.sh` outputs the plain text compliance mandate.
+- `enforce-claude-rules.sh` outputs the plain text Standing User Operational Notice.
 - `ensure-claude-link.sh` verifies `~/.claude/CLAUDE.md` and sparse checkout.
 
 ### Gemini Antigravity

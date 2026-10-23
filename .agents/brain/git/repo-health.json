@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-09-28T19:50:00+03:00",
+  "captured_at": "2026-10-23T18:57:00+03:00",
   "branch": "main",
   "identity": {
     "user_name": "JohnKibocha",
@@ -11,10 +11,10 @@
     "full_log_command": "git log --show-signature -2 --date=iso-strict --format=fuller",
     "entries": [
       {
-        "raw": "commit fff85e968657a712e28b7d37f868b33d080b7829\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-28T19:29:10+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-28T19:29:10+03:00\n\n    fix(drafting): establish instrument-class modal register, definition format, and list rules\n\n    Establish explicit modal registers for legislative, prescriptive, and declaratory instruments across governance and drafting standards. Replace present-tense legal effects and means formulas with designated command modals and standard definition syntax. Enforce ordered list structures with blank-line spacing in instruments and formal correspondence, while isolating technical documentation conventions from legal drafting requirements."
+        "raw": "commit 18cfe26d4d1bfb6d63a891be41f6558a19766e9a\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-10-05T01:35:30+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-10-05T01:35:30+03:00\n\n    feat(documentation): support non-blocking server execution in writerside wrapper\n\n    Configure the documentation server to run non-blocking by default, returning terminal control immediately once local health checks pass and endpoints become available. Introduce an explicit follow flag for foreground log inspection while preserving background argument compatibility."
       },
       {
-        "raw": "commit 1c5ab3292c14bff18a7aea3f72b119f743a67151\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-27T12:24:58+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-27T12:24:58+03:00\n\n    chore(session): record bootstrap propagation and git health audit completion\n\n    Record completion of the bootstrap synchronization and workspace git health audit within the active session tasks file. Tracks parameter normalization across repository caches and verification of agent mirrors."
+        "raw": "commit 8136faa083892f6e9b4674dc33fb9ee66dd141c2\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-28T19:51:04+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-28T19:51:04+03:00\n\n    fix(legalese): reconcile modal selection with register tier and fix entrenchment consequence\n\n    State that instrument class controls modal selection while register tier governs diction and structure, permitting standard-tier legislative provisions to command through designated modals. Reconcile standard-tier guidance to permit legislative commands, record entitlement phrasing for prescriptive instruments, and mandate declared invalidity consequences in entrenchment provisions."
       }
     ],
     "inferred_convention": "conventional-commits"
@@ -31,9 +31,7 @@
   "ssh_signing_path": {
     "path": "bitwarden-linux",
     "evidence": [
-      "core.sshCommand=~/.ssh/ssh-keygen-bitwarden.sh (global ~/.gitconfig)",
-      "gpg.ssh.program=~/.ssh/ssh-keygen-bitwarden.sh (global ~/.gitconfig)",
-      "SSH_AUTH_SOCK uses the Bitwarden desktop agent socket",
+      "SSH_AUTH_SOCK uses the keyring socket",
       "GitHub authentication succeeds with the configured github.com identity",
       "the signing public-key fingerprint matches the trusted signer entry"
     ],
@@ -44,13 +42,13 @@
     "cli": "gh",
     "installed": true,
     "authenticated": true,
-    "auth_checked_at": "2026-09-27T12:20:00+03:00",
+    "auth_checked_at": "2026-10-23T18:57:00+03:00",
     "preferred_for_remote_operations": true
   },
   "signing": {
     "gpg_format": "ssh",
-    "signing_key": "~/.ssh/ssh-signing-key-universal.pub",
-    "allowed_signers_file": "~/.ssh/allowed_signers",
+    "signing_key": "/home/vaelric/.ssh/ssh-signing-key-universal.pub",
+    "allowed_signers_file": "/home/vaelric/.ssh/allowed_signers",
     "signing_expected": true,
     "signing_intentionally_disabled": false
   },
