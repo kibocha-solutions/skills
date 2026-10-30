@@ -23,3 +23,13 @@ State: VERIFYING
 - [ ] Evaluate, validate, and package both skills
 - [ ] Commit and push the authorized change set
 - [ ] Bootstrap installed hosts and verify synchronization
+
+## Added: Coordination IDs and Child Lifecycle
+- [/] Define role-based IDs, controlled child delegation, and safe ID reuse
+- [ ] Add lifecycle examples and evaluation cases
+- [ ] Validate the amended skill and record results
+
+## Added: Coordinator Rollover
+- [x] Define predecessor cleanup and `0009` to `0000` handoff
+- [x] Add rollover examples and evaluation cases
+- [ ] Run the full skill evaluation and publish the amendment when authorized

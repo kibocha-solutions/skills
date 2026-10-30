@@ -22,3 +22,9 @@ Read each changed file and the proposal in full. Check the checkpoint authorizat
 
 ## Blocking Questions
 None for the proposal or source rule edits.
+
+## Added: Coordination ID Amendment
+
+Add role-specific four-digit IDs, coordinator-controlled child creation, a shared child registry, and lifecycle cleanup. Preserve the existing one-coordinator, three-visible-chat, and shared workload limits. Use prefix `1` for inspectors and `2` for executors; coordinator IDs run from `0000` through `0009`. Verify reuse only follows confirmed deletion and test the ten-child cleanup threshold.
+
+Changes: `coordinator/SKILL.md`, `coordinator/references/delegation.md`, `coordinator/references/contracts.md`, `coordinator/examples/coordination.md`, and `coordinator/evals/evals.json` [MODIFY]; `coordinator/references/task-ids.md` [NEW].

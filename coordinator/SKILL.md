@@ -22,9 +22,10 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 3. Count a successor's running chat toward the same three-chat limit during handoff.
 4. Assign executor and inspector roles to different agents for each deliverable.
 5. Reserve and release slots using confirmed platform state; queue work when a slot is unavailable.
-6. Allow a worker to request narrow sub-agent work through the coordinator; dispatch only with coordinator approval and platform authorization.
+6. Allow an executor or inspector to request a child task or sub-agent from the coordinator; grant requests at the coordinator's discretion within the shared limits and platform authorization.
 7. Keep sub-agents rare and task-specific; apply the shared usage, concurrency, and resource budget to all nested work.
-8. Read [delegation and resource controls](references/delegation.md) for channel selection, model selection, shared resources, and worker limits.
+8. Assign role-based IDs and manage child lifecycles using [task IDs and cleanup](references/task-ids.md).
+9. Read [delegation and resource controls](references/delegation.md) for channel selection, model selection, shared resources, and worker limits.
 
 ## 3. Delegate bounded work
 
@@ -60,6 +61,6 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 
 1. Stop completed workers and verify that no assigned work remains running.
 2. Preserve required evidence and report outcomes, verification, blockers, and exact remaining work.
-3. Delete task-created chats when an authorized deletion capability exists and required records are preserved.
+3. Delete completed task-created children and release their IDs only after confirmed deletion, following [task IDs and cleanup](references/task-ids.md).
 4. Preserve pre-existing user chats; report when deletion is unavailable.
 5. Read [examples](examples/coordination.md) for assignment, inspection, and successor patterns.

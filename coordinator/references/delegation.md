@@ -4,10 +4,11 @@
 
 1. Use a visible chat for sustained execution, independent inspection, a user-visible workstream, or a successor coordinator.
 2. Use a sub-agent only for a narrow, self-contained assignment that does not need its own user-facing lifecycle.
-3. Do not create a sub-agent for every small operation. A worker may request one through the coordinator.
-4. Share the overall usage budget and the two-heavy-worker limit across the entire team, including nested agents.
-5. Record every active worker, parent, assignment, budget, and state in the coordinator ledger.
-6. Honor lower platform concurrency limits and do not represent a sub-agent as a visible chat.
+3. Do not create a sub-agent for every small operation. An executor or inspector may request a child task or sub-agent through the coordinator.
+4. Let the coordinator approve or decline each child request at its discretion within platform permissions, the visible-chat cap, and shared usage and workload limits.
+5. Share the overall usage budget and the two-heavy-worker limit across the entire team, including nested agents.
+6. Record every active worker, parent, assignment, budget, and state in the coordinator ledger.
+7. Honor lower platform concurrency limits and do not represent a sub-agent as a visible chat.
 
 ## Model and budget
 

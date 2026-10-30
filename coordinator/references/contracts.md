@@ -4,7 +4,7 @@
 
 Include each field in a delegation:
 
-1. ID, role, coordinator, channel, and model when selectable.
+1. Coordination ID, parent ID, role, coordinator, platform task identifier, channel, and model when selectable.
 2. One finite outcome, inputs, owned paths or records, and exclusions.
 3. Authorized actions, prohibited actions, dependencies, and resource lease.
 4. Deliverables, acceptance criteria, evidence, and independent inspector.
