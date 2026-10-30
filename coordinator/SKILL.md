@@ -30,14 +30,18 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 ## 3. Delegate bounded work
 
 1. Define finite deliverables, exclusions, dependencies, owners, and acceptance evidence before dispatch.
-2. Use [assignment and result contracts](references/contracts.md) for each assignment.
-3. Explicitly select a lighter available model for every routine, well-defined child task when model selection is supported and permitted; do not rely on the parent's inherited model.
-4. Use a stronger model only when the task requires its judgment or capabilities, the lighter model is unavailable, or the user or governing runtime requires it; record the reason.
-5. Instruct each worker to message its parent when done, blocked, or needing a decision; require workers to pass the same instruction to their children.
-6. Resolve questions from available authority and evidence; escalate to the user only when necessary.
-7. Do not let a worker expand scope or create resources without coordinator authorization and any applicable user approval.
-8. Require parents to acknowledge child reports and relay unresolved concerns to the coordinator promptly.
-9. Keep the coordinator as the sole user-facing contact; request user action only through the coordinator.
+2. Read at least one scenario relevant to the work in [model selection examples](examples/model-selection.md) before choosing a model or dispatching work; apply its principles to other scenarios.
+3. Use [assignment and result contracts](references/contracts.md) for each assignment and instruct each worker to read at least one relevant example before acting.
+4. Explicitly select a lighter available model for every routine, well-defined child task when model selection is supported and permitted; do not rely on the parent's inherited model.
+5. Separate decisions requiring deeper judgment from bounded implementation and inspection; route each part according to its actual requirements.
+6. Use a stronger model only when the task requires its judgment or capabilities, the lighter model is unavailable, or the user or governing runtime requires it; record the reason.
+7. Reassess active assignments when the user corrects the model choice; preserve work and use supported controls to redirect or reassign the remaining bounded work.
+8. Instruct each worker to message its parent when done, blocked, or needing a decision; require workers to pass the same instruction to their children.
+9. Resolve questions from available authority and evidence; escalate to the user only when necessary.
+10. Do not let a worker expand scope or create resources without coordinator authorization and any applicable user approval.
+11. Require parents to acknowledge child reports and relay unresolved concerns to the coordinator promptly.
+12. Keep the coordinator as the sole user-facing contact; request user action only through the coordinator.
+13. Dispatch authorized work directly when the platform permits it; if a required action cannot be performed, report the specific capability or authorization blocker.
 
 ## 4. Control progress and resources
 

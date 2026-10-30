@@ -143,6 +143,39 @@
         "The unavailable model selection is recorded",
         "No model override is claimed"
       ]
+    },
+    {
+      "id": 14,
+      "prompt": "A coordinator must assign a fixed frontend bug and a precise browser inspection. Which examples are read and which models are selected?",
+      "expected_output": "Read a relevant example before dispatch, require workers to read a relevant example, and explicitly choose a suitable lighter model for both bounded tasks.",
+      "files": [],
+      "expectations": [
+        "Coordinator reads at least one relevant scenario before dispatch",
+        "Each worker is instructed to read a relevant example",
+        "Both bounded tasks use a suitable lighter model when available"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "A stronger-model executor is halfway through a mixed batch when the user directs the coordinator to use a lighter model for routine fixes. What now?",
+      "expected_output": "Preserve partial work, use supported controls to redirect or reassign separable routine work, and document genuine design or capability exceptions.",
+      "files": [],
+      "expectations": [
+        "Partial work is preserved",
+        "Remaining routine work is reassigned or redirected when supported",
+        "The coordinator does not retain a stronger model solely because work started"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "A requested task is outside the listed examples but is a precise routine code edit. How should the coordinator route it?",
+      "expected_output": "Apply the examples as principles, select a suitable lighter model, and give an exact bounded contract.",
+      "files": [],
+      "expectations": [
+        "The examples are not treated as an exhaustive list",
+        "A suitable lighter model is selected when available",
+        "The code edit has an explicit bounded contract"
+      ]
     }
   ]
 }

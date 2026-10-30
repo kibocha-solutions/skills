@@ -43,3 +43,8 @@ State: VERIFYING
 - [/] Require explicit lighter-model selection for routine child assignments
 - [ ] Verify examples and selection fallback
 - [ ] Commit, push, and synchronize the amendment
+
+## Added: Model Selection Examples
+- [/] Require coordinators and workers to read relevant examples before acting
+- [ ] Add varied model-routing and bounded-delegation scenarios
+- [ ] Validate and synchronize the revised skill

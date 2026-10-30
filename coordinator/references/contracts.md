@@ -11,6 +11,7 @@ Include each field in a delegation:
 5. Time or tool-call budget, review point, stop condition, and escalation route.
 6. Inherited user constraints and applicable skills.
 7. The parent recipient, supported message channel, and requirement to notify the parent on completion, blockage, or a required decision; pass the same requirement to any children.
+8. At least one relevant example to read before acting, and the corresponding principles to apply to the assignment.
 
 ## Result
 

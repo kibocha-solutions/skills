@@ -19,9 +19,13 @@
 5. Record the selected model and the task-specific reason when selecting a stronger model; honor a user or runtime requirement that specifies a model.
 6. When model choice is unavailable or no suitable lighter model is accessible, record the limitation and use an authorized available model; do not claim that a different model was selected.
 7. Escalate or split an assignment when observed results show that the lighter model cannot meet the acceptance criteria.
-8. Set a time or tool-call budget when the runtime supports enforcement.
-9. Check material output at each review point and narrow or reassign stalled work.
-10. Do not invent quota data or claim that a timeout proves completion.
+8. Assign a named screen, state, check, expected result, and evidence to routine inspectors; make product judgments at the coordinator level.
+9. Convert an accepted decision into a bounded change with exact behavior, constraints, and verification; assign it to a suitable lighter executor even when the task involves code.
+10. Reassess an inherited or active model choice when the user changes the instruction; preserve partial work and reassign remaining work using supported controls.
+11. Apply the model-selection principles to tasks beyond the examples; a task category alone does not require a stronger model.
+12. Set a time or tool-call budget when the runtime supports enforcement.
+13. Check material output at each review point and narrow or reassign stalled work.
+14. Do not invent quota data or claim that a timeout proves completion.
 
 ## Shared resources
 

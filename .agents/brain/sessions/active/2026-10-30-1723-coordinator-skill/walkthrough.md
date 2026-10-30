@@ -31,3 +31,6 @@ Required workers to notify their parent on completion, blockage, or a required d
 
 ## Mandatory Child Model Routing
 Required explicit selection of a suitable lighter model for routine child work when the platform supports it. Added stronger-model exception and unavailable-selection reporting, examples, and evaluation cases. The skill validator, JSON parsing, and diff check passed. A paired read-only scenario returned Luna for the routine task in both versions; the amendment adds an explicit override requirement and fallback. Full benchmark and token metrics were unavailable.
+
+## Mandatory Relevant Examples
+Required the coordinator to read a relevant model-selection example before dispatch and each worker to read an example relevant to its assignment. Added fourteen scenarios covering bounded inspection and code changes, design separation, migrations, batch scope, ambiguous requirements, user corrections, capability limits, credential blockers, and verification. Added instructions to reassess active assignments after model corrections and dispatch authorized work directly when supported. Paired read-only scenarios used the amended and prior skill; both favored lighter models, while the amendment explicitly covers correction of active work and example reading before dispatch. This is a qualitative comparison; full benchmark metrics were not available.
