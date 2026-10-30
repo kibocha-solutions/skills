@@ -35,3 +35,9 @@ Good: Coordinator `0009` preserves the handoff and deletes eligible retired pred
 Bad: A child finishes its inspection and leaves its findings only in its own chat. Another worker waits for credentials without notifying anyone.
 
 Good: The child messages its parent with its result and evidence. The parent acknowledges and forwards the outcome to the coordinator. A worker needing credentials sends its parent a blocker describing the required access without including a secret; the coordinator requests user action through the authorized channel.
+
+## Child model selection
+
+Bad: Launch a routine screenshot inspection with the coordinator's powerful model merely because it is the inherited default.
+
+Good: Select Luna or Haiku explicitly when available and capable of performing the bounded inspection. If only a stronger model has the required browser access, record that limitation and select an authorized model with the necessary tools.

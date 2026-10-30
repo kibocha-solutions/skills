@@ -28,3 +28,6 @@ Added the `0009` rollover sequence: preserve evidence and delete eligible retire
 
 ## Worker Reporting Amendment
 Required workers to notify their parent on completion, blockage, or a required decision and to pass that duty to their children. Parents acknowledge and relay unresolved concerns to the coordinator, who is the user-facing contact. Credential requests specify the access needed without transmitting secrets. Added reporting examples and two evaluation cases. The skill validator and JSON check passed. A paired read-only scenario confirmed the amended reporting chain; the previous version did not explicitly require proactive parent notification. Full benchmark and token metrics were not available.
+
+## Mandatory Child Model Routing
+Required explicit selection of a suitable lighter model for routine child work when the platform supports it. Added stronger-model exception and unavailable-selection reporting, examples, and evaluation cases. The skill validator, JSON parsing, and diff check passed. A paired read-only scenario returned Luna for the routine task in both versions; the amendment adds an explicit override requirement and fallback. Full benchmark and token metrics were unavailable.

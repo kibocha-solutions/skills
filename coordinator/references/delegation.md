@@ -12,12 +12,16 @@
 
 ## Model and budget
 
-1. Match model and reasoning effort to task complexity, required tools, accuracy, and cost.
-2. Prefer a lighter model for precise bounded work when it meets the acceptance criteria.
-3. Use stronger reasoning for ambiguous decomposition, difficult diagnosis, or judgment-heavy review.
-4. Set a time or tool-call budget when the runtime supports enforcement.
-5. Check material output at each review point and narrow or reassign stalled work.
-6. Do not invent quota data or claim that a timeout proves completion.
+1. Inspect the available models and the child-creation tool's model-selection capability before dispatch.
+2. Explicitly select an available lighter model such as Luna or Haiku for routine, well-defined work when it meets the required quality, tool, and authorization constraints.
+3. Do not inherit the coordinator's model by default when an appropriate lighter model can be selected.
+4. Reserve a stronger model for work requiring deeper judgment, difficult diagnosis, complex reasoning, or capabilities unavailable in the lighter model.
+5. Record the selected model and the task-specific reason when selecting a stronger model; honor a user or runtime requirement that specifies a model.
+6. When model choice is unavailable or no suitable lighter model is accessible, record the limitation and use an authorized available model; do not claim that a different model was selected.
+7. Escalate or split an assignment when observed results show that the lighter model cannot meet the acceptance criteria.
+8. Set a time or tool-call budget when the runtime supports enforcement.
+9. Check material output at each review point and narrow or reassign stalled work.
+10. Do not invent quota data or claim that a timeout proves completion.
 
 ## Shared resources
 

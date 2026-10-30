@@ -38,3 +38,8 @@ State: VERIFYING
 - [/] Require completion and blocker messages through each parent to the coordinator
 - [ ] Add reporting examples and evaluation cases
 - [ ] Validate, commit, push, and synchronize the change
+
+## Added: Mandatory Model Routing
+- [/] Require explicit lighter-model selection for routine child assignments
+- [ ] Verify examples and selection fallback
+- [ ] Commit, push, and synchronize the amendment

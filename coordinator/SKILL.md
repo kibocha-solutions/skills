@@ -31,8 +31,8 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 
 1. Define finite deliverables, exclusions, dependencies, owners, and acceptance evidence before dispatch.
 2. Use [assignment and result contracts](references/contracts.md) for each assignment.
-3. Choose the least demanding available model that meets the task's quality, judgment, and tool requirements.
-4. Reserve stronger reasoning models for complex analysis and decisions; escalate when evidence shows a lighter model is insufficient.
+3. Explicitly select a lighter available model for every routine, well-defined child task when model selection is supported and permitted; do not rely on the parent's inherited model.
+4. Use a stronger model only when the task requires its judgment or capabilities, the lighter model is unavailable, or the user or governing runtime requires it; record the reason.
 5. Instruct each worker to message its parent when done, blocked, or needing a decision; require workers to pass the same instruction to their children.
 6. Resolve questions from available authority and evidence; escalate to the user only when necessary.
 7. Do not let a worker expand scope or create resources without coordinator authorization and any applicable user approval.

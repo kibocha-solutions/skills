@@ -113,6 +113,36 @@
         "Only the coordinator requests action from the user",
         "No secret is sent in the message"
       ]
+    },
+    {
+      "id": 11,
+      "prompt": "You are a coordinator using a powerful model. A routine screenshot inspection can be performed by an available Luna worker, and the spawn tool permits selecting its model. What do you select?",
+      "expected_output": "Explicitly select Luna for the bounded inspection rather than inheriting the coordinator model.",
+      "files": [],
+      "expectations": [
+        "The child is assigned Luna explicitly",
+        "The coordinator does not rely on inherited model selection"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "A child must use a browser tool unavailable to the lighter model, and a stronger available model supports it. Choose a model and explain the exception.",
+      "expected_output": "Select the capable stronger model and record the missing browser capability as the reason.",
+      "files": [],
+      "expectations": [
+        "The selected model supports the required browser tool",
+        "The stronger-model exception is documented"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "A child-creation tool does not permit model selection. How should the coordinator proceed?",
+      "expected_output": "Record the limitation and use an authorized available model without claiming a lighter model was selected.",
+      "files": [],
+      "expectations": [
+        "The unavailable model selection is recorded",
+        "No model override is claimed"
+      ]
     }
   ]
 }
