@@ -9,6 +9,8 @@ references without project-specific residue.
 
 - Repository scaffold: `tools/scaffold-skill.py`
 - Active skills:
+  - `coordinator`: manage delegated work, independent inspection, shared resources, and coordinator succession
+  - `human-writer`: revise prose for natural voice and genre-appropriate clarity
   - `documentation`: documentation drafting, Writerside-compatible technical
     documentation, and comment guidance
   - `legalese`: legal drafting across plain-language to sovereign registers

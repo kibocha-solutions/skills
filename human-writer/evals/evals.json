@@ -1,0 +1,8 @@
+{
+  "skill_name": "human-writer",
+  "evals": [
+    {"id": 1, "prompt": "Revise: The service restarted at 09:10. This pivotal turning point highlights the importance of resilience. Preserve the factual content.", "expected_output": "Retain the 09:10 restart and remove unsupported promotional commentary.", "files": [], "expectations": ["The restart time remains 09:10", "No additional operational facts are invented"]},
+    {"id": 2, "prompt": "Revise this short scene while preserving its linear order: Mara closed the ledger. Her chest tightened with dread. She realized that trust once broken could never be repaired.", "expected_output": "Improve the scene without imposing a flashback or changing its intended order.", "files": [], "expectations": ["The scene remains chronological", "The ledger and Mara remain present"]},
+    {"id": 3, "prompt": "Make this instruction more natural: Turn off the valve. Wait 10 minutes. Open the drain. Do not omit any step.", "expected_output": "Retain all three steps and the 10 minute wait in order.", "files": [], "expectations": ["The valve is turned off first", "The wait remains 10 minutes", "The drain is opened after the wait"]}
+  ]
+}

@@ -95,7 +95,7 @@ git log --show-signature -2 --date=iso-strict --format=fuller
 4. Identify the current branch, intended base, publication state, review state,
    and collaborator use.
 5. Identify required checks and release gates.
-6. Stop when the requested mutation lacks authorization.
+6. Stop when the requested mutation lacks authorization. Checkpoint commits and pushes to a dedicated checkpoint branch are authorized by the global checkpoint rule; merges, squashes, and consolidation require explicit user authorization.
 
 ## 5. Select the workflow
 
@@ -249,8 +249,8 @@ git log -1 --format=%B
 1. Confirm the intended base and current branch ownership.
 2. Treat unclear ownership or publication state as shared.
 3. Use a disposable branch or worktree for risky cleanup.
-4. Use `git commit --fixup` for repair commits.
-5. Use `git rebase -i --autosquash` to produce the intended final history.
+4. Use `git commit --fixup` for repair commits when authorized.
+5. Obtain explicit user authorization before squashing or consolidating commits, including `git rebase -i --autosquash`.
 6. Rebase onto the latest parent before shipping.
 7. Verify the final diff and final commit.
 8. Advance one level at a time through the recorded ancestry chain.

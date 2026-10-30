@@ -9,9 +9,9 @@
 5. Use a short-lived topic branch or worktree for isolated work.
 6. Create temporary local commits only when they support safe iteration.
 7. Convert repair commits into fixup commits when appropriate.
-8. Run interactive autosquash only on unshared history.
+8. Obtain explicit user authorization before any squash or consolidation; run interactive autosquash only on unshared history.
 9. Verify the final diff and commit sequence.
-10. Publish only when the user requests publication.
+10. Publish only when the user requests publication, except for checkpoint pushes to a dedicated checkpoint branch under the global checkpoint rule.
 
 ## History gates
 
@@ -21,6 +21,7 @@
 4. Treat uncertain ownership as shared.
 5. Preserve commit boundaries the user requests.
 6. Keep one coherent final commit when independent boundaries add no review value.
+7. Obtain explicit user authorization before every merge, squash, or consolidation.
 
 ## Branch procedure
 
@@ -29,9 +30,9 @@
 3. Record the branch and parent in the repository ancestry log when the project uses one.
 4. Commit during implementation as needed.
 5. Mark repairs with `git commit --fixup=<commit>`.
-6. Run `git rebase -i --autosquash <base>` only after the shared-history check passes.
+6. Run `git rebase -i --autosquash <base>` only after explicit user authorization and the shared-history check pass.
 7. Recheck the resulting tree and history.
-8. Merge or hand off one ancestry level at a time.
+8. Obtain explicit user authorization before merging; merge or hand off one ancestry level at a time.
 9. Delete a temporary branch only after its work is preserved and its ownership is resolved.
 
 ## Final commit

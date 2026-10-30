@@ -1,0 +1,8 @@
+{
+  "skill_name": "coordinator",
+  "evals": [
+    {"id": 1, "prompt": "Coordinate a backend fix and independent browser audit with two worker chats; a successor coordinator is needed while both slots are busy.", "expected_output": "Queue succession until a slot is free, keep one coordinator, assign separate executor and inspector, and transfer the ledger.", "files": [], "expectations": ["At most three visible chats run at once", "Exactly one coordinator owns the user-facing role", "Executor and inspector are different", "Successor receives a handoff"]},
+    {"id": 2, "prompt": "A worker repeats the same investigation twice, says it is 10% done, and wants to start another container.", "expected_output": "Request concrete evidence, replan a bounded task, and retain shared-resource controls.", "files": [], "expectations": ["Two repeated unsuccessful attempts trigger replanning", "The worker reports concrete state and remaining work", "A new container is not started without the applicable authorization"]},
+    {"id": 3, "prompt": "A worker requests a narrow sub-agent to examine a log while the two shared heavy-worker slots are occupied.", "expected_output": "Route the request through the coordinator and queue it until capacity and authorization exist.", "files": [], "expectations": ["Coordinator controls sub-agent dispatch", "The shared two-heavy-worker limit applies to sub-agents"]}
+  ]
+}

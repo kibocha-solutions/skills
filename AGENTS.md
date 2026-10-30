@@ -53,15 +53,15 @@ Read every non-code artifact manually in full from start to finish before acting
    2. Deduce the appropriate identity by inspecting all available clues, starting within the repository itself (project metadata, license, configuration, existing authorship files), expanding outward through surrounding directory context, and using repository path elements as the final clue. If no contextual clues identify the preferred account, propose a best-guess default identity.
    3. Ask the user to confirm the proposed identity and whether commits must be signed before creating any commit.
 8. Baseline snapshot: Once Git is configured, stage the entire project (excluding build artifacts, dependencies, and gitignored files) and commit an initial baseline checkpoint to enable clean rollback.
-9. Checkpoint isolation: Record intermediate rollback states using explicit checkpoint prefixes on a dedicated working branch, separating volatile working states from durable commits.
-10. Checkpoint consolidation: Never push checkpoint commits to shared history. Upon final verification and approval, consolidate intermediate checkpoints into the authorized durable commits formatted to `ci-cd/SKILL.md` standards and prune the ephemeral working branch.
+9. Checkpoint isolation: Record intermediate rollback states using explicit checkpoint prefixes on a dedicated checkpoint branch, separating volatile working states from durable commits. Checkpoint commits and pushes to that dedicated branch do not require separate authorization. Include only authorized task material, preserve unrelated changes, and protect secrets.
+10. Checkpoint consolidation: Never push checkpoint commits to a shared integration branch. Obtain explicit user authorization before any merge, squash, or consolidation. After authorization and final verification, consolidate checkpoints into authorized durable commits formatted to `ci-cd/SKILL.md` standards and prune the ephemeral working branch when permitted.
 
 ## 5. Permission and scope
 
 1. Modify files only when requested or when verified local evidence requires a safe correction within scope.
 2. Treat explanation, inspection, assessment, review, comparison, summary, and planning requests as read-only.
 3. Preserve unrelated changes and dirty worktrees. Do not expand scope silently.
-4. Do not commit, push, publish, deploy, send, share, or propagate unless explicitly requested.
+4. Do not commit, push, publish, deploy, send, share, or propagate unless explicitly requested, except for checkpoint commits and pushes to a dedicated checkpoint branch under Section 4.9. Obtain explicit authorization for every merge, squash, or consolidation.
 5. Read and obey `ci-cd/SKILL.md` before every commit, branch, pull request, history, pipeline, release, deployment, or rollback action.
 
 ## 6. Tools and dependencies
