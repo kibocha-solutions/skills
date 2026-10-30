@@ -90,6 +90,29 @@
         "No duplicate 0000 is created",
         "The limitation is reported"
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "An inspector has completed its assigned review while its parent coordinator is waiting. What must the inspector do?",
+      "expected_output": "Send the parent a completion message with the result and evidence without waiting for the user to read the chat.",
+      "files": [],
+      "expectations": [
+        "The inspector sends a completion message to its parent",
+        "The message includes the result and evidence",
+        "The worker does not wait for user pickup"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "A nested child needs credentials to proceed. Its parent cannot resolve the issue. Describe the reporting chain.",
+      "expected_output": "The child notifies its parent without sending a secret; the parent promptly escalates to the coordinator, who requests user action securely.",
+      "files": [],
+      "expectations": [
+        "The child notifies its parent of the blocker",
+        "The parent escalates the unresolved issue to the coordinator",
+        "Only the coordinator requests action from the user",
+        "No secret is sent in the message"
+      ]
     }
   ]
 }

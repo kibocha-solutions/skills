@@ -33,9 +33,11 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 2. Use [assignment and result contracts](references/contracts.md) for each assignment.
 3. Choose the least demanding available model that meets the task's quality, judgment, and tool requirements.
 4. Reserve stronger reasoning models for complex analysis and decisions; escalate when evidence shows a lighter model is insufficient.
-5. Route worker questions and information through the coordinator or an approved shared ledger.
+5. Instruct each worker to message its parent when done, blocked, or needing a decision; require workers to pass the same instruction to their children.
 6. Resolve questions from available authority and evidence; escalate to the user only when necessary.
 7. Do not let a worker expand scope or create resources without coordinator authorization and any applicable user approval.
+8. Require parents to acknowledge child reports and relay unresolved concerns to the coordinator promptly.
+9. Keep the coordinator as the sole user-facing contact; request user action only through the coordinator.
 
 ## 4. Control progress and resources
 

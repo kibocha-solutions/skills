@@ -33,3 +33,8 @@ State: VERIFYING
 - [x] Define predecessor cleanup and `0009` to `0000` handoff
 - [x] Add rollover examples and evaluation cases
 - [ ] Run the full skill evaluation and publish the amendment when authorized
+
+## Added: Worker Reporting Chain
+- [/] Require completion and blocker messages through each parent to the coordinator
+- [ ] Add reporting examples and evaluation cases
+- [ ] Validate, commit, push, and synchronize the change

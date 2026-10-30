@@ -25,3 +25,6 @@ The quick validator and JSON parsing passed, and the amended skill was packaged 
 
 ## Coordinator Rollover Amendment
 Added the `0009` rollover sequence: preserve evidence and delete eligible retired predecessors; when `0000` is confirmed free, create its successor with instructions to delete the retired `0009` after handoff. If deletion of the previous `0000` is unavailable or unconfirmed, the ID remains reserved and rollover is reported as blocked. Added success and unavailable-deletion evaluation cases. The skill validator passed and the package was rebuilt. The complete evaluation suite has not been run. Changes remain local and undeployed.
+
+## Worker Reporting Amendment
+Required workers to notify their parent on completion, blockage, or a required decision and to pass that duty to their children. Parents acknowledge and relay unresolved concerns to the coordinator, who is the user-facing contact. Credential requests specify the access needed without transmitting secrets. Added reporting examples and two evaluation cases. The skill validator and JSON check passed. A paired read-only scenario confirmed the amended reporting chain; the previous version did not explicitly require proactive parent notification. Full benchmark and token metrics were not available.

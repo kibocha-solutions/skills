@@ -29,3 +29,9 @@ Good: Assign `0000` to the coordinator, `1000` to an inspector, and `2000` to an
 Bad: Create a new `0000` while the old `0000` still exists, or delete the active `0009` before the handoff.
 
 Good: Coordinator `0009` preserves the handoff and deletes eligible retired predecessors. After the old `0000` is confirmed deleted and a slot is free, `0009` creates a new `0000` with instructions to delete `0009`. The successor acknowledges the handoff, assumes coordination, waits for `0009` to stop, and confirms its deletion.
+
+## Reporting completion and blockers
+
+Bad: A child finishes its inspection and leaves its findings only in its own chat. Another worker waits for credentials without notifying anyone.
+
+Good: The child messages its parent with its result and evidence. The parent acknowledges and forwards the outcome to the coordinator. A worker needing credentials sends its parent a blocker describing the required access without including a secret; the coordinator requests user action through the authorized channel.
