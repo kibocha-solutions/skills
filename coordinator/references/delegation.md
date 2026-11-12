@@ -26,6 +26,7 @@
 12. Set a time or tool-call budget when the runtime supports enforcement.
 13. Check material output at each review point and narrow or reassign stalled work.
 14. Do not invent quota data or claim that a timeout proves completion.
+15. Initiate controlled pause, durable handoff recording, context compaction when supported, and authorized post-reset wake-up when team usage reaches 95% of the 5-hour window (5% remaining) or 98% of the weekly window (2% remaining).
 
 ## Shared resources
 

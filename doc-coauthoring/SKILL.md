@@ -21,7 +21,8 @@ license: Apache-2.0, adapted from the upstream skill of the same name
 
 ## 2. Gather context
 
-1. Ask:
+1. Read [interview protocols](references/coauthoring-interview-protocols.md) and inspect [interview examples](examples/good-vs-bad-coauthoring-interview.md) before initiating stakeholder discovery.
+2. Ask:
    - What document type is required?
    - Who is the primary audience?
    - What should the reader know, decide, or do?
@@ -152,9 +153,6 @@ When no independent agent is available:
 6. Render and inspect the exact final artifact when layout matters.
 7. Ask the user whether one final review is required.
 8. Deliver the verified document and its location.
-
-Read [interview protocols](references/coauthoring-interview-protocols.md) before initiating stakeholder discovery.
-Inspect [interview examples](examples/good-vs-bad-coauthoring-interview.md) for concrete question patterns.
 
 ## 10. Pre-completion checklist
 

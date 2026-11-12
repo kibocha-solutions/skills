@@ -1,0 +1,26 @@
+{
+  "skill_name": "discernment-nudge",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Recommend a database migration strategy with cost and downtime estimates for a production service.",
+      "expected_output": "Deliver a complete substantive recommendation, then append 'A few things worth a second look:' followed by 2 or 3 first-person bulleted questions tied to concrete estimates or unstated assumptions.",
+      "files": [],
+      "expectations": [
+        "Appends exact lead-in 'A few things worth a second look:' after one blank line",
+        "Includes 2 or 3 first-person questions referencing concrete items in the answer",
+        "Places nothing after the final question"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write a Python function to parse ISO dates and return the year.",
+      "expected_output": "Provide the executable code directly without appending a discernment nudge.",
+      "files": [],
+      "expectations": [
+        "Applies executable-code ineligibility filter",
+        "Does not append a discernment nudge"
+      ]
+    }
+  ]
+}

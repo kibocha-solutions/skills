@@ -1,33 +1,36 @@
-# Feature Staging Example
+# Graphify Usage Examples: Good vs Bad
 
-## 1. Identify the requested feature
+## Good: Graph-First Navigation and Incremental Maintenance
 
-Example: add a project API endpoint.
+1. Check graph state and lessons at task start:
 
-## 2. Find established patterns
+```bash
+ls -la graphify-out/graph.json
+graphify reflect --if-stale
+```
 
-1. Search for existing endpoint implementations.
-2. Find related schemas, models, repositories, and services.
-3. Find design records and requirements.
+2. Query the graph via MCP (`query_graph`, `shortest_path`, `affected`) or CLI before running raw text searches:
 
-## 3. Map dependencies
+```bash
+graphify query "hook guard strict claude install"
+graphify affected "hook_guard" --depth 2
+```
 
-1. Trace callers of the related repository or service.
-2. Trace downstream persistence and integration calls.
-3. Locate tests for the affected symbols.
-4. Record the affected flows.
+3. Read only the exact file lines identified by the graph (`graphify/cli.py:1561-1620`, `graphify/install.py:567-603`) instead of reading entire modules speculatively.
+4. Refresh the graph after making code changes:
 
-## 4. Plan the change
+```bash
+graphify update .
+```
 
-1. Name each file and symbol to change.
-2. Name each interface or schema constraint to preserve.
-3. Name the tests to add or update.
-4. Name the documentation to update.
+Why this works: Token usage stays minimal, cross-module callers and blast radius are surfaced immediately, and `graphify-out/graph.json` remains current for subsequent queries and hooks.
 
-## 5. Implement and verify
+---
 
-1. Implement within the approved scope.
-2. Run focused tests.
-3. Refresh the graph.
-4. Re-run impact and affected-flow queries.
-5. Verify graph results against the final source.
+## Bad: Graph Bypass, Legacy Tools, and Stale State
+
+1. Jumping straight to raw `rg` or `grep -rn` across the entire repository and reading 12 complete files when `graphify-out/graph.json` already exists.
+2. Calling removed legacy tools (`cgc`, `codegraphcontext`, or `code-review-graph`) instead of `graphify` MCP / `graphify` CLI.
+3. Dispatching exploration subagents without telling them to query `graphify-out/graph.json` first.
+4. Editing functions and signatures without running `graphify update .` afterward, causing subsequent hook checks and `query_graph` calls to cite stale line numbers.
+5. Hand-editing `graphify-out/graph.json` instead of re-running `graphify extract`, `graphify update`, or `graphify cluster-only`.

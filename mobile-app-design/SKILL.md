@@ -20,9 +20,8 @@ license: Complete terms in LICENSE.txt
 
 ## 2. Enforce touch targets and safe area insets
 
-Read [mobile and tablet ergonomics](references/mobile-and-tablet-ergonomics.md) for reachability zones, inset handling, and master-detail patterns.
-
-1. Implement platform-specific minimum touch hit areas:
+1. Read [mobile and tablet ergonomics](references/mobile-and-tablet-ergonomics.md) for reachability zones, inset handling, and master-detail patterns.
+2. Implement platform-specific minimum touch hit areas:
    - Apple iOS / iPadOS: minimum 44x44pt hit target.
    - Google Android / Material 3: minimum 48x48dp hit target.
 2. Expand visual icons smaller than 44pt to minimum touch boundaries using negative margins, padding, or pseudo-elements (`::after` hit area).
@@ -65,9 +64,8 @@ Read [mobile and tablet ergonomics](references/mobile-and-tablet-ergonomics.md) 
 
 ## 6. Implement gesture physics and tactile feedback
 
-Inspect [touch and mobile gestures](examples/touch-and-mobile-gestures.md) for pull-to-refresh, bottom sheets, and swipeable list items.
-
-1. Implement snappy tactile touch-down feedback on every tapable element:
+1. Inspect [touch and mobile gestures](examples/touch-and-mobile-gestures.md) for pull-to-refresh, bottom sheets, and swipeable list items.
+2. Implement snappy tactile touch-down feedback on every tapable element:
    ```css
    .touch-control:active {
      transform: scale(0.97);

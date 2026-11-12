@@ -1,0 +1,26 @@
+{
+  "skill_name": "webapp-testing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Verify a local React + FastAPI app's login and form validation flows with Playwright.",
+      "expected_output": "Use scripts/with_server.py for managed startup/cleanup, capture console/page/network errors, use semantic role locators, capture and visually inspect screenshots, and stop managed servers.",
+      "files": [],
+      "expectations": [
+        "Starts only project-required servers and cleans them up on exit",
+        "Captures console errors and failed network requests",
+        "Uses semantic role/label locators and visually inspects screenshots"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Test responsive layout and keyboard focus visibility at 375px and 1280px viewports.",
+      "expected_output": "Use fresh browser contexts with explicit 375px and 1280px viewports, verify keyboard navigation and focus visibility, inspect final screenshots, and close contexts in finally blocks.",
+      "files": [],
+      "expectations": [
+        "Tests explicit 375px and 1280px viewports",
+        "Closes browser contexts in finally blocks"
+      ]
+    }
+  ]
+}

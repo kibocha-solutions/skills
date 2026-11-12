@@ -15,9 +15,8 @@ license: Complete terms in LICENSE.txt
 
 ## 2. Implement the token system
 
-Read [modern CSS and tokens](references/modern-css-and-tokens.md) for custom property structure and fluid scales.
-
-1. Implement confirmed tokens as CSS custom properties under `:root` and `[data-theme]`:
+1. Read [modern CSS and tokens](references/modern-css-and-tokens.md) for custom property structure and fluid scales.
+2. Implement confirmed tokens as CSS custom properties under `:root` and `[data-theme]`:
    - Surface colors: `--surface-primary`, `--surface-secondary`, `--surface-elevated`
    - Content colors: `--content-primary`, `--content-secondary`, `--content-muted`
    - Accent colors: `--accent-default`, `--accent-hover`, `--accent-subtle`
@@ -51,9 +50,8 @@ Read [modern CSS and tokens](references/modern-css-and-tokens.md) for custom pro
 
 ## 5. Implement motion and interaction physics
 
-Read [Emil Kowalski interaction and motion](references/emil-kowalski-interaction-and-motion.md) for timing brackets and spring curve parameters.
-
-1. Enforce frequency-based duration brackets:
+1. Read [Emil Kowalski interaction and motion](references/emil-kowalski-interaction-and-motion.md) for timing brackets and spring curve parameters.
+2. Enforce frequency-based duration brackets:
    - High-frequency actions (buttons, toggles, checkboxes): 100ms to 150ms.
    - Medium-frequency actions (menus, dropdowns, tooltips): 150ms to 200ms.
    - Low-frequency actions (modals, drawers, sheets): 200ms to 280ms.
@@ -82,9 +80,8 @@ Read [Emil Kowalski interaction and motion](references/emil-kowalski-interaction
 
 ## 7. Inspect and verify in browser
 
-Inspect [good vs bad web patterns](examples/good-vs-bad-web-patterns.md) for focus rings and validation states.
-
-1. Run the project formatter, linter, type checker, and test suite.
+1. Inspect [good vs bad web patterns](examples/good-vs-bad-web-patterns.md) for focus rings and validation states.
+2. Run the project formatter, linter, type checker, and test suite.
 2. Capture full-page screenshots at desktop (1280px), tablet (768px), and mobile (375px) viewports using Playwright MCP or local CLI.
 3. Verify layout behavior across all supported viewports:
    - Check for unwanted text clipping, line wrapping, or dead space.

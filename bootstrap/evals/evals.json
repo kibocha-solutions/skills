@@ -1,0 +1,27 @@
+{
+  "skill_name": "bootstrap",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Align shared agent rules and sync skill mirrors for Gemini Antigravity and Claude Code without touching Codex or Copilot.",
+      "expected_output": "Run ensure-gemini-link.sh and ensure-claude-link.sh only, update the SHARED SKILLS RULES marker block while preserving content outside it, and leave Codex and Copilot untouched.",
+      "files": [],
+      "expectations": [
+        "Runs scripts only for confirmed requested hosts",
+        "Updates content strictly between BEGIN/END SHARED SKILLS RULES markers",
+        "Preserves unrelated host-native skills and outside instructions"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Register Antigravity PreInvocation and Claude UserPromptSubmit compliance hooks while keeping existing hooks intact.",
+      "expected_output": "Read references/hook-registration.md, register hooks in ~/.gemini/config/hooks.json and ~/.claude/settings.json, preserve unrelated hooks, and test each script once.",
+      "files": [],
+      "expectations": [
+        "Reads references/hook-registration.md before editing hooks",
+        "Preserves unrelated hook configuration",
+        "Tests each registered script directly once"
+      ]
+    }
+  ]
+}

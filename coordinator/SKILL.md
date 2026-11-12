@@ -31,7 +31,7 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 
 1. Define finite deliverables, exclusions, dependencies, owners, and acceptance evidence before dispatch.
 2. Read at least one scenario relevant to the work in [model selection examples](examples/model-selection.md) before choosing a model or dispatching work; apply its principles to other scenarios.
-3. Use [assignment and result contracts](references/contracts.md) for each assignment and instruct each worker to read at least one relevant example before acting.
+3. Use [assignment and result contracts](references/contracts.md) and [coordination examples](examples/coordination.md) for each assignment and instruct each worker to read at least one relevant example before acting.
 4. Explicitly select a lighter available model for every routine, well-defined child task when model selection is supported and permitted; do not rely on the parent's inherited model.
 5. Separate decisions requiring deeper judgment from bounded implementation and inspection; route each part according to its actual requirements.
 6. Use a stronger model only when the task requires its judgment or capabilities, the lighter model is unavailable, or the user or governing runtime requires it; record the reason.
@@ -52,7 +52,7 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 5. Require `DONE`, `PARTIAL`, or `BLOCKED` with evidence and remaining work; do not accept an unsupported percentage as progress.
 6. After two unsuccessful repetitions of the same approach, stop and replan; never retry a permission denial.
 7. Interrupt or redirect stalled work when supported; preserve partial results and uncommitted changes.
-8. Monitor available usage windows under the global rules and coordinate pausing, handoff, and any authorized wake-up.
+8. Monitor available usage windows across the team and initiate controlled pause, handoff, and authorized wake-up when usage reaches 95% of the 5-hour window (5% remaining) or 98% of the weekly window (2% remaining).
 
 ## 5. Review and hand off
 
@@ -69,4 +69,16 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 2. Preserve required evidence and report outcomes, verification, blockers, and exact remaining work.
 3. Delete completed task-created children and release their IDs only after confirmed deletion, following [task IDs and cleanup](references/task-ids.md).
 4. Preserve pre-existing user chats; report when deletion is unavailable.
-5. Read [examples](examples/coordination.md) for assignment, inspection, and successor patterns.
+
+## 7. Pre-completion checklist
+
+Before closing a coordinated project, confirm evidence exists for each item:
+
+- [ ] Active project instructions, constraints, and Maestro session read and maintained.
+- [ ] Team stayed within the coordinator-plus-two visible-chat limit and two-heavy-worker limit.
+- [ ] Executor and inspector roles assigned to separate agents for each deliverable.
+- [ ] Lighter model explicitly selected for bounded routine tasks when supported; stronger-model exceptions recorded.
+- [ ] Usage windows monitored against 95% 5-hour (5% remaining) and 98% weekly (2% remaining) thresholds.
+- [ ] Completed task-created children deleted and IDs released only after confirmed deletion.
+- [ ] Acceptance criteria verified with concrete evidence; zero unsupported percentage claims.
+- [ ] Zero AI attribution and no U+2014 em dashes in deliverables or reports.

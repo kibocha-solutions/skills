@@ -1,0 +1,26 @@
+{
+  "skill_name": "web-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement a responsive SaaS settings page from DESIGN.md with dark/light theme support.",
+      "expected_output": "Use CSS custom properties from DESIGN.md, semantic HTML landmarks and buttons, @container queries, clamp() fluid scales, frequency-based spring motion with reduced-motion support, WCAG 2.2 AA contrast/focus rings, and Playwright verification at 375px/768px/1280px.",
+      "files": [],
+      "expectations": [
+        "Implements DESIGN.md tokens via CSS custom properties without clickable divs",
+        "Uses @container queries, clamp() scales, and nested border-radius math",
+        "Captures and inspects Playwright screenshots at 375px, 768px, and 1280px"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Implement interactive button and modal transitions respecting accessibility preferences.",
+      "expected_output": "Apply 100-150ms button and 200-280ms modal durations with damped spring curves, tactile active scale feedback, and @media (prefers-reduced-motion: reduce) overrides.",
+      "files": [],
+      "expectations": [
+        "Enforces frequency-based duration brackets",
+        "Wraps animations in @media (prefers-reduced-motion: reduce)"
+      ]
+    }
+  ]
+}

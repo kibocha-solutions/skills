@@ -78,7 +78,7 @@ license: Proprietary. LICENSE.txt has complete terms
 
 1. Read the documentation skill.
 2. Read [letterhead and pagination](../documentation/references/letterhead-and-pagination.md) for fixed-page documents.
-3. Define page size, margins, typography, hierarchy, headers, footers, and folios before generation.
+3. Define page size, margins, typography, hierarchy, headers, footers, and folios before generation; inspect [PDF generation examples](examples/good-vs-bad-pdf-generation.md) for flowable document patterns.
 4. Use ReportLab, a source document workflow, or the project generator.
 5. Keep generation logic separate from the final PDF.
 6. Embed fonts required for all characters.
@@ -89,9 +89,8 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ## 9. Fill a PDF form
 
-Read [form filling](references/forms.md) in full.
-
-1. Detect fillable fields with `scripts/check_fillable_fields.py`.
+1. Read [form filling](references/forms.md) in full.
+2. Detect fillable fields with `scripts/check_fillable_fields.py`.
 2. Use the fillable-field workflow when AcroForm fields exist.
 3. Use the annotation workflow only when fillable fields do not exist.
 4. Extract field identifiers, types, options, pages, and coordinates.
@@ -119,9 +118,7 @@ Read [form filling](references/forms.md) in full.
 4. Compare page count, page sizes, metadata, bookmarks, forms, and attachments.
 5. Extract text from both versions and compare expected content.
 6. Render and inspect the final output.
-
-Use [the advanced reference](references/advanced-pdf-operations.md) for operations not covered above.
-Inspect [PDF generation examples](examples/good-vs-bad-pdf-generation.md) for flowable document patterns.
+7. Read [the advanced reference](references/advanced-pdf-operations.md) for operations not covered above.
 
 ## 12. Verify the exact final PDF
 

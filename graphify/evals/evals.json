@@ -1,0 +1,51 @@
+{
+  "skill_name": "graphify",
+  "evals": [
+    {
+      "id": "graphify-query-first-navigation",
+      "prompt": "Explore the authentication and hook enforcement flow in this repository where graphify-out/graph.json already exists.",
+      "expected_output": "Queries graphify MCP (query_graph, get_neighbors, shortest_path) or graphify CLI (query, path, affected) before raw grep/reads, cites exact source_file and source_location values from the graph, and reads only located lines.",
+      "files": [],
+      "expectations": [
+        "Runs query_graph MCP tool or `graphify query` before running raw grep/rg or broad file reads.",
+        "Adapts query terms to graph vocabulary when literal wording differs.",
+        "Reads raw source files only for lines located via graph output.",
+        "Cites observed source_file and source_location without fabricating edges."
+      ]
+    },
+    {
+      "id": "graphify-ast-build-no-key-prompt",
+      "prompt": "Build a knowledge graph for this Python and TypeScript codebase using graphify.",
+      "expected_output": "Checks .graphifyignore/.gitignore and corpus size, runs structural AST extraction via graphify extract without prompting for ANTHROPIC_API_KEY or OPENAI_API_KEY, clusters communities, and produces graphify-out/graph.json and GRAPH_REPORT.md.",
+      "files": [],
+      "expectations": [
+        "Respects .gitignore and .graphifyignore rules during extraction.",
+        "Does not prompt for or block on ANTHROPIC_API_KEY or OPENAI_API_KEY.",
+        "Produces valid graphify-out/graph.json and GRAPH_REPORT.md.",
+        "Checks or asks about gitignore handling for graphify-out/."
+      ]
+    },
+    {
+      "id": "graphify-incremental-update-and-hooks",
+      "prompt": "I finished refactoring two Python modules and want the knowledge graph and commit/agent hooks kept in sync.",
+      "expected_output": "Runs incremental `graphify update .`, confirms post-commit hook via `graphify hook install` or `graphify hook status`, and keeps host guard hooks valid without disturbing unrelated tools.",
+      "files": [],
+      "expectations": [
+        "Runs `graphify update .` instead of a full semantic rebuild for code-only changes.",
+        "Checks or installs git post-commit hook via `graphify hook install`.",
+        "Verifies hook configuration preserves existing unrelated host hooks."
+      ]
+    },
+    {
+      "id": "graphify-mcp-and-guard-recovery",
+      "prompt": "graphify-mcp fails to resolve the current project graph and strict hook-guard blocked a raw Read call.",
+      "expected_output": "Diagnoses graphify-out/graph.json presence/staleness, verifies graphify-mcp binary and project_path or cwd configuration, uses query_graph / graphify query first rather than bypassing the guard, and restores clean graph access.",
+      "files": [],
+      "expectations": [
+        "Checks graphify-mcp executable path and python version compatibility (>=3.10,<3.15).",
+        "Uses project_path argument or repository cwd containing graphify-out/graph.json.",
+        "Answers the structural lookup with query_graph/graphify query rather than disabling hook-guard."
+      ]
+    }
+  ]
+}

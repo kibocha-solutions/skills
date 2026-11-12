@@ -1,0 +1,27 @@
+{
+  "skill_name": "legalese",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Draft a non-profit charter supremacy and severability clause at Sovereign register.",
+      "expected_output": "Use Sovereign legislative register ('shall' for obligations and declared effects, 'may' for permissions), ordered list structure with blank-line spacing, definitions as 'A Term is ...', and hostile-reading audit.",
+      "files": [],
+      "expectations": [
+        "Uses 'shall' for legislative obligations and declared effects",
+        "Uses sovereign-core severability rather than ordinary prescriptive severability",
+        "Avoids synonym stacking and bare present tense for legal effects"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit an existing employee IT security policy (prescriptive instrument) for modal drift.",
+      "expected_output": "Check that obligations use 'must', scope/declared effects use 'will', permissions use 'may', and 'shall' is flagged outside verbatim quotations.",
+      "files": [],
+      "expectations": [
+        "Enforces 'must' and 'will' for prescriptive instruments",
+        "Flags 'shall' outside verbatim passages",
+        "Preserves user-supplied structure and locked wording"
+      ]
+    }
+  ]
+}

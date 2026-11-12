@@ -1,0 +1,27 @@
+{
+  "skill_name": "mcp-builder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a local Python stdio MCP server for querying a ticketing system.",
+      "expected_output": "Verify current MCP spec and SDK version, use stdio transport with stdout strictly for protocol and stderr for logs, name tools <service>_<verb>_<resource> in snake_case, set accurate tool hints, and test with MCP Inspector.",
+      "files": [],
+      "expectations": [
+        "Routes all diagnostic logging to stderr and keeps stdout protocol-clean",
+        "Names tools in snake_case with readOnlyHint/destructiveHint/idempotentHint",
+        "Defines strict input schemas and tests schema rejection and pagination"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add a destructive delete tool to an existing TypeScript Streamable HTTP MCP server.",
+      "expected_output": "Validate HTTP Origin and DNS rebinding protection, enforce authorization inside the operation, require explicit target identifiers, mark destructiveHint: true, and keep credentials out of output.",
+      "files": [],
+      "expectations": [
+        "Validates Origin and authorization at the server boundary",
+        "Marks destructiveHint: true and requires explicit target identifiers",
+        "Does not expose stack traces or secrets in error responses"
+      ]
+    }
+  ]
+}

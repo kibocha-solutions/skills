@@ -1,29 +1,58 @@
-# Multi-Agent Lifecycle Hook Registration
+# Bootstrap Hook and Graphify Registration Reference
 
-## 1. Overview
+Register only the hooks for agent hosts actually installed on the workstation. Always merge JSON and TOML files non-destructively so existing user settings, permissions, plugins, and MCP servers remain intact.
 
-Agent hooks enforce repository rules, maintain skill links, and inject compliance directives before model inference. This document defines the registration schemas and paths across Claude Code, Gemini Antigravity, Gemini CLI, Codex CLI, and GitHub Copilot.
+## 1. Per-Host Compliance Enforcement Scripts
 
-## 2. Hook Types and Contracts
+Each agent host has a dedicated enforcement script in `bootstrap/scripts/` that names its exact governing instruction file and outputs the host's native hook payload:
 
-### SessionStart Hooks
-Run once at agent launch or session resumption to ensure instruction files and skill directories match repository state.
+| Agent Host | Governing Instruction File | Enforcement Script | Hook Event | Output Format |
+| :--- | :--- | :--- | :--- | :--- |
+| Claude Code | `~/.claude/CLAUDE.md` + repo `CLAUDE.md`/`AGENTS.md` | `enforce-claude-rules.sh` | `UserPromptSubmit` | Plain text directive injected into prompt context |
+| Gemini Antigravity | `~/.gemini/GEMINI.md` + repo `GEMINI.md`/`AGENTS.md` | `enforce-gemini-rules.sh` | `PreInvocation` | `{"injectSteps":[{"ephemeralMessage":"..."}]}` |
+| Gemini CLI | `~/.gemini/GEMINI.md` + repo `GEMINI.md`/`AGENTS.md` | `enforce-gemini-cli-rules.sh` | `SessionStart` | `{"systemMessage":"...","suppressOutput":false}` |
+| Codex CLI / Desktop | `~/.codex/AGENTS.md` + repo `AGENTS.md` | `enforce-codex-rules.sh` | `SessionStart` (`startup\|resume`) | `{"systemMessage":"...","suppressOutput":false}` |
+| GitHub Copilot CLI | `~/.copilot/copilot-instructions.md` + repo `AGENTS.md` | `enforce-copilot-rules.sh` | `sessionStart` | `{"systemMessage":"...","suppressOutput":false}` |
 
-### Turn Enforcement Hooks
-Run before model evaluation on every turn to inject mandatory compliance directives into the model context:
-- Claude Code: `UserPromptSubmit` hook prints text to stdout, prepended directly to the user prompt.
-- Gemini Antigravity: `PreInvocation` hook outputs a JSON payload with `injectSteps` containing an `ephemeralMessage`.
+Every enforcement script commands the agent to:
+1. **Obey its governing instruction file and skills without exception**: even when inconvenient, slow, token-consuming, or contrary to what the agent's training or judgment suggests is a better way.
+2. **Consult the user on viable alternatives**: never unilaterally disregard or route around a rule or skill procedure; stop and ask the user for permission before deviating.
+3. **Read the actual canonical `SKILL.md` file from disk before acting**: never rely on platform skill-loader tools that may deliver summaries, excerpts, or truncated previews.
+4. **Re-consult the governing `SKILL.md` and pre-completion checklist before claiming a task is done**: including rendered visual verification where required.
+5. **Recognize task-failure accountability**: disregarding the mandate or skipping full skill reads is equivalent to failing the task outright in terms of user disappointment.
+6. **Use `graphify` first**: whenever `graphify-out/graph.json` exists, read `graphify/SKILL.md` and query `graphify` MCP/CLI before raw grep, glob, or broad file reads.
 
-## 3. Host Configurations
+## 2. Claude Code (`~/.claude/settings.json` and `~/.claude.json`)
 
-### Claude Code
+### Hooks in `~/.claude/settings.json`
 
-Target: `~/.claude/settings.json`
+Merge the following into `hooks`:
 
 ```json
 {
-  "agentPushNotifEnabled": true,
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard search --strict",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard read --strict",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "type": "command",
@@ -36,72 +65,14 @@ Target: `~/.claude/settings.json`
         "type": "command",
         "command": "bash \"$HOME/.claude/skills/bootstrap/scripts/ensure-claude-link.sh\"",
         "timeout": 10
-      }
-    ]
-  }
-}
-```
-
-Behavior:
-- `enforce-claude-rules.sh` outputs the plain text Standing User Operational Notice.
-- `ensure-claude-link.sh` verifies `~/.claude/CLAUDE.md` and sparse checkout.
-
-### Gemini Antigravity
-
-Target: `~/.gemini/config/hooks.json`
-
-```json
-{
-  "compliance-guard": {
-    "PreInvocation": [
+      },
       {
-        "type": "command",
-        "command": "bash \"$HOME/.gemini/skills/bootstrap/scripts/enforce-gemini-rules.sh\""
-      }
-    ]
-  }
-}
-```
-
-Behavior:
-- Handler receives context on stdin.
-- Script outputs JSON matching the `PreInvocation` schema:
-  `{"injectSteps": [{"ephemeralMessage": "..."}]}`
-
-### Gemini CLI
-
-Targets: `~/.gemini/settings.json` or `~/.gemini/hooks/`
-
-```json
-{
-  "matcher": "",
-  "hooks": [
-    {
-      "type": "command",
-      "command": "bash skills/bootstrap/scripts/ensure-gemini-link.sh",
-      "name": "bootstrap: AGENTS.md link check",
-      "timeout": 10000
-    }
-  ]
-}
-```
-
-### Codex CLI
-
-Target: `~/.codex/hooks.json`
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume",
+        "matcher": "compact",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/ensure-codex-link.sh\"",
-            "timeout": 10,
-            "statusMessage": "Checking AGENTS.md link"
+            "command": "graphify hook-guard compact",
+            "timeout": 10
           }
         ]
       }
@@ -110,9 +81,158 @@ Target: `~/.codex/hooks.json`
 }
 ```
 
-### GitHub Copilot CLI
+### MCP Server in `~/.claude.json`
 
-Target: `~/.copilot/hooks/bootstrap.json`
+```json
+{
+  "mcpServers": {
+    "graphify": {
+      "command": "graphify-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+## 3. Codex CLI / Desktop (`~/.codex/config.toml` and `~/.codex/hooks.json`)
+
+### Feature Flag and MCP Server in `~/.codex/config.toml`
+
+Ensure `[features]` has `codex_hooks = true` and `[mcp_servers.graphify]` is registered:
+
+```toml
+[features]
+codex_hooks = true
+
+[mcp_servers.graphify]
+command = "graphify-mcp"
+args = []
+```
+
+### Hooks in `~/.codex/hooks.json`
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-check",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat >/dev/null || true; if [ -f graphify-out/graph.json ] && command -v graphify >/dev/null 2>&1; then graphify update . >/dev/null 2>&1 || true; fi",
+            "timeout": 30,
+            "statusMessage": "Updating graphify knowledge graph"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/ensure-codex-link.sh\"",
+            "timeout": 10,
+            "statusMessage": "Aligning AGENTS.md rules and skills"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.codex/skills/bootstrap/scripts/enforce-codex-rules.sh\"",
+            "timeout": 10,
+            "statusMessage": "Loading AGENTS.md compliance directive"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## 4. Gemini Antigravity and Gemini CLI (`~/.gemini/`)
+
+### Gemini Antigravity Turn Hook (`~/.gemini/config/hooks.json`)
+
+```json
+{
+  "compliance-guard": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "bash ~/.gemini/skills/bootstrap/scripts/enforce-gemini-rules.sh"
+      }
+    ]
+  }
+}
+```
+
+### Gemini Antigravity MCP Server (`~/.gemini/antigravity/mcp_config.json`)
+
+```json
+{
+  "mcpServers": {
+    "graphify": {
+      "command": "graphify-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+### Gemini CLI Settings (`~/.gemini/settings.json`)
+
+```json
+{
+  "mcpServers": {
+    "graphify": {
+      "command": "graphify-mcp",
+      "args": []
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash \"$HOME/.gemini/skills/bootstrap/scripts/ensure-gemini-link.sh\"",
+        "timeout": 10000
+      },
+      {
+        "type": "command",
+        "command": "bash \"$HOME/.gemini/skills/bootstrap/scripts/enforce-gemini-cli-rules.sh\"",
+        "timeout": 10000
+      }
+    ],
+    "BeforeTool": [
+      {
+        "matcher": "read_file|list_directory",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-guard gemini"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## 5. GitHub Copilot CLI (`~/.copilot/hooks/bootstrap.json` and `~/.copilot/mcp-config.json`)
+
+### Hooks in `~/.copilot/hooks/bootstrap.json`
 
 ```json
 {
@@ -123,23 +243,43 @@ Target: `~/.copilot/hooks/bootstrap.json`
         "type": "command",
         "bash": "bash \"$HOME/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh\" 2>/dev/null || true",
         "timeoutSec": 10
+      },
+      {
+        "type": "command",
+        "bash": "bash \"$HOME/.copilot/skills/bootstrap/scripts/enforce-copilot-rules.sh\" 2>/dev/null || true",
+        "timeoutSec": 10
       }
     ]
   }
 }
 ```
 
-## 4. Cross-OS Portability
+### MCP Server in `~/.copilot/mcp-config.json`
 
-1. Under Linux and macOS, paths resolve relative to `$HOME`.
-2. Under WSL, scripts target `$HOME` within the Linux environment and map `/mnt/c/Users/<user>/` when managing Windows-side installations.
-3. Hook scripts must be marked executable (`chmod +x`).
-4. Scripts must use `set -euo pipefail` to fail fast on unexpected conditions.
+```json
+{
+  "mcpServers": {
+    "graphify": {
+      "command": "graphify-mcp",
+      "args": []
+    }
+  }
+}
+```
 
-## 5. Verification Checklist
+## 6. Always-On Graphify Instruction Block
 
-- [ ] Target configuration files exist and contain valid JSON or TOML.
-- [ ] Registered script paths resolve and have executable permissions.
-- [ ] Scripts produce exit code 0 when run standalone.
-- [ ] Turn enforcement scripts produce valid stdout matching the host contract.
-- [ ] Pre-existing hooks in target configuration files remain intact.
+Ensure the following block (wrapped in `<!-- graphify --> ... <!-- /graphify -->`) is present at the bottom of `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md`, and `~/.copilot/copilot-instructions.md`:
+
+```markdown
+<!-- graphify -->
+## Graphify Codebase Knowledge Graph Mandate
+
+This workstation has **graphify** (`graphify` CLI + `graphify-mcp` MCP server) and the `graphify` skill installed.
+Whenever a repository contains `graphify-out/graph.json` (or `graphify-out/GRAPH_REPORT.md`):
+1. Read and follow the `graphify` skill (`SKILL.md`) before exploring code, tracing dependencies, or reviewing architecture.
+2. Query the `graphify` MCP tools (`query_graph`, `get_neighbors`, `get_node`, `shortest_path`, `god_nodes`, `graph_stats`, `explain_node`, `get_community`) or read `graphify-out/GRAPH_REPORT.md` **before** running raw `grep`, `ripgrep`, `glob`, or broad file reads.
+3. Read raw source files only for the specific files and line ranges identified by the graph, or when preparing an exact edit.
+4. After modifying source files in a graphed repository, run `graphify update .` (or rely on the active post-edit / git hook) so `graphify-out/` stays synchronized.
+<!-- /graphify -->
+```

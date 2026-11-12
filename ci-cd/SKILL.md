@@ -25,21 +25,6 @@ description: Plan, review, and implement Git workflows, commit cleanup, branches
 5. Inspect `examples/` only when a concrete implementation pattern is
    required.
 
-## Absolute AI-attribution prohibition
-
-1. Never attribute repository work to AI, a model, an agent, an automated
-   assistant, or an AI-assisted tool.
-2. Apply the prohibition to commits, author fields, co-author trailers,
-   signatures, pull requests, issues, review comments, tags, release notes,
-   changelogs, deployment records, generated-by fields, and publication
-   metadata.
-3. Remove optional AI attribution inserted by a template, tool, hook, or
-   generator before publication.
-4. Do not replace explicit attribution with coded, abbreviated, indirect, or
-   euphemistic attribution.
-5. If a platform forces attribution that cannot be removed, do not publish
-   through that path. Report the platform requirement to the user.
-
 ## 2. Build the repository-health snapshot
 
 1. Read `.agents/brain/git/repo-health.json` when present.
@@ -222,7 +207,7 @@ git log -1 --format=%B
 3. State the verified repository fact without citing an excluded source. Use
    durable code, documentation, schemas, tickets, or external standards when a
    citation is required.
-4. Apply the absolute AI-attribution prohibition to every publication surface.
+4. Enforce the absolute AI-attribution prohibition in `AGENTS.md` across every commit, author field, trailer, PR, issue, tag, release note, changelog, and publication surface; do not publish through a path that forces unremovable AI attribution.
 
 ## 8. Handle commit and push failures
 

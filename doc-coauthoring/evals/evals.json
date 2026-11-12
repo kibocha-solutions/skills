@@ -1,0 +1,26 @@
+{
+  "skill_name": "doc-coauthoring",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Help me co-author an RFC for our new webhook retry architecture.",
+      "expected_output": "Offer the three-stage workflow (context gathering, section drafting and refinement, reader testing), ask targeted context questions, confirm structure before drafting, and run reader testing before finalizing.",
+      "files": [],
+      "expectations": [
+        "Offers the three staged phases to the user",
+        "Gathers context and confirms structure before drafting sections",
+        "Tests the completed draft with an independent reader or manual fallback"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Draft the executive summary first while we are still debating the architecture sections.",
+      "expected_output": "Defer summaries and executive overviews until underlying sections are stable, starting with the section containing the most unresolved substance.",
+      "files": [],
+      "expectations": [
+        "Starts with the section containing the most unresolved substance",
+        "Defers executive overview until underlying sections stabilize"
+      ]
+    }
+  ]
+}

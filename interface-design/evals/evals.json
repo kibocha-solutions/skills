@@ -1,0 +1,27 @@
+{
+  "skill_name": "interface-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design a financial analytics dashboard and mobile companion spec with DESIGN.md tokens.",
+      "expected_output": "Calibrate high density and appropriate variance, select a platform design system, write semantic tokens to DESIGN.md, apply nested border-radius math, address phone/tablet orientations, and reject unearned tropes.",
+      "files": [],
+      "expectations": [
+        "Calibrates Density and Variance dials and selects an archetype",
+        "Writes semantic color, typography, spacing, and motion tokens to DESIGN.md",
+        "Applies nested border-radius math and dual-orientation ergonomics",
+        "Rejects anti-slop tropes unless explicitly justified"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Propose a tablet landscape layout for an inbox and message detail view.",
+      "expected_output": "Specify a master-detail dual-pane architecture with a persistent left navigation/list pane (320-380px) and flexible detail pane supporting 44pt touch targets and pointer hover states.",
+      "files": [],
+      "expectations": [
+        "Uses a master-detail dual-pane architecture for tablet landscape",
+        "Supports both touch hit-target minimums and pointer hover states"
+      ]
+    }
+  ]
+}

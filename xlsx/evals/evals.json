@@ -1,0 +1,26 @@
+{
+  "skill_name": "xlsx",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a three-year budget model in XLSX with dynamic assumption cells, recalculate formulas, and verify layout.",
+      "expected_output": "Read financial-and-formula-modeling-standards.md and good-vs-bad-financial-model.md, separate assumptions from formulas, recalculate via xlsx/scripts/recalc.py, reopen with data_only=True, render to PDF/images, and visually inspect every sheet.",
+      "files": [],
+      "expectations": [
+        "Uses dynamic formulas referencing assumption cells with zero formula errors",
+        "Recalculates via scripts/recalc.py and verifies cached values",
+        "Renders sheets and visually inspects for ### truncation or clipping"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Update two cells in an existing macro-enabled .xlsm workbook without losing macros or formulas.",
+      "expected_output": "Use OpenPyXL with data_only=False and keep_vba=True (never pandas round trip), preserve untouched formulas/macros, and note XLSM recalculation boundary.",
+      "files": [],
+      "expectations": [
+        "Uses OpenPyXL with keep_vba=True rather than pandas",
+        "Does not run scripts/recalc.py on XLSM files"
+      ]
+    }
+  ]
+}

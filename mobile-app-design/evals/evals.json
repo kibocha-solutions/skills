@@ -1,0 +1,26 @@
+{
+  "skill_name": "mobile-app-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a mobile checkout flow supporting iOS and Android in both portrait and landscape orientations.",
+      "expected_output": "Enforce 44x44pt (iOS) / 48x48dp (Android) touch targets with 8px spacing, safe area insets, thumb-zone primary CTA in portrait, compact side rail and paired fields in landscape, and tactile touch-down scale.",
+      "files": [],
+      "expectations": [
+        "Meets minimum 44x44pt iOS and 48x48dp Android hit target sizes",
+        "Applies env(safe-area-inset-*) on all edges",
+        "Adapts portrait thumb-zone layout to phone landscape (<450px height)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Design a tablet split-view reader for iPadOS.",
+      "expected_output": "Implement a 2-column adaptive layout in tablet portrait (<75ch reading width) and a master-detail dual-pane layout in tablet landscape supporting both touch and pointer hover states.",
+      "files": [],
+      "expectations": [
+        "Restricts reading column width to 65-75 characters in tablet portrait",
+        "Uses master-detail dual-pane architecture in tablet landscape"
+      ]
+    }
+  ]
+}

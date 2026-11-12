@@ -1,0 +1,26 @@
+{
+  "skill_name": "pdf",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate a multi-page financial summary PDF from Markdown/ReportLab and verify its final layout.",
+      "expected_output": "Generate from editable source, embed fonts, repeat table headers, run pdfinfo and qpdf --check, render every page with pdftoppm, visually inspect every page, and bind verification to the exact final PDF.",
+      "files": [],
+      "expectations": [
+        "Generates PDF from editable source without hand-patching",
+        "Renders every page to images and visually inspects for clipping or dead gaps",
+        "Runs pdfinfo/qpdf checks on the exact final artifact"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Fill out an AcroForm PDF application without altering unfilled fields.",
+      "expected_output": "Read references/forms.md, detect fillable fields with scripts/check_fillable_fields.py, populate matching field IDs, preserve unfilled fields, and render/inspect every filled page.",
+      "files": [],
+      "expectations": [
+        "Detects fillable fields before choosing form-filling path",
+        "Preserves unfilled fields and verifies checkbox/choice states visually"
+      ]
+    }
+  ]
+}

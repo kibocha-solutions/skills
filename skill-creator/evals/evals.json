@@ -1,0 +1,26 @@
+{
+  "skill_name": "skill-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Revise an existing skill whose SKILL.md contains floating prose, duplicated AGENTS.md rules, and no contrasting examples.",
+      "expected_output": "Read references/skill-authoring-standard.md, snapshot the skill, rewrite SKILL.md in imperative execution order under 500 lines, move variants to references/, add good-vs-bad examples in examples/, add evals/evals.json, and re-read the final files.",
+      "files": [],
+      "expectations": [
+        "Reads references/skill-authoring-standard.md before editing",
+        "Uses imperative step-by-step execution order in SKILL.md",
+        "Provides contrasting good vs bad examples and objective evals.json"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Optimize the trigger description of a skill using 20 realistic trigger queries.",
+      "expected_output": "Create 8-10 positive and 8-10 adjacent negative queries, run scripts.run_loop when supported, apply best_description only if held-out score improves, and report before/after scores.",
+      "files": [],
+      "expectations": [
+        "Includes 8-10 positive and 8-10 adjacent negative queries",
+        "Applies best_description only when held-out score improves"
+      ]
+    }
+  ]
+}

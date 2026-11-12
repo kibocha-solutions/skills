@@ -52,7 +52,7 @@ git config --show-origin --get-regexp '^(core\.sshCommand|gpg\.format|gpg\.ssh\.
 
 ## 5. Configure the selected route
 
-1. Use one SSH client and agent route consistently.
+1. Use one SSH client and agent route consistently, and inspect [SSH configuration examples](examples/ssh-signing-and-alias-patterns.md) for host alias and signing setups.
 2. Use host aliases for multiple accounts on the same provider or host.
 3. Put aliases in the configuration file read by the active SSH client.
 4. Use `IdentitiesOnly yes` when the client must offer a specific identity.
@@ -80,8 +80,6 @@ git config --show-origin --get-regexp '^(core\.sshCommand|gpg\.format|gpg\.ssh\.
 3. Record review and rotation dates when required.
 4. Do not record private keys, secrets, internal URLs, or credentials.
 5. Use direct procedure language.
-
-Inspect [SSH configuration examples](examples/ssh-signing-and-alias-patterns.md) for host alias and signing setups.
 
 ## 8. Pre-completion checklist
 

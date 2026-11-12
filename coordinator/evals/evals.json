@@ -176,6 +176,17 @@
         "A suitable lighter model is selected when available",
         "The code edit has an explicit bounded contract"
       ]
+    },
+    {
+      "id": 17,
+      "prompt": "Team usage reaches 92% on the 5-hour window and 96% on the weekly window. Should the coordinator pause now or continue until the coordinator thresholds are reached?",
+      "expected_output": "Continue monitoring and working because coordinator thresholds are 95% for the 5-hour window (5% remaining) and 98% for the weekly window (2% remaining); initiate controlled pause and handoff once either threshold is reached.",
+      "files": [],
+      "expectations": [
+        "Coordinator uses 95% for the 5-hour window (5% remaining)",
+        "Coordinator uses 98% for the weekly window (2% remaining)",
+        "Controlled pause and handoff trigger at 95% 5h or 98% weekly rather than stopping early at 85%/95%"
+      ]
     }
   ]
 }

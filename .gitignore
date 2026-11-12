@@ -1,5 +1,6 @@
 ppt-master/
 # Added by code-review-graph
 .code-review-graph/
-# Project-local graph state (CGC + CRG); never commit
+# Project-local graph state; never commit
 .agents/code-graphs/
+graphify-out/

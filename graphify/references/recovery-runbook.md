@@ -1,61 +1,41 @@
-# Recovery Runbook
+# Graphify Recovery Runbook
 
-## 1. Capture diagnostics
+## 1. Stale Graph or Commit Drift
 
-```bash
-python3 --version
-command -v uv
-command -v cgc
-command -v code-review-graph
-uv tool list
-cgc doctor
-code-review-graph serve --help
-```
+1. Symptom: `graph_stats` reports `built_at_commit` behind `HEAD`, `graphify-out/needs_update` exists, or `hook-guard` warns that source files are newer than `graph.json`.
+2. Fix:
+   - Code-only changes: run `graphify update .`.
+   - Documentation, paper, image, or deletion changes: run full incremental merge (`detect_incremental` + semantic pass on changed non-code files + `build_merge`) or rebuild cleanly (`graphify extract .`).
+   - Run `graphify reflect --if-stale` after rebuilds to refresh `graphify-out/reflections/LESSONS.md`.
 
-## 2. Classify the failure
+## 2. Shrink-Guard Refusal
 
-1. Identify whether the failure concerns availability, configuration, storage, indexing, locking, or the MCP connection.
-2. Record the exact command, exit status, and error message.
-3. Inspect only the paths named by the error or the configured `.agents/code-graphs/` state directory.
+1. Symptom: Export prints `ERROR: refused to shrink graphify-out/graph.json (existing graph has more nodes; #479)`.
+2. Cause: Deleted files, stricter `.graphifyignore`, or an incomplete extraction produced fewer nodes than the existing graph.
+3. Fix:
+   - First check whether extraction failed or dropped semantic chunks (inspect `graphify diagnose` and `.graphify_partial.txt`).
+   - If the shrink is intentional (files removed or ignored), re-run with `--force` (`graphify update . --force` or `to_json(..., force=True)`).
 
-## 3. Repair availability
+## 3. MCP Server Missing Graph or Tool Errors
 
-1. Follow [environment setup](environment-setup.md).
-2. Apply the universal installation gate.
-3. Re-run the executable checks.
+1. Symptom: `graphify-mcp` fails to connect, crashes on import, or returns missing-graph errors.
+2. Checks:
+   - Verify the binary was installed with the `[mcp]` extra (`which graphify-mcp` and `graphify-mcp --help`).
+   - Verify Python version is `<3.15` (`head -1 "$(which graphify-mcp)"`).
+   - Verify `graphify-out/graph.json` exists at `cwd` or pass `project_path="<repo-root>"` to the MCP tool call.
+   - Check `graph.json` size limits and valid JSON via `python3 -m json.tool graphify-out/graph.json >/dev/null`.
 
-## 4. Repair configuration
+## 4. Strict `hook-guard` Blocking Raw Read or Grep
 
-1. Inspect the active client configuration without exposing secrets.
-2. Compare it with `../assets/mcp-config-template.json`.
-3. Change persistent client configuration only when the user requests it.
-4. Reconnect the client or restart the configured MCP process when the host permits it.
+1. Symptom: Claude Code or Gemini CLI blocks or nudges on raw `Grep` or `Read` calls.
+2. Expected behavior: Do not disable `hook-guard`; satisfy it properly:
+   - Query `graphify` MCP (`query_graph`, `get_neighbors`, `shortest_path`) or `graphify query "<terms>"` first.
+   - Subsequent targeted `Read` calls for files located by the graph succeed (strict mode blocks only the first unqueried `Read`/`Grep` per session or compaction cycle).
+   - If stale timestamps trigger false freshness warnings after `git checkout`, verify manifest hashes or run `graphify update .`.
 
-## 5. Repair storage
+## 5. Empty Graph or Legacy Node-ID Scheme
 
-1. Confirm the target repository root.
-2. Confirm the configured data directory is under `.agents/code-graphs/`.
-3. Inspect permissions and free space.
-4. Preserve existing databases unless the user authorizes rebuilding them.
-5. Do not delete a database, lock, or state directory to bypass an error.
-
-## 6. Repair indexing
-
-1. Run the tool's status or doctor command.
-2. Update an existing index before rebuilding it.
-3. Rebuild only after the user authorizes replacement of existing graph state.
-4. Verify the final index against a known symbol in the repository.
-
-## 7. Repair locking
-
-1. Identify the process holding the lock.
-2. Determine whether it is an active graph operation.
-3. Wait for an active operation or ask the user before terminating it.
-4. Retry once after the lock is released.
-
-## 8. Stop after repeated failure
-
-1. Limit recovery to three distinct attempts.
-2. Stop after the third failed attempt.
-3. Report the diagnostics, attempted repairs, and remaining blocker.
-4. Do not improvise destructive cleanup or privilege escalation.
+1. Symptom: `0 nodes` extracted or `[graphify] note: this graph uses the pre-#1504 node-ID scheme`.
+2. Fix:
+   - Inspect `.graphifyignore` and `.gitignore` for over-broad exclusions matching source folders.
+   - Rebuild cleanly with `graphify extract --force .` to upgrade legacy IDs to full path-qualified `{stem}_{entity}` IDs.

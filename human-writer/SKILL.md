@@ -23,17 +23,27 @@ description: Write, revise, or edit prose for a natural, distinctive voice while
 
 ## 3. Revise
 
-1. Put the intended point and concrete information where the reader needs them.
-2. Remove redundant interpretation, filler, decorative contrast, and stock transitions when they weaken the passage.
-3. Choose specific, accurate words and vary sentence rhythm naturally for the writer and audience.
-4. Preserve distinctive phrasing and intentional repetition when they serve the work.
-5. In fiction, use ambiguity, nonlinear structure, subplots, dialogue, or direct emotion only when the story benefits; do not insert them mechanically.
-6. Keep facts, dates, names, numbers, caveats, and citations faithful to the source.
-7. Do not promise detector evasion or infer authorship from stylistic features.
+1. Inspect [revision examples](examples/revisions.md) for fiction and factual editing patterns.
+2. Put the intended point and concrete information where the reader needs them.
+3. Remove redundant interpretation, filler, decorative contrast, and stock transitions when they weaken the passage.
+4. Choose specific, accurate words and vary sentence rhythm naturally for the writer and audience.
+5. Preserve distinctive phrasing and intentional repetition when they serve the work.
+6. In fiction, use ambiguity, nonlinear structure, subplots, dialogue, or direct emotion only when the story benefits; do not insert them mechanically.
+7. Keep facts, dates, names, numbers, caveats, and citations faithful to the source.
+8. Do not promise detector evasion or infer authorship from stylistic features.
 
 ## 4. Verify and deliver
 
 1. Read the result as the intended reader and confirm the requested tone, structure, and length.
 2. Compare the result against the source for changed claims, lost qualifications, and altered intent.
 3. Return the requested writing; include a concise explanation of material changes only when useful or requested.
-4. Inspect [examples](examples/revisions.md) for fiction and factual editing patterns.
+
+## 5. Pre-completion checklist
+
+Before delivering revised prose, confirm evidence exists for each item:
+
+- [ ] Source text, brief, and target audience read manually in full from start to finish.
+- [ ] Author's meaning, facts, dates, citations, and locked wording preserved.
+- [ ] Redundant interpretation, filler, and stock transitions removed without distorting voice.
+- [ ] Zero AI attribution and no U+2014 em dashes in normal prose.
+- [ ] Final text read as the intended reader.

@@ -1,0 +1,26 @@
+{
+  "skill_name": "pptx",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a 6-slide executive briefing deck from verified project metrics and inspect the rendered slides.",
+      "expected_output": "Read references/pptxgenjs.md, use assertion titles, remove placeholder residue, validate with scripts/office/validate.py, convert to PDF via soffice.py, render all slides with pdftoppm, and inspect every slide.",
+      "files": [],
+      "expectations": [
+        "Gives each slide an assertion title",
+        "Validates package with validate.py and renders slides to images",
+        "Visually inspects every rendered slide for overflow, contrast, and alignment"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Update two slides in an existing branded .potx/.pptx template without breaking master styles.",
+      "expected_output": "Read references/editing.md, map slides to existing layouts, unpack/clean/pack with bundled scripts, validate, and render/inspect.",
+      "files": [],
+      "expectations": [
+        "Preserves template masters, typography, and brand system",
+        "Validates and visually inspects rendered slides after repacking"
+      ]
+    }
+  ]
+}

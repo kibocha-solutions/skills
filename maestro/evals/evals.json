@@ -1,0 +1,27 @@
+{
+  "skill_name": "maestro",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Start a multi-phase refactoring project that needs to survive context changes.",
+      "expected_output": "Orient by reading AGENTS.md, .agents/MEMORY.md, handoffs, and active sessions; create one timestamped session directory under .agents/brain/sessions/active/ with meta/, implementation_plan.md, tasks.md, and walkthrough.md before editing.",
+      "files": [],
+      "expectations": [
+        "Checks .agents/MEMORY.md and active sessions before creating a new session",
+        "Creates implementation_plan.md, tasks.md, and walkthrough.md under .agents/brain/sessions/active/",
+        "Creates goal.md only if requested or required"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Mark a Maestro session DONE after fixing all listed tasks.",
+      "expected_output": "Verify every acceptance criterion against exact final artifacts, re-read changed non-code files in full, update walkthrough.md with verification evidence, and set State: DONE.",
+      "files": [],
+      "expectations": [
+        "Verifies all acceptance criteria against exact final artifacts",
+        "Records verification commands and evidence in walkthrough.md",
+        "Marks tasks [x] only after artifact verification"
+      ]
+    }
+  ]
+}

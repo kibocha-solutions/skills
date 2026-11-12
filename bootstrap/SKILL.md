@@ -1,134 +1,67 @@
 ---
 name: bootstrap
-description: Verify and align shared agent rules and skill mirrors for Claude Code, Codex, Gemini CLI, Gemini Antigravity, and GitHub Copilot across Linux, macOS, and WSL. Use for new workstation setup, stale installed skills, shared-rule alignment, session-start hook registration, or /bootstrap.
+description: Verify and align shared agent rules, skill mirrors, per-host compliance hooks, and graphify hooks for Claude Code, Codex, Gemini CLI, Gemini Antigravity, and GitHub Copilot across Linux, macOS, and WSL. Use for new workstation setup, stale installed skills, shared-rule alignment, session-start or turn-enforcement hook registration, or /bootstrap.
 ---
 
 # Bootstrap
 
-## 1. Establish scope
+## Overview
 
-1. Identify the installed agent hosts.
-2. Identify native Linux, macOS, and WSL target paths.
-3. Confirm that the user requested alignment or bootstrap propagation.
-4. Read the repository root `AGENTS.md`.
-5. Read `references/hook-registration.md` only when registering hooks.
-6. Do not run a script for an unrequested host.
+Bootstrap aligns shared agent rules (`AGENTS.md`), skill mirrors, per-host compliance enforcement hooks, and `graphify` codebase-graph hooks across Claude Code, Codex CLI/Desktop, Gemini CLI, Gemini Antigravity, and GitHub Copilot CLI on Linux, macOS, and WSL.
 
-## 2. Verify the source repository
+Read `references/hook-registration.md` before modifying host settings or hook files. Inspect `examples/bootstrap-audit-report.md` for the expected verification report format.
 
-1. Resolve the repository root.
-2. Verify the configured `origin` URL.
-3. Verify that the intended branch is `main`.
-4. List every top-level directory containing `SKILL.md`.
-5. Confirm that the working tree changes intended for deployment are committed
-   and pushed.
-6. Stop if the remote state does not contain the intended rules and skills.
+## Step 1: Detect Installed Agent Hosts
 
-## 3. Resolve targets
+Check which agent hosts exist on the workstation before running any alignment or hook changes:
 
-Use these instruction files:
+1. **Claude Code**: `command -v claude` or `~/.claude/`
+2. **Codex**: `command -v codex` or `~/.codex/`
+3. **Gemini CLI**: `command -v gemini`, `~/.gemini/settings.json`, or `~/.gemini/hooks/`
+4. **Gemini Antigravity**: `command -v agy`, `~/.gemini/antigravity/`, or `~/.gemini/config/`
+5. **GitHub Copilot CLI**: `command -v copilot` or `~/.copilot/`
+6. **WSL Windows host**: `/mnt/c/Users/<WinUser>/.claude`, `.codex`, `.gemini`, or `.copilot`
 
-| Host | Instruction file |
-|---|---|
-| Claude Code | `~/.claude/CLAUDE.md` |
-| Codex | `~/.codex/AGENTS.md` |
-| Gemini CLI & Antigravity | `~/.gemini/GEMINI.md` |
-| GitHub Copilot | `~/.copilot/copilot-instructions.md` |
+Do not create host directories for tools that are not installed on the workstation.
 
-1. Resolve each installed host's home directory.
-2. Under WSL, resolve the active Windows user under `/mnt/c/Users/`.
-3. Include an existing Windows-host instruction path.
-4. Prune redundant root `AGENTS.md` files from host directories when the host uses a product-specific file.
-5. Skip a target whose product directory does not exist.
+## Step 2: Run the Bootstrap Alignment Scripts
 
-## 4. Align rules
-
-1. Use these block markers:
-
-```text
-<!-- BEGIN SHARED SKILLS RULES -->
-<!-- END SHARED SKILLS RULES -->
-```
-
-2. Replace the content between the first start marker and the last end marker.
-3. Preserve all content outside the marker block.
-4. Remove legacy `@skills/AGENTS.md` import pointers.
-5. Replace a legacy instruction-file symlink with a regular file when the host
-   requires one.
-6. Never overwrite unrelated user instructions.
-
-## 5. Synchronize skills
-
-1. Initialize the target `skills/` directory as a Git working copy when
-   required.
-2. Preserve unrelated untracked host-native skills.
-3. Resolve `origin` from the source checkout.
-4. Fall back to `git@github.com:kibocha-solutions/skills.git` only when the
-   source checkout has no usable `origin`.
-5. Configure non-cone sparse checkout.
-6. Include `AGENTS.md` and every top-level skill directory.
-7. Exclude `sources/`, `docs/`, and unrelated root files.
-8. Fetch `origin/main`.
-9. Reapply the sparse-checkout patterns.
-10. Reset the managed working copy to `origin/main`.
-11. Remove a stale collision only when its top-level name matches a managed
-    skill.
-12. Never remove an unrelated host-native skill.
-
-## 6. Run host scripts
-
-Run only the scripts for confirmed targets:
+Run only the alignment scripts for the detected hosts from `bootstrap/scripts/`:
 
 ```bash
-bash ~/.claude/skills/bootstrap/scripts/ensure-claude-link.sh
-bash ~/.codex/skills/bootstrap/scripts/ensure-codex-link.sh
-bash ~/.gemini/skills/bootstrap/scripts/ensure-gemini-link.sh
-bash ~/.copilot/skills/bootstrap/scripts/ensure-copilot-link.sh
+bash bootstrap/scripts/ensure-claude-link.sh
+bash bootstrap/scripts/ensure-codex-link.sh
+bash bootstrap/scripts/ensure-gemini-link.sh
+bash bootstrap/scripts/ensure-copilot-link.sh
 ```
 
-For a source-checkout invocation, use the matching script under
-`bootstrap/scripts/`.
+Each script performs two idempotent actions:
+1. Syncs `~/.<tool>/skills/` as a sparse git checkout tracking `origin/main` (including `AGENTS.md` and every top-level `<skill>/` directory).
+2. Embeds or updates the shared `AGENTS.md` rules inside the host instruction file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md`, or `~/.copilot/copilot-instructions.md`) between `<!-- BEGIN SHARED SKILLS RULES -->` and `<!-- END SHARED SKILLS RULES -->` while preserving custom content outside those markers.
 
-## 7. Handle Gemini Antigravity
+## Step 3: Register Session-Start, Turn-Enforcement, and Graphify Hooks
 
-1. Target `~/.gemini/skills/`.
-2. Register managed skills in `~/.gemini/config/skills.json` and symlink to `~/.gemini/config/skills`.
-3. Align `~/.gemini/GEMINI.md` with shared rules.
-4. Remove redundant `AGENTS.md` from `~/.gemini/`.
-5. Preserve `~/.gemini/antigravity/builtin/skills/` exclusively for built-in application skills (`agy-customizations`, `antigravity_guide`, `generative_ui`, `migrate-workflows`, `permissioned-github`).
-6. Clean any managed skills accidentally placed in `builtin/skills/`.
+Open `references/hook-registration.md` and verify that each installed host has:
 
-## 8. Register automated alignment and compliance hooks
+1. Its `SessionStart` (`sessionStart`) hook registered to run `ensure-<tool>-link.sh` so rules and skills stay aligned automatically.
+2. Its host-specific turn/session compliance enforcement hook registered so the agent is explicitly commanded to obey its governing instruction file (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, or `copilot-instructions.md`), manually read full `SKILL.md` files from disk (never relying on platform loader summaries), consult the user before taking any perceived viable alternative, re-consult the governing `SKILL.md` before claiming completion, and query `graphify` when `graphify-out/graph.json` exists:
+   - Claude Code (`~/.claude/settings.json` `UserPromptSubmit`): `enforce-claude-rules.sh`
+   - Gemini Antigravity (`~/.gemini/config/hooks.json` `PreInvocation`): `enforce-gemini-rules.sh`
+   - Gemini CLI (`~/.gemini/settings.json` `SessionStart`): `enforce-gemini-cli-rules.sh`
+   - Codex (`~/.codex/hooks.json` `SessionStart`): `enforce-codex-rules.sh`
+   - GitHub Copilot (`~/.copilot/hooks/bootstrap.json` `sessionStart`): `enforce-copilot-rules.sh`
+3. Its `graphify` MCP server (`graphify-mcp`) and `graphify` PreToolUse/PostToolUse/BeforeTool hooks configured when `graphify` is installed on the workstation:
+   - Run `graphify claude install`, `graphify codex install`, `graphify gemini install`, or `graphify hook install` as appropriate for the host.
+   - Ensure the `<!-- graphify -->` always-on rule block is present in the host's instruction file (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, `copilot-instructions.md`) so agents invoke the `graphify` skill and query `graphify` MCP/CLI before raw `grep`/`glob`/file reads whenever `graphify-out/graph.json` is present.
 
-1. Read `references/hook-registration.md`.
-2. Add the requested host's lifecycle hooks:
-   - Claude Code: `SessionStart` (alignment) and `UserPromptSubmit` (compliance enforcement) in `~/.claude/settings.json`.
-   - Gemini Antigravity: `PreInvocation` (compliance enforcement) in `~/.gemini/config/hooks.json`.
-   - Codex CLI: `SessionStart` (alignment) in `~/.codex/hooks.json`.
-   - GitHub Copilot: `sessionStart` (alignment) in `~/.copilot/hooks/bootstrap.json`.
-3. Preserve unrelated hook configuration.
-4. Test each registered script directly once.
-5. Confirm that repeated execution produces no unintended change.
+Merge JSON and TOML settings non-destructively using `python3` or `jq`; never overwrite existing user permissions, plugins, or unrelated MCP servers.
 
-## 9. Verify
+## Step 4: Verify Alignment and Report
 
-1. Confirm that each target instruction file contains exactly one complete
-   marker block.
-2. Confirm that content outside the block is unchanged.
-3. Confirm that each managed skill matches `origin/main`.
-4. Confirm that deleted repository skills are absent from managed mirrors.
-5. Confirm that native skills remain present.
-6. Confirm that no `sources/`, `docs/`, or unrelated root files entered a
-   mirror.
-7. Report changed targets, skipped targets, warnings, and failures.
+Run the verification checks before reporting completion:
 
-## 10. Pre-completion checklist
-
-- [ ] Target instruction files identified and verified.
-- [ ] Redundant root `AGENTS.md` removed from host directories (`~/.gemini/`, `~/.claude/`, `~/.copilot/`).
-- [ ] Rule blocks bounded by exact `BEGIN/END SHARED SKILLS RULES` markers.
-- [ ] Content outside marker blocks intact.
-- [ ] Managed skills synced and matching `origin/main`.
-- [ ] Native built-in skills preserved.
-- [ ] MCP servers configured with valid local paths across all hosts.
-- [ ] Lifecycle hooks registered and verified.
+1. Confirm each installed host's instruction file contains both the `<!-- BEGIN SHARED SKILLS RULES --> ... <!-- END SHARED SKILLS RULES -->` block and the `<!-- graphify -->` rule block.
+2. Confirm `~/.<tool>/skills/` is a clean git sparse checkout on `main` and all 25 skill directories exist.
+3. Execute each `ensure-<tool>-link.sh` and `enforce-<tool>-rules.sh` script once from the shell and confirm exit code `0` and valid output.
+4. Validate every modified JSON/TOML settings file (`python3 -m json.tool` / `tomllib`).
+5. Present a concise status table patterned after `examples/bootstrap-audit-report.md`.

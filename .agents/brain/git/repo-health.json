@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-10-23T18:57:00+03:00",
+  "captured_at": "2026-11-13T02:13:17+03:00",
   "branch": "main",
   "identity": {
     "user_name": "JohnKibocha",
@@ -11,10 +11,10 @@
     "full_log_command": "git log --show-signature -2 --date=iso-strict --format=fuller",
     "entries": [
       {
-        "raw": "commit 18cfe26d4d1bfb6d63a891be41f6558a19766e9a\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-10-05T01:35:30+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-10-05T01:35:30+03:00\n\n    feat(documentation): support non-blocking server execution in writerside wrapper\n\n    Configure the documentation server to run non-blocking by default, returning terminal control immediately once local health checks pass and endpoints become available. Introduce an explicit follow flag for foreground log inspection while preserving background argument compatibility."
+        "raw": "commit cdc8647887b84ea6f0916ca2b97cfc23673bc286\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-10-30T19:03:18+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-10-30T19:03:18+03:00\n\n    feat(coordinator): require scenario-based delegation guidance\n    \n    Use relevant examples to route bounded work, separate decisions from execution, and reassess active assignments when model requirements change."
       },
       {
-        "raw": "commit 8136faa083892f6e9b4674dc33fb9ee66dd141c2\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-09-28T19:51:04+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-09-28T19:51:04+03:00\n\n    fix(legalese): reconcile modal selection with register tier and fix entrenchment consequence\n\n    State that instrument class controls modal selection while register tier governs diction and structure, permitting standard-tier legislative provisions to command through designated modals. Reconcile standard-tier guidance to permit legislative commands, record entitlement phrasing for prescriptive instruments, and mandate declared invalidity consequences in entrenchment provisions."
+        "raw": "commit 94f94ec89410145fcbcb6afe73c80e5d940df4ec\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-10-30T18:55:35+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-10-30T18:55:35+03:00\n\n    feat(coordinator): require lighter models for routine delegation\n    \n    Select suitable lighter models explicitly for bounded child work and record capability-based exceptions when stronger models are necessary."
       }
     ],
     "inferred_convention": "conventional-commits"
@@ -42,7 +42,7 @@
     "cli": "gh",
     "installed": true,
     "authenticated": true,
-    "auth_checked_at": "2026-10-23T18:57:00+03:00",
+    "auth_checked_at": "2026-11-13T02:13:17+03:00",
     "preferred_for_remote_operations": true
   },
   "signing": {

@@ -44,7 +44,7 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ## 4. Build the storyboard
 
-1. State one communication objective per slide.
+1. State one communication objective per slide, and inspect [deck examples](examples/good-vs-bad-deck-patterns.md) for assertion-evidence layout patterns.
 2. Put slides in a clear narrative order.
 3. Give each slide an assertion title.
 4. Assign the supporting evidence, visual, and source to each slide.
@@ -63,8 +63,7 @@ license: Proprietary. LICENSE.txt has complete terms
 8. Use a reduced identity and slide number on content slides when branding is required.
 9. Do not add decorative title underlines.
 10. Do not add ungrounded decorative elements.
-
-Read [letterhead and pagination](../documentation/references/letterhead-and-pagination.md) when the deck carries formal branding.
+11. Read [letterhead and pagination](../documentation/references/letterhead-and-pagination.md) when the deck carries formal branding.
 
 ## 6. Lay out each slide
 
@@ -134,8 +133,6 @@ Read [letterhead and pagination](../documentation/references/letterhead-and-pagi
 7. Re-render every corrected slide.
 8. Re-run full content and package validation after the last correction.
 9. Deliver only the exact verified `.pptx` file.
-
-Inspect [deck examples](examples/good-vs-bad-deck-patterns.md) for assertion-evidence layout patterns.
 
 ## 12. Pre-completion checklist
 

@@ -30,42 +30,40 @@ license: Complete terms in LICENSE.txt
 
 ## 3. Draft formal external correspondence
 
-Read [external correspondence standards](references/external-correspondence-standards.md).
-Inspect [external correspondence examples](examples/external-correspondence-examples.md) for contrasting good versus bad implementations.
-
-1. Use a formal tone and the declaratory register (AGENTS.md §9.2): simple present for a stated position or present fact, past tense for a completed event, and `will` for a future event. Do not use command modals (`shall`, `must`).
-2. Address the recipient directly.
-3. State the necessary context.
-4. State the requested action, decision, or information.
-5. State the deadline or response method when required.
-6. Format subjects and reference lines in Title Case with periods separating
+1. Read [external correspondence standards](references/external-correspondence-standards.md) and inspect [external correspondence examples](examples/external-correspondence-examples.md) for contrasting good versus bad implementations.
+2. Use a formal tone and the declaratory register (AGENTS.md §9.2): simple present for a stated position or present fact, past tense for a completed event, and `will` for a future event. Do not use command modals (`shall`, `must`).
+3. Address the recipient directly.
+4. State the necessary context.
+5. State the requested action, decision, or information.
+6. State the deadline or response method when required.
+7. Format subjects and reference lines in Title Case with periods separating
    distinct clauses, never sentence case or colons replacing em dashes.
-7. Follow `documentation/references/letterhead-and-pagination.md` when drafting
+8. Follow `documentation/references/letterhead-and-pagination.md` when drafting
    formal letters with letterhead, including date of dispatch, recipient legal
    name and institutional address, reference line, salutation, operative
    narrative, recommendations, closing, and full signature block.
-8. Never use tables in email correspondence; format structured data as ordered
+9. Never use tables in email correspondence; format structured data as ordered
    text items to prevent rendering defects. In formal letters, format tables
    cleanly per pagination standards.
-9. Use a U+2014 em dash `—` specifically to introduce a list; do not use em
-   dashes in normal flowing prose.
-10. In formal external correspondence and any attached or governing instruments, follow Rule C (AGENTS.md §9.11): do not use bullet lists; use ordered lists with a blank line after every list item; nest with (a), (b), then (i), (ii).
-11. Never use "Next steps" as a communication header; use "Recommendations" or
+10. Use a U+2014 em dash specifically to introduce a list; do not use em
+    dashes in normal flowing prose.
+11. In formal external correspondence and any attached or governing instruments, follow Rule C (AGENTS.md §9.11): do not use bullet lists; use ordered lists with a blank line after every list item; nest with (a), (b), then (i), (ii).
+12. Never use "Next steps" as a communication header; use "Recommendations" or
     "Action Requested".
-12. Introduce attachments in the opening or body text when reader attention is
+13. Introduce attachments in the opening or body text when reader attention is
     required; do not place a detached attachments block at the bottom of
     correspondence.
-13. Exclude personal or sensitive identifying information such as national ID,
+14. Exclude personal or sensitive identifying information such as national ID,
     tax, passport, or registration numbers, personal email addresses, and
     private names unless expressly authorized by the user.
-14. Completely decouple deliverables from internal agent deliberation,
+15. Completely decouple deliverables from internal agent deliberation,
     verification tallies, repository paths, and workspace mechanics.
-15. Refer to documents by their full reader-facing titles.
-16. Present referenced documents as attachments or formal citations.
-17. Follow `documentation/references/ngo-and-donor-narrative.md` for report or
+16. Refer to documents by their full reader-facing titles.
+17. Present referenced documents as attachments or formal citations.
+18. Follow `documentation/references/ngo-and-donor-narrative.md` for report or
     proposal citations.
-18. Close with the sender's required name, title, and contact fields.
-19. Do not include a bare repository link or internal file reference.
+19. Close with the sender's required name, title, and contact fields.
+20. Do not include a bare repository link or internal file reference.
 
 ## 4. Draft an internal communication
 

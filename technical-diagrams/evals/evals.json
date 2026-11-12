@@ -1,0 +1,26 @@
+{
+  "skill_name": "technical-diagrams",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a C4 system context diagram in Draw.io and export an SVG for documentation.",
+      "expected_output": "Read diagram-type-routing, palette, layout, and mxgraph references, create editable .drawio source with unique IDs and orthogonal connectors, export SVG, render and visually inspect for overlap/clipping.",
+      "files": [],
+      "expectations": [
+        "Produces editable .drawio source with unique node IDs and resolving edge references",
+        "Exports SVG from the exact final .drawio source",
+        "Visually inspects rendered output or reports missing renderer without claiming visual QA"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Update labels in an existing .drawio architecture diagram without breaking existing node IDs.",
+      "expected_output": "Preserve existing stable node/edge IDs and project palette tokens, validate XML, regenerate exports, and visually inspect the final rendered output.",
+      "files": [],
+      "expectations": [
+        "Preserves existing node identifiers and project vocabulary",
+        "Regenerates exports after the final source edit"
+      ]
+    }
+  ]
+}

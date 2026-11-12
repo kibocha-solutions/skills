@@ -15,9 +15,8 @@ description: Audit and maintain workstation sudoers scope, workspace storage, pa
 
 ## 2. Run the read-only audit
 
-Read [the checklist](references/checklist.md).
-
-1. Inspect the current sudoers grant.
+1. Read [the checklist](references/checklist.md).
+2. Inspect the current sudoers grant.
 2. Inspect block devices, filesystems, mounts, and persistent mount configuration.
 3. Inspect installed tool versions and executable origins.
 4. Compare current LTS and stable versions with official sources.
@@ -26,9 +25,8 @@ Read [the checklist](references/checklist.md).
 
 ## 3. Apply permission rules
 
-Read [permissions](references/permissions.md).
-
-1. Use only commands present in the live sudoers grant.
+1. Read [permissions](references/permissions.md).
+2. Use only commands present in the live sudoers grant.
 2. Use only the plain invocation required by the task.
 3. Do not use config overrides, shell escapes, arbitrary package files, unsafe confinement flags, or interpreter chaining.
 4. Use `sudoedit` only for exact files present in the live grant.
@@ -38,9 +36,8 @@ Read [permissions](references/permissions.md).
 
 ## 4. Apply installation rules
 
-Read [dependency installation](references/dependency-installation.md).
-
-1. Apply the qualifying-installation gate in `AGENTS.md`.
+1. Read [dependency installation](references/dependency-installation.md).
+2. Apply the qualifying-installation gate in `AGENTS.md`.
 2. Verify the exact package identity, publisher, source, version, and scope.
 3. Install a qualifying dependency without requesting separate permission.
 4. Stop when any integrity, identity, relevance, or safety gate fails.
@@ -49,9 +46,8 @@ Read [dependency installation](references/dependency-installation.md).
 
 ## 5. Apply storage rules
 
-Read [storage and partitions](references/storage-and-partitions.md).
-
-1. Treat every unidentified device or partition as off-limits.
+1. Read [storage and partitions](references/storage-and-partitions.md).
+2. Treat every unidentified device or partition as off-limits.
 2. Treat unmounted, unlabeled, reserved, boot, recovery, diagnostic, and foreign-system partitions as unavailable.
 3. Preserve all existing data.
 4. Do not format, partition, wipe, resize, or overwrite a block device unless the live user names the exact device and confirms the exact operation in the current session.
@@ -62,9 +58,8 @@ Read [storage and partitions](references/storage-and-partitions.md).
 
 ## 6. Apply toolchain rules
 
-Read [toolchain](references/toolchain.md).
-
-1. Inspect Java, Kotlin, Python, Docker, Node, Git, GitHub CLI, and GitLab CLI separately.
+1. Read [toolchain](references/toolchain.md).
+2. Inspect Java, Kotlin, Python, Docker, Node, Git, GitHub CLI, and GitLab CLI separately.
 2. Compare each version with its official current LTS or stable line.
 3. Keep the operating system's managed Python intact.
 4. Distinguish Docker group access from sudoers access.

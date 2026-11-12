@@ -21,53 +21,50 @@ license: Complete terms in LICENSE.txt
 
 ## 2. Check and initialize multi-agent MCP tooling
 
-Read [multi-agent MCP setup](references/multi-agent-mcp-setup.md) to inspect, configure, and authenticate tooling across Claude Code, Codex CLI, Gemini Antigravity, and GitHub Copilot.
-
-1. Check if the task requires extracting Figma designs or running visual/accessibility browser verification.
-2. Inspect the active agent host configuration file for registered MCP servers:
+1. Read [multi-agent MCP setup](references/multi-agent-mcp-setup.md) to inspect, configure, and authenticate tooling across Claude Code, Codex CLI, Gemini Antigravity, and GitHub Copilot.
+2. Check if the task requires extracting Figma designs or running visual/accessibility browser verification.
+3. Inspect the active agent host configuration file for registered MCP servers:
    - Claude Code: `~/.claude/settings.json`
    - Codex CLI: `~/.codex/config.toml`
    - Gemini Antigravity: `~/.gemini/antigravity/mcp_config.json`
    - Gemini CLI: `~/.gemini/settings.json`
    - GitHub Copilot: VS Code User settings or `~/.copilot/` config
-3. Check for the `figma` MCP server when Figma links or assets are supplied:
+4. Check for the `figma` MCP server when Figma links or assets are supplied:
    - If missing, autonomously write the server configuration into the active host's configuration file.
    - Pause execution and guide the user through the authentication step by requesting their Figma Personal Access Token.
    - Store the provided token in the environment configuration and verify connectivity before continuing.
-4. Check for the `playwright` MCP server when browser verification is required:
+5. Check for the `playwright` MCP server when browser verification is required:
    - If missing, autonomously register the `@playwright/mcp@latest` server in the active host's configuration.
    - Verify that Playwright browser runtimes are available.
-5. Extract frame nodes, component variants, text styles, and color variables via Figma MCP when connected.
+6. Extract frame nodes, component variants, text styles, and color variables via Figma MCP when connected.
 
 ## 3. Calibrate taste dials and style archetypes
 
-Read [taste and aesthetic archetypes](references/taste-and-aesthetic-archetypes.md) for calibration scales and archetype specifications.
-
-1. Set the **Density Dial** from 1 to 10 based on information throughput:
+1. Read [taste and aesthetic archetypes](references/taste-and-aesthetic-archetypes.md) for calibration scales and archetype specifications.
+2. Set the **Density Dial** from 1 to 10 based on information throughput:
    - Low density (1 to 3): Consumer marketing, portfolios, onboarding flows.
    - Balanced density (4 to 6): Standard SaaS applications, settings, documentation.
    - High density (7 to 10): Financial workstations, analytics dashboards, developer tools.
-2. Set the **Variance Dial** from 1 to 10 based on structural distinctiveness:
+3. Set the **Variance Dial** from 1 to 10 based on structural distinctiveness:
    - Low variance (1 to 3): Standard modular grid, predictable form hierarchy.
    - Medium variance (4 to 6): Distinctive grid rhythms, asymmetric hero regions.
    - High variance (7 to 10): Editorial typography, dynamic split viewpoints.
-3. Select one primary style archetype:
+4. Select one primary style archetype:
    - Clean Functional (modern SaaS, crisp borders, neutral surfaces, deliberate focus).
    - Refined Editorial (serif display type, generous leading, structured rules).
    - Dense Utility (monospace data tables, minimal padding, visible dividers).
    - Soft Tactile (gentle inner shadows, pill geometry, tactile spring response).
    - Bold Contemporary (vibrant accents, high-contrast type, expressive geometry).
-4. Restrain all secondary elements around the primary focal anchor.
+5. Restrain all secondary elements around the primary focal anchor.
 
 ## 4. Select the platform design system
 
-Read [design systems HIG and Material 3](references/design-systems-hig-and-material3.md) for component anatomy, official URLs, and platform selection matrices.
-
-1. Choose the authoritative design foundation:
+1. Read [design systems HIG and Material 3](references/design-systems-hig-and-material3.md) for component anatomy, official URLs, and platform selection matrices.
+2. Choose the authoritative design foundation:
    - **Apple Human Interface Guidelines (HIG)**: For iOS and iPadOS applications. Enforce 44x44pt minimum touch targets, San Francisco typography, vibrancy materials, and standard navigation controllers.
    - **Google Material 3 Expressive**: For Android applications. Enforce 48x48dp minimum touch targets, dynamic color tonal palettes, 35+ expressive shape corners, and container transforms.
    - **Modern Web Synthesis**: For responsive cross-platform web applications. Combine Apple's typographic restraint and touch ergonomics with Material 3's semantic container token hierarchy.
-2. Inspect the official design guideline documentation for each requested component type:
+3. Inspect the official design guideline documentation for each requested component type:
    - Apple HIG: `https://developer.apple.com/design/human-interface-guidelines/`
    - Material 3 Components: `https://m3.material.io/components/`
 
@@ -100,22 +97,20 @@ Read [design systems HIG and Material 3](references/design-systems-hig-and-mater
 
 ## 7. Reject unearned defaults
 
-Do not select any of these generic tropes without explicit support from the brief:
-
-- Terracotta, cream, and high-contrast serif palette.
-- Near-black surface paired automatically with one acid accent.
-- Broadsheet layout with hairline rules used as default decoration.
-- Identical rounded cards with uniform floating drop shadows.
-- Gradient washes applied purely as decorative background filler.
-- All-caps eyebrow labels placed above every single section heading.
-- Single-word colored accenting inside headlines.
-- Middle-dot (`·`) metadata chains used without semantic hierarchy.
-- Automatic right arrows (`→`) appended to every button and link.
-- Hover zoom animations applied to every card container.
-
-1. Compare proposed wireframes and tokens against this exclusion list.
-2. Replace any choice that cannot be justified by the brief or brand constraints.
-3. Record confirmed choices in `DESIGN.md`.
+1. Inspect [interface design examples](examples/good-vs-bad-interface-design.md) for contrasting good versus bad token, radius, and layout patterns.
+2. Compare proposed wireframes and tokens against these generic tropes, and reject any choice lacking explicit support from the brief:
+   - Terracotta, cream, and high-contrast serif palette.
+   - Near-black surface paired automatically with one acid accent.
+   - Broadsheet layout with hairline rules used as default decoration.
+   - Identical rounded cards with uniform floating drop shadows.
+   - Gradient washes applied purely as decorative background filler.
+   - All-caps eyebrow labels placed above every single section heading.
+   - Single-word colored accenting inside headlines.
+   - Middle-dot (`·`) metadata chains used without semantic hierarchy.
+   - Automatic right arrows (`→`) appended to every button and link.
+   - Hover zoom animations applied to every card container.
+3. Replace any choice that cannot be justified by the brief or brand constraints.
+4. Record confirmed choices in `DESIGN.md`.
 
 ## 8. Write interface content and copy
 

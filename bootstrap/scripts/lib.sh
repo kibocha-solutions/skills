@@ -97,6 +97,24 @@ with open(sys.argv[5], "w", encoding="utf-8") as f:
     echo "$rules_content" >> "$tmp_file"
   fi
 
+  if command -v graphify >/dev/null 2>&1 || [ -x "$HOME/.local/bin/graphify" ]; then
+    if ! grep -qF "<!-- graphify -->" "$tmp_file" 2>/dev/null; then
+      cat >> "$tmp_file" << 'GRAPHIFY_EOF'
+
+<!-- graphify -->
+## Graphify Codebase Knowledge Graph Mandate
+
+This workstation has **graphify** (`graphify` CLI + `graphify-mcp` MCP server) and the `graphify` skill installed.
+Whenever a repository contains `graphify-out/graph.json` (or `graphify-out/GRAPH_REPORT.md`):
+1. Read and follow the `graphify` skill (`SKILL.md`) before exploring code, tracing dependencies, or reviewing architecture.
+2. Query the `graphify` MCP tools (`query_graph`, `get_neighbors`, `get_node`, `shortest_path`, `god_nodes`, `graph_stats`, `explain_node`, `get_community`) or read `graphify-out/GRAPH_REPORT.md` **before** running raw `grep`, `ripgrep`, `glob`, or broad file reads.
+3. Read raw source files only for the specific files and line ranges identified by the graph, or when preparing an exact edit.
+4. After modifying source files in a graphed repository, run `graphify update .` (or rely on the active post-edit / git hook) so `graphify-out/` stays synchronized.
+<!-- /graphify -->
+GRAPHIFY_EOF
+    fi
+  fi
+
   if cmp -s "$target" "$tmp_file"; then
     rm -f "$tmp_file"
     echo "unchanged"

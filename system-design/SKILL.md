@@ -33,9 +33,8 @@ description: Design and audit system architecture, ERDs, database schemas, domai
 
 ## 4. Define responsibilities and boundaries
 
-Read [naming and responsibility](references/naming-and-responsibility.md).
-
-1. Give every component one clear responsibility.
+1. Read [naming and responsibility](references/naming-and-responsibility.md) and inspect [boundary examples](examples/good-vs-bad-system-boundaries.md) for service decoupling patterns.
+2. Give every component one clear responsibility.
 2. State what each component owns.
 3. State what each component excludes.
 4. State when it is created, changed, and retired.
@@ -57,9 +56,8 @@ Read [naming and responsibility](references/naming-and-responsibility.md).
 
 ## 6. Design data and ERDs
 
-Read [ERD design](references/erd-design.md).
-
-1. Define the row responsibility for every table.
+1. Read [ERD design](references/erd-design.md).
+2. Define the row responsibility for every table.
 2. Identify candidate keys, primary keys, alternate keys, and foreign keys.
 3. Identify every functional, multivalued, and join dependency.
 4. Test 1NF, 2NF, 3NF, BCNF, 4NF, and 5NF where applicable.
@@ -95,14 +93,12 @@ Read [ERD design](references/erd-design.md).
 5. Recommend one design when the evidence supports it.
 6. Leave the decision open when the evidence does not resolve it.
 7. Record rejected alternatives only when the rejection prevents repeated design errors.
-
-Read [bad patterns](references/bad-patterns.md).
+8. Read [bad patterns](references/bad-patterns.md).
 
 ## 9. Record the settled design
 
-Read [design workflow](references/design-workflow.md).
-
-1. Keep unstable brainstorming in chat.
+1. Read [design workflow](references/design-workflow.md).
+2. Keep unstable brainstorming in chat.
 2. Record accepted design decisions under the project's `.agents/brain/<domain>/` convention.
 3. Include responsibilities, boundaries, names, relationships, examples, constraints, lifecycle, open questions, and rejected alternatives.
 4. Make the record understandable without chat history.
@@ -127,8 +123,6 @@ Read [design workflow](references/design-workflow.md).
 6. Verify normalization claims with declared dependencies.
 7. Verify diagrams and documentation match the settled design.
 8. Read the final design record in full.
-
-Inspect [boundary examples](examples/good-vs-bad-system-boundaries.md) for service decoupling patterns.
 
 ## 12. Pre-completion checklist
 

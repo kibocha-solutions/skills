@@ -47,7 +47,8 @@ license: Complete terms in LICENSE.txt
 
 ## 3. Write the questions
 
-1. Write two or three questions.
+1. Read [question criteria](references/reflection-question-criteria.md) and inspect [question examples](examples/good-vs-bad-reflection-sets.md) for concrete framing patterns before drafting reflection sets.
+2. Write two or three questions.
 2. Tie each question to one named fact, figure, decision, inference, or missing
    context from the answer.
 3. Use each question for one purpose:
@@ -84,9 +85,6 @@ A few things worth a second look:
 4. Confirm that there are two or three questions.
 5. Confirm that the exact lead-in appears once.
 6. Confirm that the nudge is the final content.
-
-Read [question criteria](references/reflection-question-criteria.md) before drafting reflection sets.
-Inspect [question examples](examples/good-vs-bad-reflection-sets.md) for concrete framing patterns.
 
 ## 6. Pre-completion checklist
 

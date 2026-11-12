@@ -6,38 +6,14 @@ license: Complete terms in LICENSE.txt
 
 # Web Application Testing
 
-## Procedure
+## 1. Inspect and start the server
 
 1. Read the project instructions.
 2. Inspect the application entrypoint, routes, server command, expected port, and existing test configuration.
 3. Inspect every helper script before executing it.
 4. Check whether the required server is already running.
 5. Start only the server command required by the project.
-6. Use `scripts/with_server.py` when the test requires managed server startup and cleanup.
-7. Create a temporary Playwright script or add a project test when the user requested a durable test.
-8. Navigate to the exact route under test.
-9. Wait for a deterministic application-ready condition.
-10. Inspect the rendered DOM and take a baseline screenshot.
-11. Select elements by accessible role, label, visible name, test identifier, or stable project selector.
-12. Perform the user workflow.
-13. Assert the visible result and relevant state change.
-14. Capture console errors, page errors, failed requests, and response failures.
-15. Test each requested viewport and interaction state.
-16. Take final screenshots.
-17. Open and visually inspect every screenshot used as evidence.
-18. Stop managed servers and close the browser.
-19. Run existing relevant tests.
-20. Report the exact command, route, checks, evidence paths, and failures.
-
-## Server runner
-
-Inspect help before use:
-
-```bash
-python3 webapp-testing/scripts/with_server.py --help
-```
-
-Run one server:
+6. Use `scripts/with_server.py` when the test requires managed server startup and cleanup; inspect `python3 webapp-testing/scripts/with_server.py --help` before use:
 
 ```bash
 python3 webapp-testing/scripts/with_server.py \
@@ -46,45 +22,29 @@ python3 webapp-testing/scripts/with_server.py \
   -- python3 /tmp/ui_check.py
 ```
 
-Run two servers from separate directories:
+For two servers from separate directories, pass repeated `--server`, `--port`, and `--cwd` flags.
 
-```bash
-python3 webapp-testing/scripts/with_server.py \
-  --server "python3 -m uvicorn app:app" --port 8000 --cwd backend \
-  --server "npm run dev" --port 5173 --cwd frontend \
-  -- python3 /tmp/ui_check.py
-```
+## 2. Author and execute Playwright checks
 
-## Playwright requirements
+1. Read [Playwright test architecture](references/playwright-test-architecture.md) for locator hierarchy, stability patterns, and server-runner details.
+2. Inspect [element discovery](examples/element_discovery.py), [console logging](examples/console_logging.py), and [static HTML automation](examples/static_html_automation.py) when concrete Playwright script patterns are needed.
+3. Create a temporary Playwright script, or add a project test when the user requested a durable test.
+4. Use a fresh browser context with an explicit viewport for each isolated scenario, and close contexts and browsers in `finally` blocks.
+5. Capture console errors, page errors, failed requests, and response failures before navigation.
+6. Navigate with `page.goto(..., wait_until="domcontentloaded")` and wait for a deterministic application-ready condition; use time-based waits only when testing time-dependent behavior.
+7. Inspect the rendered DOM and take a baseline screenshot.
+8. Select elements by accessible role, label, visible name, test identifier, or stable project selector.
+9. Perform the user workflow and assert visible outcomes after every state-changing action across initial load, primary path, validation/error, loading/empty, keyboard interaction, focus visibility, and requested responsive widths.
+10. Save final screenshots outside the repository unless the project prescribes a test-artifact directory; do not expose secrets, tokens, cookies, or private page content in logs or screenshots.
 
-- Use a fresh browser context for each isolated scenario.
-- Set an explicit viewport.
-- Close contexts and browsers in `finally` blocks.
-- Use `page.goto(..., wait_until="domcontentloaded")`.
-- Wait for a stable element or application state.
-- Use time-based waits only when testing time-dependent behavior.
-- Keep selectors tied to user-visible semantics or stable project identifiers.
-- Assert outcomes after every state-changing action.
-- Capture browser and application errors before navigation.
-- Save evidence outside the repository unless the project prescribes a test-artifact directory.
-- Do not expose secrets, tokens, cookies, or private page content in logs or screenshots.
+## 3. Verify and clean up
 
-## Coverage checklist
+1. Open and visually inspect every screenshot used as evidence.
+2. Stop managed servers and close the browser.
+3. Run existing relevant tests.
+4. Report the exact command, route, checks, evidence paths, and failures.
 
-- [ ] Initial page load
-- [ ] Primary user path
-- [ ] Validation and error state
-- [ ] Loading and empty state
-- [ ] Keyboard interaction
-- [ ] Focus visibility
-- [ ] Requested responsive widths
-- [ ] Console and page errors
-- [ ] Failed requests and responses
-- [ ] Final rendered appearance
-
-Read [Playwright test architecture](references/playwright-test-architecture.md) for locator hierarchy and stability patterns.
-
-## Pre-completion checklist
+## 4. Pre-completion checklist
 
 - [ ] The tested server command matches the project.
 - [ ] The tested route is recorded.
@@ -96,4 +56,3 @@ Read [Playwright test architecture](references/playwright-test-architecture.md) 
 - [ ] Zero AI attribution in test files, logs, or reports.
 - [ ] No U+2014 em dashes in normal prose.
 - [ ] Reported results match the exact final test run.
-

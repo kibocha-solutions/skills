@@ -1,0 +1,27 @@
+{
+  "skill_name": "docx",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a three-page A4 institutional report in DOCX with a repeating-header table and verify its layout.",
+      "expected_output": "Build with explicit DXA dimensions, repeating table headers (tblHeader/cantSplit), validate with validate.py, convert to PDF via soffice.py, render pages with pdftoppm, and visually inspect every page.",
+      "files": [],
+      "expectations": [
+        "Uses explicit DXA widths and A4 dimensions",
+        "Validates package with scripts/office/validate.py",
+        "Renders to PDF and page images and inspects rendered pages"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add tracked changes to an existing contract DOCX without leaving AI attribution in author metadata.",
+      "expected_output": "Unpack the DOCX, use sibling w:del and w:ins elements with the established or Editor author (never an AI name), repack, validate, and visually inspect.",
+      "files": [],
+      "expectations": [
+        "Uses established author, user-specified author, or 'Editor'",
+        "Never places AI names in author metadata",
+        "Validates and renders the final repacked DOCX"
+      ]
+    }
+  ]
+}

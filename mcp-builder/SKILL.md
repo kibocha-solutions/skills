@@ -22,8 +22,7 @@ license: Complete terms in LICENSE.txt
 4. Use only APIs documented for that major version.
 5. Record the protocol revision and SDK versions in the implementation plan.
 6. Do not copy examples from an older major version without migrating them.
-
-Use [TypeScript implementation](references/node_mcp_server.md) or [Python implementation](references/python_mcp_server.md).
+7. Read [TypeScript implementation](references/node_mcp_server.md) or [Python implementation](references/python_mcp_server.md) for the target SDK.
 
 ## 3. Choose the transport
 
@@ -36,9 +35,8 @@ Use [TypeScript implementation](references/node_mcp_server.md) or [Python implem
 
 ## 4. Design the MCP surface
 
-Read [MCP best practices](references/mcp_best_practices.md).
-
-1. Use tools for actions and parameterized operations.
+1. Read [MCP best practices](references/mcp_best_practices.md) and inspect [MCP server examples](examples/good-vs-bad-mcp-server.md) for stdio logging and schema hygiene.
+2. Use tools for actions and parameterized operations.
 2. Use resources for retrievable content with stable identifiers.
 3. Use prompts for reusable user-invoked prompt templates.
 4. Use server instructions for cross-tool order and constraints.
@@ -106,9 +104,8 @@ Read [MCP best practices](references/mcp_best_practices.md).
 
 ## 10. Evaluate usability
 
-Read [evaluation procedure](references/evaluation.md).
-
-1. Create ten independent, read-only tasks with stable answers.
+1. Read [evaluation procedure](references/evaluation.md).
+2. Create ten independent, read-only tasks with stable answers.
 2. Cover discovery, pagination, multi-step retrieval, ambiguity resolution, and output interpretation.
 3. Solve each task through the public MCP surface.
 4. Verify each expected answer independently.
@@ -124,8 +121,6 @@ Read [evaluation procedure](references/evaluation.md).
 4. Include tested client configuration examples without credentials.
 5. Re-run all verification against the final code.
 6. Confirm the documentation matches the final exposed MCP surface.
-
-Inspect [MCP server examples](examples/good-vs-bad-mcp-server.md) for stdio logging and schema hygiene.
 
 ## 12. Pre-completion checklist
 

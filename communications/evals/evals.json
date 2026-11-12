@@ -1,0 +1,28 @@
+{
+  "skill_name": "communications",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Draft a formal donor update letter with two attached financial reports and a table of grant milestones.",
+      "expected_output": "Apply external declaratory register, Title Case period-separated subject, letterhead and pagination standards, introduce attachments in body prose using ordered text, and omit AI attribution or em dashes in normal prose.",
+      "files": [],
+      "expectations": [
+        "Applies external formal declaratory register without command modals",
+        "Uses Title Case with period separators in subject/reference line",
+        "Introduces attachments in body prose rather than a detached bottom block",
+        "Uses ordered lists rather than bullets and no U+2014 em dashes in normal prose"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Draft an email update to a partner summarizing three action items; the user has not said the audience is internal.",
+      "expected_output": "Default to external register, format structured items as ordered text rather than a Markdown/HTML table, and exclude internal paths or session notes.",
+      "files": [],
+      "expectations": [
+        "Defaults to external register when internal audience is unconfirmed",
+        "Avoids tables in email correspondence",
+        "Excludes repository paths, filenames, and internal deliberation"
+      ]
+    }
+  ]
+}

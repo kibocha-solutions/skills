@@ -1,18 +1,9 @@
 {
-  "mcp": {
-    "servers": {
-      "code-review-graph": {
-        "command": "code-review-graph",
-        "args": ["serve"],
-        "cwd": "<repo-root>",
-        "transport": "stdio"
-      },
-      "codegraphcontext": {
-        "command": "cgc",
-        "args": ["mcp", "start"],
-        "cwd": "<repo-root>",
-        "transport": "stdio"
-      }
+  "mcpServers": {
+    "graphify": {
+      "command": "/home/<USER>/.local/bin/graphify-mcp",
+      "args": []
     }
-  }
+  },
+  "_comment": "Multi-project capable: every MCP tool accepts an optional project_path parameter pointing to a directory containing graphify-out/graph.json. To pin a single workspace graph by default, pass [\"<REPO_ROOT>/graphify-out/graph.json\"] in args or set cwd to <REPO_ROOT>. Alternative invocation without global PATH: command=\"uv\", args=[\"run\", \"--with\", \"graphifyy[mcp]\", \"-m\", \"graphify.serve\"]."
 }
