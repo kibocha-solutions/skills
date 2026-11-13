@@ -1,7 +1,7 @@
 ---
 name: graphify
 description: Build, update, query, export, and enforce codebase and document knowledge graphs with `graphifyy` (`graphify` CLI and `graphify-mcp`). Use for architecture mapping, blast-radius and PR impact analysis, dependency and path tracing, structural code review, community and god-node inspection, setting up `graphify` MCP or guard hooks, and handling `/graphify`, `--update`, `--cluster-only`, `--watch`, or `--mode deep`.
-compatibility: Requires Python >=3.10,<3.15, uv or pip, and graphifyy (optional extras: mcp, watch, leiden, pdf, office, svg).
+compatibility: "Requires Python >=3.10,<3.15, uv or pip, and graphifyy (optional extras: mcp, watch, leiden, pdf, office, svg)."
 ---
 
 # Graphify
