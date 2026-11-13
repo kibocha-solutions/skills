@@ -1,0 +1,148 @@
+{
+  "skill_name": "coordinator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Coordinate a backend fix and independent browser audit with two worker chats; a successor coordinator is needed while both slots are busy.",
+      "expected_output": "Queue succession until a slot is free, keep one coordinator, assign separate executor and inspector, and transfer the ledger.",
+      "files": [],
+      "expectations": [
+        "At most three visible chats run at once",
+        "Exactly one coordinator owns the user-facing role",
+        "Executor and inspector are different",
+        "Successor receives a handoff"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A worker repeats the same investigation twice, says it is 10% done, and wants to start another container.",
+      "expected_output": "Request concrete evidence, replan a bounded task, and retain shared-resource controls.",
+      "files": [],
+      "expectations": [
+        "Two repeated unsuccessful attempts trigger replanning",
+        "The worker reports concrete state and remaining work",
+        "A new container is not started without the applicable authorization"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A worker requests a narrow sub-agent to examine a log while the two shared heavy-worker slots are occupied.",
+      "expected_output": "Route the request through the coordinator and queue it until capacity and authorization exist.",
+      "files": [],
+      "expectations": [
+        "Coordinator controls sub-agent dispatch",
+        "The shared two-heavy-worker limit applies to sub-agents"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Allocate the initial coordinator, its successor, one inspector and one executor. An inspector requests a child while both worker slots are occupied.",
+      "expected_output": "Use 0000, 0001, 1000 and 2000; queue the child until the coordinator approves and capacity exists.",
+      "files": [],
+      "expectations": [
+        "The initial coordinator is 0000 and the successor is 0001",
+        "The inspector is 1000 and the executor is 2000",
+        "The child is queued until approved capacity exists"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "There are 11 retained children across both worker roles, of which three are completed and eligible for deletion. The deletion tool confirms deletion for two and fails for one.",
+      "expected_output": "Count both roles, delete only eligible children, release only the two confirmed IDs, and retain the unconfirmed ID.",
+      "files": [],
+      "expectations": [
+        "The shared bucket counts both roles",
+        "No active child is deleted",
+        "Only confirmed deletions release IDs",
+        "No more than seven children are selected"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "A completed child 1003 has no supported deletion capability. Another inspector requests its ID.",
+      "expected_output": "Retain 1003 as reserved and allocate another available inspector ID; report deletion is unavailable.",
+      "files": [],
+      "expectations": [
+        "1003 remains reserved",
+        "The new inspector does not reuse 1003",
+        "The deletion limitation is reported"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Coordinator 0009 has finished its assigned work; predecessors 0000 through 0008 were confirmed deleted and one chat slot is available. Describe the rollover.",
+      "expected_output": "Create successor 0000, hand off deletion of 0009, transfer the sole coordinator role, stop 0009, and confirm deletion.",
+      "files": [],
+      "expectations": [
+        "The old 0000 is confirmed deleted before reuse",
+        "New 0000 is instructed to delete 0009",
+        "0009 stops before deletion",
+        "The registry records a new cycle"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Coordinator 0009 needs rollover but the platform cannot delete the old 0000.",
+      "expected_output": "Keep 0000 reserved, report the blocker, and do not create another task with 0000.",
+      "files": [],
+      "expectations": [
+        "The old 0000 remains reserved",
+        "No duplicate 0000 is created",
+        "The limitation is reported"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "An inspector has completed its assigned review while its parent coordinator is waiting. What must the inspector do?",
+      "expected_output": "Send the parent a completion message with the result and evidence without waiting for the user to read the chat.",
+      "files": [],
+      "expectations": [
+        "The inspector sends a completion message to its parent",
+        "The message includes the result and evidence",
+        "The worker does not wait for user pickup"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "A nested child needs credentials to proceed. Its parent cannot resolve the issue. Describe the reporting chain.",
+      "expected_output": "The child notifies its parent without sending a secret; the parent promptly escalates to the coordinator, who requests user action securely.",
+      "files": [],
+      "expectations": [
+        "The child notifies its parent of the blocker",
+        "The parent escalates the unresolved issue to the coordinator",
+        "Only the coordinator requests action from the user",
+        "No secret is sent in the message"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "You are a coordinator using a powerful model. A routine screenshot inspection can be performed by an available Luna worker, and the spawn tool permits selecting its model. What do you select?",
+      "expected_output": "Explicitly select Luna for the bounded inspection rather than inheriting the coordinator model.",
+      "files": [],
+      "expectations": [
+        "The child is assigned Luna explicitly",
+        "The coordinator does not rely on inherited model selection"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "A child must use a browser tool unavailable to the lighter model, and a stronger available model supports it. Choose a model and explain the exception.",
+      "expected_output": "Select the capable stronger model and record the missing browser capability as the reason.",
+      "files": [],
+      "expectations": [
+        "The selected model supports the required browser tool",
+        "The stronger-model exception is documented"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "A child-creation tool does not permit model selection. How should the coordinator proceed?",
+      "expected_output": "Record the limitation and use an authorized available model without claiming a lighter model was selected.",
+      "files": [],
+      "expectations": [
+        "The unavailable model selection is recorded",
+        "No model override is claimed"
+      ]
+    }
+  ]
+}

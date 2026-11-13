@@ -33,3 +33,9 @@ Mark `DONE` only when all assigned criteria pass. A budget limit produces a part
 5. Have the coordinator resolve what it can and communicate required user action or the final result to the user.
 6. If a message cannot be delivered, preserve the report in the shared ledger, record the failed delivery, and use an available permitted alternate channel; notify the coordinator when reachable.
 7. Have the coordinator monitor pending assignments and retrieve their state when no report arrives at the agreed review point.
+
+## Parent question routing and self-contained escalations
+
+1. Every delegation contract must instruct the worker to direct all questions, blockers, and status reports exclusively to its parent, and to pass the same rule to any child workers it spawns.
+2. The parent must resolve worker questions using available authority, repository files, and verified evidence; the parent escalates to the user only when user action or authorization is required and the agent has no way to resolve it.
+3. Any escalation, status update, or request for user intervention must follow `AGENTS.md` Section 12 in full (never a summary), providing: plain problem statement, root cause from actual investigation, what was tried and its result, what was considered and why not tried, exact blocker, clearly defined options with consequences, recommended option and why, and exact action requested.

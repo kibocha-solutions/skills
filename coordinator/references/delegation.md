@@ -36,3 +36,10 @@
 4. Schedule at most two concurrent heavy operations across all chats and sub-agents.
 5. Collect related audit findings before compatible fixes and refresh once for the batch when authorized.
 6. Preserve shared data and obtain required maintenance authorization before service, schema, or data changes.
+
+## Heartbeat, wake timer, and persistence checklist
+
+1. Confirm at startup whether timers/cron, one-shot wake, usage-window checks, and messaging work; if any fails after inspecting docs/schemas and attempting it, report the failure to the user per `AGENTS.md` Section 12.
+2. Keep one 30-minute active heartbeat running during active work (`references/heartbeat-and-wake.md`), or one 90-minute blocked heartbeat if waiting exclusively on user action.
+3. Enforce strict mutual exclusion: cancel any active heartbeat before scheduling a wake timer, and cancel any active wake timer before starting a heartbeat.
+4. At 95% 5-hour or 98% weekly usage, persist state to `.agents/brain/sessions/active/` and `.agents/brain/handoffs/`, cancel the heartbeat, and schedule a post-reset wake timer.

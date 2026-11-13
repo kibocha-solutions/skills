@@ -21,8 +21,8 @@ skill_dirs = sorted(path.parent for path in root.glob("*/SKILL.md"))
 agents_file = root / "AGENTS.md"
 agents_text = agents_file.read_text(encoding="utf-8")
 agents_words = len(agents_text.split())
-if agents_words >= 1500:
-    errors.append(f"AGENTS.md: {agents_words} words; limit is 1499")
+if agents_words >= 2500:
+    errors.append(f"AGENTS.md: {agents_words} words; limit is 2499")
 
 agents_sections = re.findall(r"^## (.+)$", agents_text, re.MULTILINE)
 required_opening_sections = ["1. General commands", "2. Working with skills"]

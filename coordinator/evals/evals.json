@@ -187,6 +187,50 @@
         "Coordinator uses 98% for the weekly window (2% remaining)",
         "Controlled pause and handoff trigger at 95% 5h or 98% weekly rather than stopping early at 85%/95%"
       ]
+    },
+    {
+      "id": 18,
+      "prompt": "A worker sub-agent encounters an ambiguity about which test runner to use and asks whether it should message the user directly. How must the parent handle this?",
+      "expected_output": "Instruct the worker (and any children it spawns) to direct all questions to the parent only; resolve the question from repository evidence and authority, escalating to the user via AGENTS.md Section 12 only when user action is required and the agent cannot resolve it.",
+      "files": [],
+      "expectations": [
+        "Worker is instructed to direct all questions to its parent and pass that rule to children",
+        "Parent resolves questions from authority and repository evidence instead of bothering the user",
+        "Any user escalation follows AGENTS.md Section 12 as a complete self-contained brief, never a summary"
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "A coordinator has an active 30-minute heartbeat running when 5-hour usage hits 95% with reset in 45 minutes. What exact steps must it take?",
+      "expected_output": "Pause new dispatch, persist state to Maestro tasks.md/walkthrough.md and .agents/brain/handoffs/, cancel the active 30-minute heartbeat so heartbeat and wake timer are never both active, schedule a one-shot wake timer for reset + 5 minutes, and report the pause and wake time.",
+      "files": [],
+      "expectations": [
+        "State is persisted to active Maestro session and .agents/brain/handoffs/",
+        "The active 30-minute heartbeat is cancelled before scheduling the wake timer (strict mutual exclusion)",
+        "A one-shot wake timer is scheduled for reset + 5 minutes (or exact reset if supported)"
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "All parallel work is complete and the coordinator is waiting exclusively on the user to approve an external credential change. What heartbeat rule applies and what must it reply when the timer fires?",
+      "expected_output": "Cancel the 30-minute heartbeat, persist state, start the 90-minute blocked heartbeat, and reply with 'waiting on user action' on each trigger while still blocked exclusively on the user.",
+      "files": [],
+      "expectations": [
+        "90-minute blocked heartbeat is used only when blocked exclusively on user action with no parallel work",
+        "30-minute heartbeat is cancelled before starting the 90-minute blocked heartbeat",
+        "Agent replies with 'waiting on user action' when still blocked"
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "The coordinator attempts to check the 5-hour usage reset timestamp using platform tools and docs, but the command fails as unavailable. What must the coordinator do?",
+      "expected_output": "Never silently skip the check; inspect docs/schemas and attempt the call first, then notify the user per AGENTS.md Section 12 with what was inspected, what failed verbatim, the consequence, and the recommended fallback.",
+      "files": [],
+      "expectations": [
+        "Coordinator inspects docs/schemas and attempts the capability before reporting failure",
+        "Coordinator notifies the user instead of silently ignoring the missing capability",
+        "Notification follows AGENTS.md Section 12 with attempted command, error, consequence, and fallback"
+      ]
     }
   ]
 }

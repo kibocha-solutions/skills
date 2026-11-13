@@ -36,11 +36,11 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 5. Separate decisions requiring deeper judgment from bounded implementation and inspection; route each part according to its actual requirements.
 6. Use a stronger model only when the task requires its judgment or capabilities, the lighter model is unavailable, or the user or governing runtime requires it; record the reason.
 7. Reassess active assignments when the user corrects the model choice; preserve work and use supported controls to redirect or reassign the remaining bounded work.
-8. Instruct each worker to message its parent when done, blocked, or needing a decision; require workers to pass the same instruction to their children.
-9. Resolve questions from available authority and evidence; escalate to the user only when necessary.
+8. Instruct each worker to direct all questions, blockers, and completion reports to its parent (never directly to the user), and require workers to pass the same instruction to their children.
+9. Require the parent to make the best decision from available authority and evidence; escalate to the user only when user action is required and the agent has no way to resolve it.
 10. Do not let a worker expand scope or create resources without coordinator authorization and any applicable user approval.
 11. Require parents to acknowledge child reports and relay unresolved concerns to the coordinator promptly.
-12. Keep the coordinator as the sole user-facing contact; request user action only through the coordinator.
+12. Keep the coordinator as the sole user-facing contact; format every escalation, status update, or question as a complete, self-contained brief per `AGENTS.md` Section 12 (never as a summary).
 13. Dispatch authorized work directly when the platform permits it; if a required action cannot be performed, report the specific capability or authorization blocker.
 
 ## 4. Control progress and resources
@@ -48,11 +48,12 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 1. Maintain a shared ledger of assignments, active chats and sub-agents, resource owners, evidence, blockers, and decisions.
 2. Treat the environment as a shared two-core system; schedule at most two heavy worker operations concurrently.
 3. Reuse authorized services and batch audits, compatible fixes, and verification around a coordinated refresh.
-4. Set a bounded review time and iteration limit where supported; use 30 minutes as the default progress review interval for sustained assignments.
+4. Run the 30-minute active heartbeat, 90-minute blocked heartbeat, post-reset wake timer, and state persistence per `references/heartbeat-and-wake.md` using prompts in `assets/heartbeat-prompts.md`; enforce strict mutual exclusion so Heartbeat and Wake Timer are never active at the same time.
 5. Require `DONE`, `PARTIAL`, or `BLOCKED` with evidence and remaining work; do not accept an unsupported percentage as progress.
 6. After two unsuccessful repetitions of the same approach, stop and replan; never retry a permission denial.
 7. Interrupt or redirect stalled work when supported; preserve partial results and uncommitted changes.
-8. Monitor available usage windows across the team and initiate controlled pause, handoff, and authorized wake-up when usage reaches 95% of the 5-hour window (5% remaining) or 98% of the weekly window (2% remaining).
+8. Monitor 5-hour and weekly usage windows across the team; when usage reaches 95% of the 5-hour window (5% remaining) or 98% of the weekly window (2% remaining), persist state, cancel the active heartbeat, and schedule a post-reset wake timer per `references/heartbeat-and-wake.md`.
+9. Never silently skip a timer, wake, or usage check: inspect platform documentation, commands, and tool schemas first, attempt the call, and if it still fails, notify the user per `AGENTS.md` Section 12 and `references/heartbeat-and-wake.md`.
 
 ## 5. Review and hand off
 

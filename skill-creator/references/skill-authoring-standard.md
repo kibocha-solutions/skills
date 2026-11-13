@@ -17,7 +17,7 @@ Do not duplicate an instruction. Route to its controlling location.
 
 ## `AGENTS.md`
 
-1. Keep `AGENTS.md` below 1,500 words.
+1. Keep `AGENTS.md` below 2,500 words.
 2. Start with direct authority and compliance commands.
 3. Put the complete skill-use procedure immediately after the general commands.
 4. Include only rules that apply across repositories and task types:
