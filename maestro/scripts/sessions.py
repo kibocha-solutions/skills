@@ -30,6 +30,9 @@ STATE_LINE = re.compile(r"^\W*state\W*[:=]\s*(.+?)\s*(-->)?\s*$", re.I | re.M)
 EVIDENCE_EXT = re.compile(
     r"\.(png|jpe?g|webp|gif|bmp|svg|mp4|webm|mov|pdf|zip|tar|gz|zst|xz|7z|har|trace|log)$", re.I
 )
+TEXT_SOURCE = re.compile(
+    r"\.(md|markdown|txt|rst|json|jsonl|csv|tsv|ya?ml|toml|html?|xml|docx?|xlsx?|pptx?|odt|ods|odp)$", re.I
+)
 TODAY = datetime.date.today()
 
 
@@ -105,7 +108,8 @@ def move_evidence(folder: Path) -> int:
     for path in sorted(folder.rglob("*")):
         if not path.is_file() or path.name == "EVIDENCE.md":
             continue
-        if EVIDENCE_EXT.search(path.name) or path.stat().st_size > 1048576:
+        large_binary = path.stat().st_size > 1048576 and not TEXT_SOURCE.search(path.name)
+        if EVIDENCE_EXT.search(path.name) or large_binary:
             target = dest_root / path.relative_to(folder)
             target.parent.mkdir(parents=True, exist_ok=True)
             tracked = in_git(path)
