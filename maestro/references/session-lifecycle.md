@@ -10,8 +10,13 @@ Use these states in `tasks.md`:
 | `PLANNING` | Write the plan and initial tasks. |
 | `EXECUTING` | Complete tasks in order. |
 | `VERIFYING` | Test every acceptance criterion. |
-| `DONE` | Finalize the walkthrough and wait for the next task. |
 | `BLOCKED` | Record the blocker and required input. |
+| `DONE` | Closed: every acceptance criterion passed. |
+| `PARTIAL` | Closed: the user accepted the result or moved on; deferred items recorded. |
+| `SUPERSEDED` | Closed: another Maestro session took over. |
+| `ABANDONED` | Closed: no change for 14 days and no open user request. |
+
+Write the state as the first state line of `tasks.md`, exactly `## State: <STATE>` with an optional parenthesized note. Never use another word or format.
 
 ## INIT
 
@@ -47,11 +52,12 @@ Use these states in `tasks.md`:
 4. Record passing evidence.
 5. Set the state to `DONE` when all criteria pass.
 
-## DONE
+## Close
 
-1. Finalize the walkthrough.
+1. Finalize the walkthrough with the outcome in its first sentence, which becomes the archive index entry.
 2. Record limitations and deferred work in the walkthrough.
-3. Keep the session active until a new task or phase arrives.
+3. Fold the Maestro session's handoffs into the walkthrough and delete them.
+4. Run `python3 scripts/sessions.py close <session> <STATE> "<note>"` immediately; do not wait for a new task.
 
 ## BLOCKED
 
@@ -61,14 +67,14 @@ Use these states in `tasks.md`:
 4. Continue independent tasks when authorized and safe.
 5. Restore the prior state when the blocker clears.
 
-## Archive
+## Archive and retention
 
-1. Trigger archival only after a new task or phase arrives.
-2. Confirm the session is `DONE`.
-3. Confirm every acceptance criterion has evidence.
-4. Move the session from `sessions/active/` to `sessions/archive/`.
-5. Do not edit the archived session.
-6. Create a new session for the new work.
+1. `sessions.py close` and `sessions.py stale --apply` move evidence to `~/.agents/evidence/<project>/<session>/`, move the folder to `sessions/archive/`, and rewrite `sessions/archive/INDEX.md`.
+2. Keep the 10 newest archived folders on disk.
+3. In a Git repository, `sessions.py prune --apply` removes older committed archive folders and records a restore command for each in `INDEX.md`; Git history keeps the content.
+4. Outside Git, `sessions.py prune --apply` bundles older folders into one `YYYY-Qn.tar.gz` per quarter.
+5. Delete a quarterly bundle older than 12 months only with the user's approval.
+6. Do not edit an archived Maestro session.
 
 ## Resume
 

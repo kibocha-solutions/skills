@@ -2,13 +2,17 @@
 
 ## Channel selection
 
-1. Use a visible chat for sustained execution, independent inspection, a user-visible workstream, or a successor coordinator.
-2. Use a sub-agent only for a narrow, self-contained assignment that does not need its own user-facing lifecycle.
-3. Do not create a sub-agent for every small operation. An executor or inspector may request a child task or sub-agent through the coordinator.
-4. Let the coordinator approve or decline each child request at its discretion within platform permissions, the visible-chat cap, and shared usage and workload limits.
-5. Share the overall usage budget and the two-heavy-worker limit across the entire team, including nested agents.
-6. Record every active worker, parent, assignment, budget, and state in the coordinator ledger.
-7. Honor lower platform concurrency limits and do not represent a sub-agent as a visible chat.
+Every agent applies these rules, with or without a coordinated team:
+
+1. Do the work in the current chat by default.
+2. Use a sub-agent for a bounded search, read, test, check, or routine edit whose result the current turn needs. Give it a complete brief and a lighter model.
+3. Start a new chat only for independent work that outlives the current turn, needs the user's steering, or ends in its own branch, pull request, or repository change.
+4. Never start a chat for part of the current task. Never start a sub-agent for a single command.
+5. Keep at most two started chats running at once. Count a coordinated team's chats against the same limit.
+6. Close each sub-agent when its result returns. Close or archive each started chat when its work is reported or merged, and report any that cannot be closed.
+7. In a coordinated team, let executors and inspectors request children through the coordinator, which approves within platform permissions, the chat limit, and shared usage limits.
+8. Share the usage budget and the two-heavy-worker limit across the whole team, including nested agents, and record every active worker in the coordinator ledger.
+9. Honor lower platform concurrency limits and do not represent a sub-agent as a visible chat.
 
 ## Model and budget
 
@@ -26,7 +30,7 @@
 12. Set a time or tool-call budget when the runtime supports enforcement.
 13. Check material output at each review point and narrow or reassign stalled work.
 14. Do not invent quota data or claim that a timeout proves completion.
-15. Initiate controlled pause, durable handoff recording, context compaction when supported, and authorized post-reset wake-up when team usage reaches 95% of the 5-hour window (5% remaining) or 98% of the weekly window (2% remaining).
+15. Initiate the controlled pause in `references/heartbeat-and-wake.md` when team usage reaches a threshold in `SKILL.md` Section 4.
 
 ## Shared resources
 
@@ -42,4 +46,4 @@
 1. Confirm at startup whether timers/cron, one-shot wake, usage-window checks, and messaging work; if any fails after inspecting docs/schemas and attempting it, report the failure to the user per `AGENTS.md` Section 12.
 2. Keep one 30-minute active heartbeat running during active work (`references/heartbeat-and-wake.md`), or one 90-minute blocked heartbeat if waiting exclusively on user action.
 3. Enforce strict mutual exclusion: cancel any active heartbeat before scheduling a wake timer, and cancel any active wake timer before starting a heartbeat.
-4. At 95% 5-hour or 98% weekly usage, persist state to `.agents/brain/sessions/active/` and `.agents/brain/handoffs/`, cancel the heartbeat, and schedule a post-reset wake timer.
+4. At a usage threshold in `SKILL.md` Section 4, persist state, cancel the heartbeat, and schedule a post-reset wake timer per `references/heartbeat-and-wake.md`.

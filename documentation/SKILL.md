@@ -1,6 +1,6 @@
 ---
 name: documentation
-description: Draft, review, rewrite, and validate documentation, README files, guides, procedures, policies, proposals, reports, correspondence, reference pages, Writerside technical documentation, API prose, docstrings, and code comments. Use for documentation structure, source fidelity, concise prose, citation cleanup, weak-writing remediation, and documentation quality control. Route legal instruments to legalese and production diagrams to technical-diagrams.
+description: Draft, review, rewrite, and validate documentation, README files, guides, procedures, policies, proposals, reports, correspondence, reference pages, Writerside technical documentation, API prose, docstrings, and code comments. Use for documentation structure, source fidelity, citation cleanup, and documentation quality control. Route sentence-level prose quality to human-writer, legal instruments to legalese, and production diagrams to technical-diagrams.
 ---
 
 # Documentation
@@ -116,47 +116,22 @@ description: Draft, review, rewrite, and validate documentation, README files, g
 
 ## 5. Enforce deliverable boundaries
 
-1. Treat the delivery document as a separate canvas from the chat interface. Never place conversational deliberation, reservations, or internal notes in deliverables.
-2. Keep deliverables free of progress markers and workflow notes:
-   1. Exclude workflow markers such as "pending promulgation", "pending determination", and "user will clarify".
-   2. Exclude sample labels and protective warnings such as "template audit report", "do not rely on this", "draft", and "provisional".
-   3. Inspect existing repository documents for prerequisite instruments before drafting; if missing, stop and ask the user in chat before proceeding.
-3. Exclude uncertainty markers and hedging:
-   1. Deliverables must be free of uncertainty markers such as `[estimate]` and "to be confirmed", as well as quantity hedging such as "about", "approximately", and "roughly".
-   2. Notify the user in chat of any concern, reservation, problem, or ambiguity, and abide by the user's decision.
-   3. Where unsure whether background context belongs in the deliverable, ask the user in chat: "Did you intend for X to go into the document?"
-4. Exclude unprompted details, internal methodology, background directions, and sensitive identifiers:
-   1. Deliverables must contain only what the document type expressly requires; omit unprompted information.
-   2. Never disclose sensitive identifiers such as national identity numbers, registration numbers, or banking details unless completing an authoritative form field or explicitly directed.
-   3. Withhold financial amounts beyond those requested and compliance-status detail unless an authoritative form field requires them or the user explicitly directs disclosure.
-   4. Treat a funder's eligibility statement as a condition to satisfy, not as a request for an identifier or certificate.
-   5. Do not explain obvious context, donor restrictions, internal costing models, or governing directions such as "We did this to comply with..." or "As directed...".
-   6. Do not state what an organization decided not to do.
+1. Apply `AGENTS.md` Sections 9.5 to 9.7 to every deliverable: no progress markers, workflow notes, sample labels, hedging, uncertainty markers, unprompted details, or sensitive identifiers.
+2. Inspect existing repository documents for prerequisite instruments before drafting; if one is missing, stop and ask the user in chat.
+3. Withhold financial amounts beyond those requested and compliance-status detail unless an authoritative form field requires them or the user explicitly directs disclosure.
+4. Treat a funder's eligibility statement as a condition to satisfy, not as a request for an identifier or certificate.
 
 ## 6. Draft in Markdown
 
 1. Draft or rewrite in Markdown before converting to another format.
-2. State the subject directly.
-3. Use specific, verifiable, neutral language.
-4. Keep facts, recommendations, constraints, and unknowns distinct.
-5. Keep every sentence that narrows, contextualizes, instructs, verifies,
-   warns, or connects.
-6. Remove unsupported significance claims, promotional language, vague
-   attribution, unsupported interpretation, filler, repetition, and decorative
-   conclusions.
-7. Remove diminish-to-elevate constructions and their paraphrases.
-8. Remove purposeless references to the report, document, guide, or section.
-9. Do not use U+2014 em dashes in normal prose, except when introducing a list.
-10. Remove chatbot phrases, placeholders, malformed markup, tracking
-    parameters, citation residue, and broken references.
-11. Use headings, lists, tables, emphasis, and code fences only when they
-    improve retrieval or execution.
-12. In legislative, prescriptive, and declaratory instruments, do not use bullet lists. Use ordered lists. Separate list items with blank lines. Nest with (a), (b), then (i), (ii). These list rules do not apply to technical documentation.
-13. State every definition as "A **Term** is ...", never "means", per AGENTS.md §9.3.
-14. Use prose and tables for narrative or persuasive documents.
-15. Use Writerside components where the repository convention requires them.
-16. Read `references/weak-ai-writing-patterns.md` for close rewrites,
-    editorial review, or quality cleanup.
+2. Apply `human-writer/SKILL.md` for sentence-level prose quality, including its weak writing pattern checks.
+3. Keep facts, recommendations, constraints, and unknowns distinct.
+4. Remove malformed markup, tracking parameters, citation residue, and broken references.
+5. Use headings, lists, tables, emphasis, and code fences only when they
+   improve retrieval or execution.
+6. Apply the list rules of `AGENTS.md` §9.11 and the definition rule of §9.3 to instruments.
+7. Use prose and tables for narrative or persuasive documents.
+8. Use Writerside components where the repository convention requires them.
 
 ## 7. Verify content
 

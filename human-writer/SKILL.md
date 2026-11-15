@@ -1,6 +1,6 @@
 ---
 name: human-writer
-description: Write, revise, or edit prose for a natural, distinctive voice while preserving the author's intent and factual accuracy. Use when the user asks to humanize writing, reduce formulaic phrasing, improve narrative craft, preserve a personal voice, or invoke human-writer.
+description: Write, revise, or edit prose for a natural, distinctive voice and sentence-level quality while preserving the author's intent and factual accuracy. Use when the user asks to humanize writing, reduce formulaic or AI-sounding phrasing, remove weak writing patterns, improve narrative craft, preserve a personal voice, or invoke human-writer; and for the prose of documentation, proposals, reports, and correspondence.
 ---
 
 # Human Writer
@@ -20,17 +20,21 @@ description: Write, revise, or edit prose for a natural, distinctive voice while
 3. For fiction, consider whether theme, causality, character choices, dialogue, time, sensory detail, and resolution serve the story.
 4. Treat research patterns as prompts for editorial judgment, not as rules that every story must follow.
 5. For factual or instructional writing, retain the explicit explanation, complete steps, and clarity readers need.
+6. For documentation, proposals, reports, and correspondence, run every check in [weak writing patterns](references/weak-ai-writing-patterns.md).
 
 ## 3. Revise
 
 1. Inspect [revision examples](examples/revisions.md) for fiction and factual editing patterns.
 2. Put the intended point and concrete information where the reader needs them.
 3. Remove redundant interpretation, filler, decorative contrast, and stock transitions when they weaken the passage.
-4. Choose specific, accurate words and vary sentence rhythm naturally for the writer and audience.
-5. Preserve distinctive phrasing and intentional repetition when they serve the work.
-6. In fiction, use ambiguity, nonlinear structure, subplots, dialogue, or direct emotion only when the story benefits; do not insert them mechanically.
-7. Keep facts, dates, names, numbers, caveats, and citations faithful to the source.
-8. Do not promise detector evasion or infer authorship from stylistic features.
+4. In factual writing, state the subject directly in specific, verifiable, neutral language.
+5. Remove unsupported significance claims, promotional language, vague attribution, unsupported interpretation, decorative conclusions, diminish-to-elevate constructions, purposeless references to the document itself, chatbot phrases, and placeholders.
+6. Keep every sentence that narrows, contextualizes, instructs, verifies, warns, or connects.
+7. Choose specific, accurate words and vary sentence rhythm naturally for the writer and audience.
+8. Preserve distinctive phrasing and intentional repetition when they serve the work.
+9. In fiction, use ambiguity, nonlinear structure, subplots, dialogue, or direct emotion only when the story benefits; do not insert them mechanically.
+10. Keep facts, dates, names, numbers, caveats, and citations faithful to the source.
+11. Do not promise detector evasion or infer authorship from stylistic features.
 
 ## 4. Verify and deliver
 

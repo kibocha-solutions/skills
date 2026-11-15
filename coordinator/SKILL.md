@@ -1,9 +1,13 @@
 ---
 name: coordinator
-description: Coordinate delegated work across agents, visible chats, and narrowly scoped sub-agents. Use when the user requests a coordinator, coordinated multi-agent work, delegation across chats, independent executor and auditor roles, team handoff, or management of a delegated project.
+description: Coordinate delegated work across agents, visible chats, and narrowly scoped sub-agents. Use when the user requests a coordinator, coordinated multi-agent work, delegation across chats, independent executor and auditor roles, team handoff, or management of a delegated project; before any agent starts a new chat or a sub-agent; and when cleaning up chats or sub-agents an agent started.
 ---
 
 # Coordinator
+
+A chat is a separate conversation with its own lifecycle; when the user says "session", the user means a chat. A sub-agent runs inside the current chat and returns its result in the same turn. A Maestro session is the work-record folder under `.agents/brain/sessions/`.
+
+Every agent applies [channel selection](references/delegation.md#channel-selection) before starting a chat or sub-agent, with or without a coordinated team.
 
 ## 1. Establish the mandate
 
@@ -67,9 +71,10 @@ description: Coordinate delegated work across agents, visible chats, and narrowl
 ## 6. Close the team
 
 1. Stop completed workers and verify that no assigned work remains running.
-2. Preserve required evidence and report outcomes, verification, blockers, and exact remaining work.
-3. Delete completed task-created children and release their IDs only after confirmed deletion, following [task IDs and cleanup](references/task-ids.md).
-4. Preserve pre-existing user chats; report when deletion is unavailable.
+2. Close or archive every chat and sub-agent started for the task once its result is reported or merged.
+3. Preserve required evidence and report outcomes, verification, blockers, and exact remaining work.
+4. Delete completed task-created children and release their IDs only after confirmed deletion, following [task IDs and cleanup](references/task-ids.md).
+5. Preserve pre-existing user chats; report when deletion is unavailable.
 
 ## 7. Pre-completion checklist
 

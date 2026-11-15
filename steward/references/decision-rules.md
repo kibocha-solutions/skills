@@ -29,6 +29,27 @@ A heavy job is a build, test suite, container stack, virtual machine, local mode
 
 The guard also accepts the project label `talentsphere.throwaway=true` as a throwaway label.
 
+## Agent store
+
+The agent store is `~/.agents/` on the user's home drive. It holds everything agents create that is not part of a project.
+
+| Path | Holds | Retention since last use |
+| :--- | :--- | :--- |
+| `~/.agents/system-profile.md` | Machine capacity profile | Rewritten each session |
+| `~/.agents/steward/ledger.tsv` | Steward ledger | Permanent |
+| `~/.agents/evidence/<project>/<maestro-session>/` | Screenshots, renders, logs, traces, verification exports | 90 days |
+| `~/.agents/envs/<project>-<purpose>/` | Python virtual environments and other toolchain environments | 30 days |
+| `~/.agents/scratch/<task>/` | Temporary working files | 2 days |
+
+`steward.py store path` creates the directory and marks it used. `steward.py store prune` lists expired entries; `--apply` removes them. The monthly cleanup job runs `store prune --apply`.
+
+| Toolchain | Placement |
+| :--- | :--- |
+| Python with uv | `UV_PROJECT_ENVIRONMENT="$(python3 steward.py store path env <project>-py)" uv sync`; uv's shared cache links packages across environments. |
+| Python with venv | `python3 -m venv "$(python3 steward.py store path env <project>-py)"` |
+| Node.js | Install with `pnpm`; its content-addressed store shares packages across projects. Keep `node_modules` in the project, where Node resolves it. |
+| Playwright browsers | Keep the shared default browser cache; never download a second copy per project. |
+
 ## Ledger
 
 The ledger is `~/.agents/steward/ledger.tsv`, scoped by project root.

@@ -5,16 +5,21 @@ description: Plan, track, resume, verify, and archive substantial or multi-sessi
 
 # Maestro
 
+A Maestro session is the work-record folder under `.agents/brain/sessions/`. A chat is a separate conversation. When the user says "session", the user means a chat; always write "Maestro session" for the folder.
+
+Run scripts with the skill directory as the base path, for example `python3 <skill-dir>/scripts/sessions.py status`.
+
 ## 1. Orient
 
 1. Identify the project root. Discover the repository's agent instruction and state directories. Names vary across tools: look for `AGENTS.md`, `CLAUDE.md`, and hidden directories such as `.agents/`, `.claude/`, `.cursor/`, or `.github/`, plus any memory index, handoff folder, or sessions folder they reference.
 2. Read `.agents/MEMORY.md` in full when it exists.
 3. Read every topic file linked from relevant memory entries.
 4. Read relevant files in `.agents/brain/handoffs/`.
-5. List every session in `.agents/brain/sessions/active/`.
-6. Match the current task to active sessions by objective and slug.
-7. Do not create a duplicate session.
-8. Activate `steward/SKILL.md` and size the plan to the capacity in `~/.agents/system-profile.md`.
+5. Run `python3 scripts/sessions.py status` to list every active Maestro session.
+6. Close finished and stale Maestro sessions with `python3 scripts/sessions.py stale --apply`, and report the closures to the user in one line.
+7. Match the current task to the remaining active Maestro sessions by objective and slug.
+8. Do not create a duplicate Maestro session.
+9. Activate `steward/SKILL.md` and size the plan to the capacity in `~/.agents/system-profile.md`.
 
 Read [brain conventions](references/brain-conventions.md) before creating or moving session files.
 
@@ -35,7 +40,7 @@ Read [brain conventions](references/brain-conventions.md) before creating or mov
 2. Use local time and a two-to-five-word lowercase slug.
 3. Create `meta/`, `implementation_plan.md`, `tasks.md`, and `walkthrough.md`.
 4. Create `goal.md` only when the user requests a tracked goal or the governing runtime explicitly requires it.
-5. Put source material and task-specific research in `meta/`.
+5. Put text sources and research notes in `meta/`. Put screenshots, renders, logs, and other evidence in the steward agent store.
 
 ## 3. Write the plan
 
@@ -105,14 +110,20 @@ Read [memory conventions](references/memory-conventions.md).
 4. Keep session state in the session folder.
 5. Keep secrets, private strategy, and client-confidential content out of memory.
 
-## 9. Archive
+## 9. Close and archive
 
-1. Wait for a new task or phase before archiving a `DONE` session.
-2. Confirm the final walkthrough and acceptance evidence.
-3. Move the session from `sessions/active/` to `sessions/archive/`.
-4. Do not edit an archived session.
-5. Create a new session for the new task.
-6. Keep an incomplete session active unless the user authorizes abandonment.
+Read [session lifecycle](references/session-lifecycle.md#close).
+
+1. Close a Maestro session as soon as one closed state applies, even when work remains:
+   - `DONE`: every acceptance criterion passed.
+   - `PARTIAL`: the user accepted the result or moved to other work; record the deferred items in `walkthrough.md`.
+   - `SUPERSEDED`: another Maestro session took over; name it in `walkthrough.md`.
+   - `ABANDONED`: no change for 14 days and no open user request.
+2. Fold the Maestro session's handoffs into `walkthrough.md`, then delete them.
+3. Run `python3 scripts/sessions.py close <session> <STATE> "<note>"` to set the state, move evidence to the agent store, archive the folder, and update `sessions/archive/INDEX.md`.
+4. Do not edit an archived Maestro session; reopen one by moving it back to `sessions/active/`.
+5. Run `python3 scripts/sessions.py prune --apply` after the archive is committed and holds more than 10 folders.
+6. Report each closure to the user in one line.
 
 Inspect [session examples](examples/session-lifecycle-and-recovery.md) for task state transitions and recovery patterns.
 
@@ -127,6 +138,7 @@ Before marking a Maestro session complete, confirm evidence exists for each item
 - [ ] All changed narrative or instruction files read manually in full from start to finish.
 - [ ] Durable knowledge and decisions recorded in `.agents/MEMORY.md` or topic files.
 - [ ] Steward check clean and every temporary artifact removed.
+- [ ] Maestro session closed with `DONE`, `PARTIAL`, `SUPERSEDED`, or `ABANDONED` and archived, or left active in an open state.
 - [ ] Zero AI attribution across all session artifacts and commits.
 - [ ] No U+2014 em dashes in normal prose.
 

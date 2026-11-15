@@ -8,6 +8,9 @@ Usage:
   steward.py ledger add <kind> <target> <removal condition>
   steward.py ledger close <target> [--kept <approval>]
   steward.py ledger list [--all]
+  steward.py store path <evidence|env|scratch> <name>   Create and print a store path.
+  steward.py store list                                  List store entries with ages.
+  steward.py store prune [--apply]                       Remove expired entries (dry run by default).
 
 Exit codes: 0 allowed or clean; 2 refused (reason on stderr);
 1 findings in check mode or usage error.
@@ -27,7 +30,13 @@ from pathlib import Path
 THROWAWAY_LABELS = ("agent.throwaway=true", "talentsphere.throwaway=true")
 PERSISTENT_LABEL = "agent.persistent=true"
 MAX_THROWAWAY = 2
-LEDGER = Path.home() / ".agents" / "steward" / "ledger.tsv"
+AGENTS_HOME = Path.home() / ".agents"
+LEDGER = AGENTS_HOME / "steward" / "ledger.tsv"
+STORE_KINDS = {"evidence": 90, "env": 30, "scratch": 2}  # retention in days since last use
+STORE_DIRS = {"evidence": "evidence", "env": "envs", "scratch": "scratch"}
+EVIDENCE_EXT = re.compile(
+    r"\.(png|jpe?g|webp|gif|bmp|mp4|webm|mov|pdf|zip|tar|gz|zst|xz|7z|har|trace|log)$", re.I
+)
 LEDGER_FIELDS = ("created", "root", "kind", "target", "condition", "status", "note")
 BACKUP_NAME = re.compile(
     r"(\.(bak|backup|old|orig|save)|~|[-_ ]copy|[-_ .](19|20)\d{6}([-_T]?\d{4,6})?)$", re.I
@@ -164,7 +173,7 @@ def check_container(tokens: list[str]) -> str | None:
 
 def check_copy(tokens: list[str], cwd: str) -> str | None:
     operands, skip = [], False
-    for index, token in enumerate(tokens[1:], start=1):
+    for token in tokens[1:]:
         if skip:
             skip = False
             continue
@@ -217,7 +226,7 @@ def read_ledger() -> list[dict]:
     for line in LEDGER.read_text(encoding="utf-8").splitlines():
         parts = line.split("\t")
         if len(parts) == len(LEDGER_FIELDS):
-            rows.append(dict(zip(LEDGER_FIELDS, parts)))
+            rows.append(dict(zip(LEDGER_FIELDS, parts, strict=True)))
     return rows
 
 
@@ -264,6 +273,11 @@ def findings(cwd: str) -> list[str]:
         backups = [p for p in lines(untracked) if is_backup_name(p)]
         if backups:
             found.append(f"{len(backups)} untracked backup copies in the worktree: {', '.join(backups[:10])}")
+        evidence = [p for p in lines(untracked)
+                    if p.startswith(".agents/") and EVIDENCE_EXT.search(p)]
+        if evidence:
+            found.append(f"{len(evidence)} evidence files inside .agents/; move them to "
+                         f"'steward.py store path evidence <project>/<session>': {', '.join(evidence[:10])}")
     project = project_root(cwd)
     open_rows = [r for r in read_ledger() if r["status"] == "open" and r["root"] == project and target_exists(r)]
     for row in open_rows:
@@ -307,7 +321,7 @@ def ledger(args: list[str]) -> int:
         clean = [x.replace("\t", " ").replace("\n", " ") for x in (kind, target, condition)]
         rows.append(dict(zip(LEDGER_FIELDS, (
             datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
-            root, clean[0], clean[1], clean[2], "open", ""))))
+            root, clean[0], clean[1], clean[2], "open", ""), strict=True)))
         write_ledger(rows)
         print(f"recorded {clean[0]} {clean[1]}")
         return 0
@@ -333,6 +347,68 @@ def ledger(args: list[str]) -> int:
     return 1
 
 
+def store_root(kind: str) -> Path:
+    return AGENTS_HOME / STORE_DIRS[kind]
+
+
+def last_used(path: Path) -> float:
+    marker = path / ".last-used"
+    if marker.exists():
+        return marker.stat().st_mtime
+    newest = path.stat().st_mtime
+    for child in path.rglob("*"):
+        try:
+            newest = max(newest, child.lstat().st_mtime)
+        except OSError:
+            pass
+    return newest
+
+
+def store_entries(kind: str) -> list[Path]:
+    root = store_root(kind)
+    if not root.is_dir():
+        return []
+    depth = 2 if kind == "evidence" else 1
+    entries = [p for p in root.glob("/".join(["*"] * depth)) if p.is_dir()]
+    return sorted(entries)
+
+
+def store(args: list[str]) -> int:
+    if not args:
+        print(__doc__, file=sys.stderr)
+        return 1
+    action, rest = args[0], args[1:]
+    if action == "path" and len(rest) == 2 and rest[0] in STORE_KINDS:
+        kind, name = rest
+        if ".." in Path(name).parts or name.startswith("/"):
+            print("store name must be relative and must not contain '..'", file=sys.stderr)
+            return 1
+        path = store_root(kind) / name
+        path.mkdir(parents=True, exist_ok=True)
+        (path / ".last-used").touch()
+        print(path)
+        return 0
+    now = datetime.datetime.now().timestamp()
+    if action == "list":
+        for kind in STORE_KINDS:
+            for entry in store_entries(kind):
+                age = (now - last_used(entry)) / 86400
+                print(f"{kind}\t{age:5.0f} days\t{entry}")
+        return 0
+    if action == "prune":
+        apply = "--apply" in rest
+        for kind, days in STORE_KINDS.items():
+            for entry in store_entries(kind):
+                age = (now - last_used(entry)) / 86400
+                if age > days:
+                    print(f"{'removed' if apply else 'would remove'} {kind} {entry} ({age:.0f} days unused)")
+                    if apply:
+                        shutil.rmtree(entry, ignore_errors=True)
+        return 0
+    print(__doc__, file=sys.stderr)
+    return 1
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print(__doc__, file=sys.stderr)
@@ -349,6 +425,8 @@ def main() -> int:
         return check()
     if mode == "ledger":
         return ledger(sys.argv[2:])
+    if mode == "store":
+        return store(sys.argv[2:])
     print(__doc__, file=sys.stderr)
     return 1
 

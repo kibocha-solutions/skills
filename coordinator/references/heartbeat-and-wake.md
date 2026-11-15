@@ -12,14 +12,14 @@
 
 ## 1. Startup capability inventory and reset-time lookup
 
-At session start, before dispatching sustained work:
+At the start of a chat, before dispatching sustained work:
 
 1. Inspect platform tool schemas, documentation, and local commands for:
    - Recurring timer or cron scheduling (`schedule` with `CronExpression` or platform equivalent).
    - One-shot wake timer scheduling (`schedule` with `DurationSeconds` or platform equivalent).
    - Usage-window status and next reset time (e.g., platform usage command, status endpoint, or metadata).
    - Inter-agent messaging (`send_message`, `manage_task`, `manage_subagents`, or platform equivalent).
-   - Persistent state storage (`.agents/brain/sessions/active/` and `.agents/brain/handoffs/`).
+   - Persistent state storage (the active Maestro session under `.agents/brain/sessions/active/` and `.agents/brain/handoffs/`).
 2. Attempt to read the current 5-hour and weekly usage percentages and their exact next reset timestamps.
 3. If any required capability (timer, wake, usage check, or messaging) fails or is missing after inspecting documentation and attempting it, report the failure to the user per Section 7 instead of silently skipping it.
 

@@ -121,7 +121,7 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 ## 13. Situational awareness and continuity
 
 1. At the start of any session in a repository, even unprompted, activate `graphify/SKILL.md` and query the graph (`graph_stats`, `god_nodes`, `GRAPH_REPORT.md`) to learn the repository before exploring. Without a graph, tell the user; build one only as authorized.
-2. For coordinated, long-running, or multi-session work, read `coordinator/SKILL.md` first to learn the usage windows, next reset times, and coordination tools (messaging, scheduling, cancellation), then run the heartbeat and wake timer per `coordinator/references/heartbeat-and-wake.md`, keeping only one active at a time.
+2. Before starting a chat or sub-agent, and for coordinated or long-running work, read `coordinator/SKILL.md` first and apply its channel selection, heartbeat, and wake timer, keeping only one timer active.
 3. Persist state in durable files (the active Maestro session and a handoff under `.agents/`) at every phase end, scheduled check-in, and pause, and whenever compaction is near or unpredictable, recording objective, current task, completed work, changed files, verification, blockers, and next action.
 4. Read the system profile (`~/.agents/system-profile.md`) before substantial work and keep work within its measured memory, disk, processor, and temperature capacity as `steward/SKILL.md` directs.
 

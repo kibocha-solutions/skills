@@ -22,6 +22,18 @@
         "Records verification commands and evidence in walkthrough.md",
         "Marks tasks [x] only after artifact verification"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Start work on a new feature in a project whose .agents/brain/sessions/active holds two DONE Maestro sessions and one EXECUTING Maestro session untouched for 30 days.",
+      "expected_output": "Before creating the new Maestro session, run sessions.py status and stale --apply: the DONE sessions are archived, the idle one is closed as ABANDONED and archived, evidence files move to ~/.agents/evidence, INDEX.md lists all three, and the user gets a one-line closure report.",
+      "files": [],
+      "expectations": [
+        "ls .agents/brain/sessions/active shows only the new Maestro session",
+        "grep -c '^## State: ABANDONED' .agents/brain/sessions/archive/*/tasks.md counts 1",
+        "test -f .agents/brain/sessions/archive/INDEX.md",
+        "no png, jpg, webp, log, or zip file remains under .agents/brain/sessions/archive"
+      ]
     }
   ]
 }

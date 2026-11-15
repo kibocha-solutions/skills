@@ -1,6 +1,6 @@
 ---
 name: steward
-description: "Govern every agent action that creates, copies, moves, backs up, or deletes files, documents, containers, volumes, images, environments, or caches, and keep work within the measured capacity of the machine. Use before any copy, move, rename, backup, removal, container or pod start, virtual environment or dependency install, scratch or temporary file, build, or cleanup; when a task risks leaving duplicates or backups behind; at session start to read the system profile; and before reporting completion to run the steward check."
+description: "Govern every agent action that creates, copies, moves, backs up, or deletes files, documents, containers, volumes, images, environments, or caches, and keep work within the measured capacity of the machine. Use before any copy, move, rename, backup, removal, container or pod start, virtual environment or dependency install, scratch or temporary file, screenshot or verification evidence, build, or cleanup; when a task risks leaving duplicates or backups behind; at session start to read the system profile; and before reporting completion to run the steward check."
 compatibility: "Requires python3. Uses git, podman or docker, and gio or trash-put when present."
 ---
 
@@ -41,24 +41,33 @@ Use the first mechanism that applies:
 3. Start a throwaway container with `--rm --label agent.throwaway=true`.
 4. Keep at most two throwaway containers at any time.
 5. Label a container the user asked to keep with `--label agent.persistent=true`, and never use that label for throwaway work.
-6. Put scratch files in the platform scratch or temporary directory, never in the project tree.
-7. Never keep a throwaway resource as a backup, reference copy, or fallback.
-8. Delete each resource when its removal condition is met, then close its ledger entry.
+6. Never keep a throwaway resource as a backup, reference copy, or fallback.
+7. Delete each resource when its removal condition is met, then close its ledger entry.
 
-## 5. Obey the guard hooks
+## 5. Place working files outside the project
+
+Read [the agent store](references/decision-rules.md#agent-store) before creating evidence, an environment, or scratch files.
+
+1. Save screenshots, renders, logs, traces, and exports made to verify work under `python3 scripts/steward.py store path evidence <project>/<maestro-session>`. Never save them in the project or its `.agents/` directory.
+2. Cite evidence in a walkthrough by its `~/.agents/evidence/...` path.
+3. Create Python environments and other toolchain environments under `python3 scripts/steward.py store path env <project>-<purpose>`, unless the project's recipe requires an in-project environment.
+4. Reuse an existing store environment for the same project and lock file before creating another.
+5. Put scratch files under `python3 scripts/steward.py store path scratch <task>`, and delete them when the task ends.
+
+## 6. Obey the guard hooks
 
 1. Treat a refusal from `steward.py pre` or `steward.py stop` as a binding instruction.
 2. Correct the refused action as the refusal directs.
 3. Never route around a refusal through another tool, interpreter, file operation, or command form.
 
-## 6. Work within capacity
+## 7. Work within capacity
 
 1. Run one heavy job at a time: build, test suite, container stack, virtual machine, model, or large download.
 2. Run `bash scripts/system-profile.sh --brief` before a heavy job.
 3. Pause heavy work and report to the user when a budget in [decision rules](references/decision-rules.md#capacity-budgets) is exceeded.
 4. Stop servers, watchers, and processes you started once they are no longer needed.
 
-## 7. Verify before completion
+## 8. Verify before completion
 
 1. Run `python3 scripts/steward.py check` from the project root.
 2. Resolve every finding by deleting the leftover.
@@ -67,11 +76,12 @@ Use the first mechanism that applies:
 
 Inspect [examples](examples/good-vs-bad-stewardship.md) for contrasting actions.
 
-## 8. Pre-completion checklist
+## 9. Pre-completion checklist
 
 - [ ] System profile read and capacity budgets respected.
 - [ ] No backup, duplicate, or dated copy left inside a Git worktree.
 - [ ] Every backup outside version control recorded, then deleted or kept with approval.
 - [ ] Every throwaway resource deleted and its ledger entry closed.
+- [ ] Evidence, environments, and scratch files kept in the agent store, never in the project or `.agents/`.
 - [ ] `steward.py check` reports no findings.
 - [ ] Final report lists created, deleted, and approved-kept items.
