@@ -330,10 +330,11 @@ def ledger(args: list[str]) -> int:
         if len(rest) == 3 and rest[1] == "--kept":
             note, status = rest[2].replace("\t", " ").replace("\n", " "), "kept"
         matched = 0
-        for row in rows:
-            if row["status"] == "open" and row["root"] == root and row["target"] == target:
-                row["status"], row["note"] = status, note
-                matched += 1
+        candidates = [r for r in rows if r["status"] == "open" and r["target"] == target]
+        scoped = [r for r in candidates if r["root"] == root]
+        for row in scoped or candidates:
+            row["status"], row["note"] = status, note
+            matched += 1
         write_ledger(rows)
         print(f"{status} {matched} entries for {target}")
         return 0 if matched else 1
