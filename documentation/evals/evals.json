@@ -9,7 +9,7 @@
       "expectations": [
         "The agent installs the wrapper from documentation/scripts/wrs into ~/.local/bin/wrs",
         "The agent keeps a copy of any existing ~/.local/bin/wrs before replacing it",
-        "The agent pulls docker.io/jetbrains/writerside-builder:2026.08.0328 with podman, not docker",
+        "The agent runs wrs update, which pulls the newest dated docker.io/jetbrains/writerside-builder tag with podman, not docker, and pins no tag",
         "The agent runs wrs doctor before building",
         "The agent runs wrs build without instance arguments",
         "The report states pass or fail per instance and, for each failure, the failed check and the log path"

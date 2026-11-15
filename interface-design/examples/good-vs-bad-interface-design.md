@@ -14,7 +14,23 @@
 2. Apply $\text{Radius}_{\text{inner}} = \max(0, \text{Radius}_{\text{outer}} - \text{Padding})$ so a `16px` outer card with `12px` padding uses a `4px` inner radius.
 3. Keep copy in sentence case with action-oriented button labels (`Save draft`, `Export report`) and omit decorative arrows (`→`).
 
-## 2. Dual-orientation mobile and tablet layout
+## 2. One design foundation and traceable standards
+
+### Bad
+
+1. Combine Material 3 tonal color roles with Apple HIG translucent navigation bars and San Francisco headings on one web dashboard.
+2. Install `@material/web` and add hand-made rounded shapes to selected screens to call the result Material 3 Expressive.
+3. Follow a rule such as "use a toast for every error" or "lazy-load all images" because a popular article or a generated template does.
+4. Build a custom select and tooltip from `div` elements from memory without checking browser support.
+
+### Good
+
+1. Record in `DESIGN.md`: category "data-dense dashboard aligned to an Android product", foundation "Material 3 Expressive", Baseline target "Widely available", and the selected standards from the catalogue.
+2. Apply Material 3 Expressive shape, motion, type, and color roles to every component, implemented from the published specifications and tokens because `@material/web` does not implement Expressive.
+3. Trace each rule to a source: inline field errors with an error summary (WCAG 2.2 SC 3.3.1, GOV.UK Design System) and eager loading with high fetch priority for the LCP image (Core Web Vitals).
+4. Search Modern Web Guidance for `custom select dropdown` and `tooltip popover`, apply the retrieved pattern and its fallbacks, and run `impeccable detect` on the result.
+
+## 3. Dual-orientation mobile and tablet layout
 
 ### Bad
 

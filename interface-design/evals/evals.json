@@ -22,6 +22,18 @@
         "Uses a master-detail dual-pane architecture for tablet landscape",
         "Supports both touch hit-target minimums and pointer hover states"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Design the web dashboard for our Android fleet-tracking app. We want it to feel like Material 3 Expressive but with Apple-style navigation and typography.",
+      "expected_output": "Classify the product as a data-dense dashboard aligned to an Android product, explain in chat that one foundation is required per surface, propose Material 3 Expressive throughout with brand tokens mapped to its roles, note that @material/web does not implement Expressive and record the implementation route in DESIGN.md, and write a Standards section naming the category, foundation, Baseline target, and selected standards.",
+      "files": [],
+      "expectations": [
+        "Reads the web standards catalogue and classifies the product category",
+        "Refuses to blend Apple HIG navigation or typography with Material 3 Expressive and raises the conflict in chat",
+        "Records how Material 3 Expressive is implemented on the web without relying on @material/web for Expressive",
+        "Writes a Standards section in DESIGN.md with category, foundation, Baseline target, and standards"
+      ]
     }
   ]
 }

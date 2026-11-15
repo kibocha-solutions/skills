@@ -1,6 +1,6 @@
 ---
 name: steward
-description: "Govern every agent action that creates, copies, moves, backs up, or deletes files, documents, containers, volumes, images, environments, or caches, and keep work within the measured capacity of the machine. Use before any copy, move, rename, backup, removal, container or pod start, virtual environment or dependency install, scratch or temporary file, screenshot or verification evidence, build, or cleanup; when a task risks leaving duplicates or backups behind; at session start to read the system profile; and before reporting completion to run the steward check."
+description: "Govern every agent action that creates, copies, moves, backs up, or deletes files, documents, containers, volumes, images, environments, or caches, and keep work within the measured capacity of the machine. Use before any copy, move, rename, backup, removal, container or pod start, virtual environment or dependency install, scratch or temporary file, screenshot or verification evidence, build, or cleanup; when a task risks leaving duplicates or backups behind; at session start to read the system profile and the device record; before installing or first using a shared agent tool such as modern-web-guidance or impeccable; when recording a lasting device default; and before reporting completion to run the steward check."
 compatibility: "Requires python3. Uses git, podman or docker, and gio or trash-put when present."
 ---
 
@@ -8,14 +8,24 @@ compatibility: "Requires python3. Uses git, podman or docker, and gio or trash-p
 
 Run every script with the skill directory as the base path, for example `python3 <skill-dir>/scripts/steward.py`.
 
-## 1. Read the system profile
+## 1. Read the system profile and device record
 
 1. Read `~/.agents/system-profile.md`.
 2. Run `bash scripts/system-profile.sh` first when the file is missing or older than 24 hours.
 3. Read the capacity budgets in [decision rules](references/decision-rules.md#capacity-budgets).
-4. Never copy the profile into a project file or record a hostname, user name, or home path in a project file.
+4. Read `~/.agents/device.md`. Run `python3 scripts/steward.py device` first when the file is missing or its Facts section is older than 30 days.
+5. Apply every entry under Defaults in `~/.agents/device.md` unless the user or the project instructions state otherwise.
+6. Record a lasting user choice about tools or device use under Defaults, one table row per choice.
+7. Never copy the profile or the device record into a project file or record a hostname, user name, or home path in a project file.
 
-## 2. Choose the recovery mechanism before any change
+## 2. Install shared tools
+
+1. Run `python3 scripts/steward.py tool ensure <name>` before the first use of a registered tool in a session. Read the [tool registry](references/decision-rules.md#tool-registry).
+2. Let the command install the latest stable release when the tool is missing and refresh it when its record is 30 days old.
+3. Never pin a registered tool to a fixed version or install a second copy of it per project.
+4. Stop and report the exact error when the command exits 1.
+
+## 3. Choose the recovery mechanism before any change
 
 Use the first mechanism that applies:
 
@@ -25,7 +35,7 @@ Use the first mechanism that applies:
 4. Never keep a second backup of the same target.
 5. Delete each backup once its removal condition is met, then run `python3 scripts/steward.py ledger close <path>`.
 
-## 3. Copy, move, rename, and remove
+## 4. Copy, move, rename, and remove
 
 1. Move with `mv` or `git mv` when instructed to move. Never copy and leave the source.
 2. Rename in place. Never duplicate a file under a new name.
@@ -34,7 +44,7 @@ Use the first mechanism that applies:
 5. Delete intermediate exports and conversions after the final output passes verification.
 6. Remove when instructed to remove, under the confirmation rules of `AGENTS.md` Section 7.
 
-## 4. Create throwaway resources
+## 5. Create throwaway resources
 
 1. Reuse an existing environment, image, cache, or container before creating another.
 2. Record each container, pod, volume, virtual environment, dependency cache, scratch directory, server, or build output made only for the current task with `python3 scripts/steward.py ledger add <kind> <target> "<removal condition>"`.
@@ -44,7 +54,7 @@ Use the first mechanism that applies:
 6. Never keep a throwaway resource as a backup, reference copy, or fallback.
 7. Delete each resource when its removal condition is met, then close its ledger entry.
 
-## 5. Place working files outside the project
+## 6. Place working files outside the project
 
 Read [the agent store](references/decision-rules.md#agent-store) before creating evidence, an environment, or scratch files.
 
@@ -54,20 +64,20 @@ Read [the agent store](references/decision-rules.md#agent-store) before creating
 4. Reuse an existing store environment for the same project and lock file before creating another.
 5. Put scratch files under `python3 scripts/steward.py store path scratch <task>`, and delete them when the task ends.
 
-## 6. Obey the guard hooks
+## 7. Obey the guard hooks
 
 1. Treat a refusal from `steward.py pre` or `steward.py stop` as a binding instruction.
 2. Correct the refused action as the refusal directs.
 3. Never route around a refusal through another tool, interpreter, file operation, or command form.
 
-## 7. Work within capacity
+## 8. Work within capacity
 
 1. Run one heavy job at a time: build, test suite, container stack, virtual machine, model, or large download.
 2. Run `bash scripts/system-profile.sh --brief` before a heavy job.
 3. Pause heavy work and report to the user when a budget in [decision rules](references/decision-rules.md#capacity-budgets) is exceeded.
 4. Stop servers, watchers, and processes you started once they are no longer needed.
 
-## 8. Verify before completion
+## 9. Verify before completion
 
 1. Run `python3 scripts/steward.py check` from the project root.
 2. Resolve every finding by deleting the leftover.
@@ -76,9 +86,10 @@ Read [the agent store](references/decision-rules.md#agent-store) before creating
 
 Inspect [examples](examples/good-vs-bad-stewardship.md) for contrasting actions.
 
-## 9. Pre-completion checklist
+## 10. Pre-completion checklist
 
-- [ ] System profile read and capacity budgets respected.
+- [ ] System profile and device record read; capacity budgets and recorded defaults respected.
+- [ ] Every registered tool used was ensured through `steward.py tool ensure`.
 - [ ] No backup, duplicate, or dated copy left inside a Git worktree.
 - [ ] Every backup outside version control recorded, then deleted or kept with approval.
 - [ ] Every throwaway resource deleted and its ledger entry closed.

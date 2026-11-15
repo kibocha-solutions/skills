@@ -11,15 +11,19 @@ Usage:
   steward.py store path <evidence|env|scratch> <name>   Create and print a store path.
   steward.py store list                                  List store entries with ages.
   steward.py store prune [--apply]                       Remove expired entries (dry run by default).
+  steward.py device                                      Rewrite the Facts section of ~/.agents/device.md.
+  steward.py tool ensure <name>... [--update]            Install or refresh shared tools and record them.
+  steward.py tool list                                   List registered tools and their records.
 
 Exit codes: 0 allowed or clean; 2 refused (reason on stderr);
-1 findings in check mode or usage error.
+1 findings in check mode, a failed install, or usage error.
 """
 from __future__ import annotations
 
 import datetime
 import json
 import os
+import platform
 import re
 import shlex
 import shutil
@@ -42,6 +46,14 @@ BACKUP_NAME = re.compile(
     r"(\.(bak|backup|old|orig|save)|~|[-_ ]copy|[-_ .](19|20)\d{6}([-_T]?\d{4,6})?)$", re.I
 )
 BACKUP_STEM = re.compile(r"(^copy of .+| copy( \d+)?| \(copy\))$", re.I)
+DEVICE = AGENTS_HOME / "device.md"
+TOOL_REFRESH_DAYS = 30
+TOOL_FIELDS = ("tool", "version", "source", "installed", "checked")
+# Shared agent tools, installed once per device at the latest stable release.
+TOOLS = {
+    "modern-web-guidance": {"npm": "modern-web-guidance", "command": "modern-web-guidance"},
+    "impeccable": {"npm": "impeccable", "command": "impeccable"},
+}
 WRAPPERS = {"sudo", "env", "nice", "nohup", "command", "time", "doas"}
 SEPARATORS = {";", "&&", "||", "|", "&", "\n", "(", ")"}
 
@@ -465,6 +477,164 @@ def store(args: list[str]) -> int:
     return 1
 
 
+def today() -> str:
+    return datetime.date.today().isoformat()
+
+
+def first_line(text: str) -> str:
+    return text.strip().splitlines()[0].strip() if text.strip() else ""
+
+
+def device_facts() -> list[tuple[str, str]]:
+    facts: list[tuple[str, str]] = []
+    os_name = platform.system()
+    release = Path("/etc/os-release")
+    if release.exists():
+        match = re.search(r'^PRETTY_NAME="?([^"\n]+)', release.read_text(encoding="utf-8"), re.M)
+        os_name = match.group(1) if match else os_name
+    elif shutil.which("sw_vers"):
+        os_name = "macOS " + run(["sw_vers", "-productVersion"]).strip()
+    facts.append(("Operating system", os_name))
+    facts.append(("Kernel and architecture", f"{platform.release()} {platform.machine()}"))
+    cpu = ""
+    cpuinfo = Path("/proc/cpuinfo")
+    if cpuinfo.exists():
+        match = re.search(r"^model name\s*:\s*(.+)$", cpuinfo.read_text(encoding="utf-8"), re.M)
+        cpu = match.group(1).strip() if match else ""
+    elif shutil.which("sysctl"):
+        cpu = run(["sysctl", "-n", "machdep.cpu.brand_string"]).strip()
+    facts.append(("Processor", f"{cpu or 'unknown'}, {os.cpu_count()} threads"))
+    meminfo = Path("/proc/meminfo")
+    if meminfo.exists():
+        info = meminfo.read_text(encoding="utf-8")
+        for label, key in (("Memory", "MemTotal"), ("Swap", "SwapTotal")):
+            match = re.search(rf"^{key}:\s+(\d+)", info, re.M)
+            if match:
+                facts.append((label, f"{int(match.group(1)) / 1048576:.1f} GiB"))
+    if shutil.which("lspci"):
+        gpus = [re.sub(r"^\S+\s+[^:]+:\s*", "", line) for line in lines(run(["lspci"]))
+                if re.search(r"VGA|3D controller|Display controller", line)]
+        if gpus:
+            facts.append(("Graphics", "; ".join(gpus)))
+    facts.append(("Home filesystem size", f"{shutil.disk_usage(Path.home()).total / 1073741824:.0f} GiB"))
+    versions = (("Container engine", [engine() or "none", "--version"]),
+                ("Node.js", ["node", "--version"]), ("npm", ["npm", "--version"]),
+                ("Python", ["python3", "--version"]), ("Git", ["git", "--version"]))
+    for label, args in versions:
+        found = shutil.which(args[0]) if args[0] != "none" else None
+        facts.append((label, first_line(run(args)) if found else "not installed"))
+    hosts = [name for name, path in (("Claude Code", ".claude"), ("Codex", ".codex"),
+                                     ("Gemini CLI", ".gemini/settings.json"),
+                                     ("Antigravity", ".gemini/antigravity"), ("Copilot", ".copilot"))
+             if (Path.home() / path).exists()]
+    facts.append(("Agent hosts", ", ".join(hosts) or "none"))
+    cache = Path.home() / ("Library/Caches/ms-playwright" if sys.platform == "darwin" else ".cache/ms-playwright")
+    browsers = sorted(p.name for p in cache.glob("*-[0-9]*") if p.is_dir()) if cache.is_dir() else []
+    facts.append(("Playwright browser cache", f"{cache} ({', '.join(browsers) or 'empty'})"))
+    return facts
+
+
+def read_device() -> tuple[list[dict], str]:
+    """Return the tool rows and the preserved Defaults section text."""
+    if not DEVICE.exists():
+        return [], ""
+    text = DEVICE.read_text(encoding="utf-8")
+    rows = []
+    tools = re.search(r"^## Tools\n(.*?)(?=^## |\Z)", text, re.M | re.S)
+    for line in (tools.group(1).splitlines() if tools else []):
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == len(TOOL_FIELDS) and cells[0] not in ("Tool", "") and not set(cells[0]) <= set("-: "):
+            rows.append(dict(zip(TOOL_FIELDS, cells, strict=True)))
+    defaults = re.search(r"^## Defaults\n(.*?)(?=^## |\Z)", text, re.M | re.S)
+    return rows, defaults.group(1).strip() if defaults else ""
+
+
+def write_device(rows: list[dict], defaults: str) -> None:
+    out = ["# Device record", "",
+           "Stable facts about this device and the shared agent tools installed on it. "
+           "`steward.py device` and `steward.py tool` rewrite the Facts and Tools sections. "
+           "Agents add lasting choices under Defaults by hand. Live load, memory, and temperature "
+           "are in system-profile.md.", "",
+           "## Facts", "", f"Updated {today()}.", "", "| Fact | Value |", "| :--- | :--- |"]
+    out += [f"| {k} | {v.replace('|', '/')} |" for k, v in device_facts()]
+    out += ["", "## Tools", "", "| Tool | Version | Source | Installed | Checked |",
+            "| :--- | :--- | :--- | :--- | :--- |"]
+    out += ["| " + " | ".join(r[f] for f in TOOL_FIELDS) + " |" for r in sorted(rows, key=lambda r: r["tool"])]
+    out += ["", "## Defaults", "", defaults or "No defaults recorded.", ""]
+    DEVICE.parent.mkdir(parents=True, exist_ok=True)
+    DEVICE.write_text("\n".join(out), encoding="utf-8")
+
+
+def device(_args: list[str]) -> int:
+    rows, defaults = read_device()
+    write_device(rows, defaults)
+    print(DEVICE)
+    return 0
+
+
+def npm_installed_version(package: str) -> str:
+    data = run(["npm", "ls", "-g", "--depth=0", "--json", package])
+    try:
+        return json.loads(data or "{}").get("dependencies", {}).get(package, {}).get("version", "")
+    except json.JSONDecodeError:
+        return ""
+
+
+def ensure_tool(name: str, rows: list[dict], force: bool) -> bool:
+    spec = TOOLS[name]
+    package = spec["npm"]
+    if not shutil.which("npm"):
+        print(f"{name}: npm is not installed; install Node.js through system-init, then retry", file=sys.stderr)
+        return False
+    row = next((r for r in rows if r["tool"] == name), None)
+    installed = npm_installed_version(package) if shutil.which(spec["command"]) else ""
+    stale = row is None or force or (
+        datetime.date.today() - datetime.date.fromisoformat(row["checked"])).days >= TOOL_REFRESH_DAYS
+    if installed and not stale:
+        print(f"{name}: {installed} present, checked {row['checked']}")
+        return True
+    latest = first_line(run(["npm", "view", package, "version"]))
+    if installed and latest and installed == latest:
+        action = "current"
+    else:
+        result = subprocess.run(["npm", "install", "-g", f"{package}@latest"],
+                                capture_output=True, text=True, timeout=900)
+        if result.returncode != 0:
+            print(f"{name}: install failed\n{result.stderr.strip()[-600:]}", file=sys.stderr)
+            return False
+        action = "updated" if installed else "installed"
+        installed = npm_installed_version(package)
+    if row is None:
+        row = {"tool": name, "installed": today()}
+        rows.append(row)
+    elif action != "current":
+        row["installed"] = today()
+    row.update(version=installed or "unknown", source=f"npm -g {package}@latest", checked=today())
+    print(f"{name}: {installed} {action}")
+    return True
+
+
+def tool(args: list[str]) -> int:
+    if not args or args[0] not in ("ensure", "list"):
+        print(__doc__, file=sys.stderr)
+        return 1
+    rows, defaults = read_device()
+    if args[0] == "list":
+        for name in TOOLS:
+            row = next((r for r in rows if r["tool"] == name), None)
+            print(f"{name}\t" + ("\t".join(row[f] for f in TOOL_FIELDS[1:]) if row else "not recorded"))
+        return 0
+    names = [a for a in args[1:] if not a.startswith("--")]
+    unknown = [n for n in names if n not in TOOLS]
+    if not names or unknown:
+        print(f"registered tools: {', '.join(TOOLS)}" + (f"; unknown: {', '.join(unknown)}" if unknown else ""),
+              file=sys.stderr)
+        return 1
+    ok = all([ensure_tool(n, rows, "--update" in args) for n in names])
+    write_device(rows, defaults)
+    return 0 if ok else 1
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print(__doc__, file=sys.stderr)
@@ -483,6 +653,10 @@ def main() -> int:
         return ledger(sys.argv[2:])
     if mode == "store":
         return store(sys.argv[2:])
+    if mode == "device":
+        return device(sys.argv[2:])
+    if mode == "tool":
+        return tool(sys.argv[2:])
     print(__doc__, file=sys.stderr)
     return 1
 

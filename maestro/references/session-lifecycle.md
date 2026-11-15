@@ -15,6 +15,7 @@ Use these states in `tasks.md`:
 | `PARTIAL` | Closed: the user accepted the result or moved on; deferred items recorded. |
 | `SUPERSEDED` | Closed: another Maestro session took over. |
 | `ABANDONED` | Closed: no change for 14 days and no open user request. |
+| `DORMANT` | Parked: future or condition-bound work kept under `sessions/dormant/`, exempt from closing, staleness, and pruning. |
 
 Write the state as the first state line of `tasks.md`, exactly `## State: <STATE>` with an optional parenthesized note. Never use another word or format.
 
@@ -75,6 +76,25 @@ Write the state as the first state line of `tasks.md`, exactly `## State: <STATE
 4. Outside Git, `sessions.py prune --apply` bundles older folders into one `YYYY-Qn.tar.gz` per quarter.
 5. Delete a quarterly bundle older than 12 months only with the user's approval.
 6. Do not edit an archived Maestro session.
+
+## Dormant
+
+1. Park a session only when the user defers its work or ties it to a future condition.
+2. Run `python3 scripts/sessions.py dormant <session> "<reason>" --wake "<condition>"`. The command writes `wake.md` with the reason, the conditions, and a history line, sets `## State: DORMANT`, and moves the folder to `sessions/dormant/`.
+3. Use these condition forms:
+
+| Form | Met when |
+|---|---|
+| `date: YYYY-MM-DD` | The current date is on or after the date. |
+| `after: <session> closes` | The named session is in the archive or its index. |
+| `exists: <project path>` | The path exists in the project. |
+| Plain words | The agent judges it from current evidence and reports the evidence. |
+
+4. A session with no condition is ready whenever no active session remains open.
+5. `sessions.py stale --apply` moves an active session whose state is `DORMANT` to `sessions/dormant/` instead of closing it.
+6. `sessions.py close`, `stale`, and `prune` never act on `sessions/dormant/`.
+7. Run `python3 scripts/sessions.py wake-check` after the last open active session closes. It reports `waiting`, `judge conditions`, or `ready: ask the user` for each dormant session.
+8. Ask the user before waking any session. Run `python3 scripts/sessions.py wake <session> "<approval>"` after approval; it restores the state the session was parked from, or `PLANNING`, appends to the history, and moves the folder back to `sessions/active/`.
 
 ## Resume
 

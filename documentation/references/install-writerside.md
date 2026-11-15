@@ -12,7 +12,7 @@ builder image, or the wrapper. Apply the universal installation gate.
 - Requirements
 - Install
 - Verify
-- Pin project settings
+- Project settings
 - Build
 - Check tier references
 - Serve and inspect
@@ -27,7 +27,7 @@ builder image, or the wrapper. Apply the universal installation gate.
 |---|---|
 | Python | 3.11 or later. `wrs` uses the standard library only. |
 | Container runtime | Podman (preferred, rootless) or Docker. `wrs` selects Podman first, then Docker. Force one with `WRS_RUNTIME` or `--runtime`. |
-| Builder image | `docker.io/jetbrains/writerside-builder:2026.08.0328`. The image is published for `amd64` only; `wrs` adds `--platform linux/amd64` on `arm64` hosts. |
+| Builder image | The newest dated tag of `docker.io/jetbrains/writerside-builder`, pulled by `wrs update`. The image is published for `amd64` only; `wrs` adds `--platform linux/amd64` on `arm64` hosts. |
 | Server image | `docker.io/library/nginx:alpine`. `wrs serve` pulls it on first use. |
 | Wrapper | `scripts/wrs` from this skill, installed as `~/.local/bin/wrs`. |
 | Dev gate | Bitwarden CLI (`bw`) logged in, or 1Password CLI (`op`) with an added account or desktop app integration; `secret-tool` with an unlocked login keyring. Required only for `wrs serve --dev` and `wrs key`. |
@@ -42,39 +42,32 @@ builder image, or the wrapper. Apply the universal installation gate.
    podman info
    ```
 
-3. Pull the builder image:
-
-   ```bash
-   podman pull docker.io/jetbrains/writerside-builder:2026.08.0328
-   ```
-
-4. Keep the previous wrapper when `~/.local/bin/wrs` exists:
-
-   ```bash
-   cp -p "$HOME/.local/bin/wrs" "$HOME/.local/bin/wrs.previous"
-   ```
-
-5. Install the wrapper from this skill:
+3. Install the wrapper from this skill. Git holds the previous version; keep no copy of the old wrapper:
 
    ```bash
    install -D -m 0755 <skills-root>/documentation/scripts/wrs "$HOME/.local/bin/wrs"
    ```
 
-6. Add `~/.local/bin` to `PATH` when `command -v wrs` prints nothing:
+4. Add `~/.local/bin` to `PATH` when `command -v wrs` prints nothing:
 
    ```bash
    grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.bashrc" \
      || printf '\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$HOME/.bashrc"
    ```
 
-7. Check for a newer builder image:
+5. Pull the latest builder image:
 
    ```bash
    wrs update
    ```
 
-   `wrs update --pull` pulls the newest dated tag and verifies that the local
-   digest matches the Docker Hub digest.
+   `wrs update` pulls the newest dated tag from Docker Hub when it is missing,
+   verifies that the local digest matches the Docker Hub digest, and removes
+   every superseded builder image. `--pull` pulls again when the tag is already
+   present. `--keep-old` keeps superseded images.
+
+6. Run `wrs update` again before a build when `wrs doctor --online` reports a
+   newer image.
 
 ## Verify
 
@@ -90,13 +83,14 @@ Expected result: every line of `wrs doctor` shows a pass mark, including
 `latest image`. The command exits `0`. `wrs` finds `writerside.cfg` in the
 current directory, a parent directory, or a `docs/` or `Writerside/` child.
 
-## Pin project settings
+## Project settings
 
-Commit a `.wrs.toml` beside `writerside.cfg` so every contributor builds with
-the same image and ports:
+Commit a `.wrs.toml` beside `writerside.cfg` so every contributor uses the same
+ports and tiers. Leave `image_tag` unset: `wrs` then builds with the newest
+dated builder image present locally. Set `image_tag` to a dated tag only when
+the user directs a fixed builder for the project.
 
 ```toml
-image_tag = "2026.08.0328"
 port_base = 44190
 jobs = 2
 sensitivity = ["public", "internal", "restricted", "confidential"]
@@ -111,6 +105,7 @@ environment variables (`WRS_RUNTIME`, `WRS_IMAGE_TAG`, `WRS_PORT_BASE`,
 
 | Key | Meaning |
 |---|---|
+| `image_tag` | A dated builder tag that overrides the newest local image. Unset by default. |
 | `sensitivity` | Instance IDs from lowest to highest tier. An instance missing from the list ranks above every listed instance. |
 | `gated_from` | The first tier behind the dev gate. That tier and every higher tier are served only with `--dev`. |
 | `dev_item` | The login item that holds the dev key: an item name, or `op://<vault>/<item>` for 1Password. Default `wrs-dev`. |
@@ -279,15 +274,16 @@ Gate behavior:
 | `wrs stop` | Stop this project's server. `--all` stops every `wrs` server. |
 | `wrs clean` | Remove temporary source copies, exited `wrs` containers, and logs beyond the newest 40. |
 | `wrs clean --all` | Also remove built sites, artifacts, logs, and server files for the project. |
-| `wrs update` | Compare the configured image with the newest dated tag on Docker Hub. |
+| `wrs update` | Pull the newest dated builder image from Docker Hub and remove superseded builder images. |
 
 ## Builder behavior
 
-Verified with builder `2026.08.0328` on rootless Podman 4.9.3:
+Verified with builder `2026.10.0423` on rootless Podman 6.1.4: a passing
+build exits `0` and writes `report.json` with the fields below. Verified with
+builder `2026.08.0328` on rootless Podman 4.9.3: a failed check exits `255`.
 
-- The builder exits `0` after a passing build and `255` when a check fails.
-  Treat every non-zero status as failure.
-- The log contains a JCEF sandbox line with
+- Treat every non-zero builder status as failure.
+- Builder `2026.08.0328` logs a JCEF sandbox line with
   `LoggedError ... ELEVATED_PRIVILEGES` on rootless Podman. The line does not
   affect the build result.
 - `report.json` in the output directory records `testsTotal`,

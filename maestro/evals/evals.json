@@ -34,6 +34,18 @@
         "test -f .agents/brain/sessions/archive/INDEX.md",
         "no png, jpg, webp, log, or zip file remains under .agents/brain/sessions/archive"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Park the mobile money integration work until the provider sends sandbox credentials, then finish the active dashboard session.",
+      "expected_output": "Run sessions.py dormant on the integration session with its reason and a plain-word wake condition about sandbox credentials, finish and close the dashboard session, then run sessions.py wake-check, judge the plain-word condition from evidence, and ask the user before waking the integration session.",
+      "files": [],
+      "expectations": [
+        "Parks the integration session with sessions.py dormant and a --wake condition instead of closing or abandoning it",
+        "Completes and closes the active dashboard session before checking dormant sessions",
+        "Runs sessions.py wake-check after no active session remains open",
+        "Asks the user for permission before running sessions.py wake"
+      ]
     }
   ]
 }

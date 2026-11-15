@@ -1,6 +1,6 @@
 ---
 name: maestro
-description: Plan, track, resume, verify, and archive substantial or multi-session work with repository-local sessions under `.agents/brain/`. Use for multi-step tasks, phased work, long-running tasks, project orchestration, explicit planning requests, or work that must survive context changes.
+description: Plan, track, resume, verify, park, wake, and archive substantial or multi-session work with repository-local sessions under `.agents/brain/`. Use for multi-step tasks, phased work, long-running tasks, project orchestration, explicit planning requests, work that must survive context changes, deferred or future work that must be kept as a dormant session with wake conditions, and checking dormant sessions once active work is cleared.
 ---
 
 # Maestro
@@ -15,11 +15,13 @@ Run scripts with the skill directory as the base path, for example `python3 <ski
 2. Read `.agents/MEMORY.md` in full when it exists.
 3. Read every topic file linked from relevant memory entries.
 4. Read relevant files in `.agents/brain/handoffs/`.
-5. Run `python3 scripts/sessions.py status` to list every active Maestro session.
+5. Run `python3 scripts/sessions.py status` to list every active and dormant Maestro session.
 6. Close finished and stale Maestro sessions with `python3 scripts/sessions.py stale --apply`, and report the closures to the user in one line.
-7. Match the current task to the remaining active Maestro sessions by objective and slug.
+7. Match the current task to the remaining active Maestro sessions by objective and slug. Match it to a dormant Maestro session only when the user names that work.
 8. Do not create a duplicate Maestro session.
 9. Activate `steward/SKILL.md` and size the plan to the capacity in `~/.agents/system-profile.md`.
+
+Read [dormant sessions](references/session-lifecycle.md#dormant) before parking, checking, or waking a Maestro session.
 
 Read [brain conventions](references/brain-conventions.md) before creating or moving session files.
 
@@ -118,16 +120,27 @@ Read [session lifecycle](references/session-lifecycle.md#close).
    - `DONE`: every acceptance criterion passed.
    - `PARTIAL`: the user accepted the result or moved to other work; record the deferred items in `walkthrough.md`.
    - `SUPERSEDED`: another Maestro session took over; name it in `walkthrough.md`.
-   - `ABANDONED`: no change for 14 days and no open user request.
+   - `ABANDONED`: no change for 14 days, no open user request, and no deferral by the user; park deferred work under Section 10 instead.
 2. Fold the Maestro session's handoffs into `walkthrough.md`, then delete them.
 3. Run `python3 scripts/sessions.py close <session> <STATE> "<note>"` to set the state, move evidence to the agent store, archive the folder, and update `sessions/archive/INDEX.md`.
 4. Do not edit an archived Maestro session; reopen one by moving it back to `sessions/active/`.
 5. Run `python3 scripts/sessions.py prune --apply` after the archive is committed and holds more than 10 folders.
 6. Report each closure to the user in one line.
 
+## 10. Park and wake dormant sessions
+
+1. Park a Maestro session as `DORMANT` instead of closing it when the user defers its work to the future or ties it to a condition: `python3 scripts/sessions.py dormant <session> "<reason>" --wake "<condition>"`. Repeat `--wake` for each condition. To park an archived Maestro session the user names, move it back to `sessions/active/` first.
+2. Write each wake condition in a checkable form when possible: `date: YYYY-MM-DD`, `after: <session> closes`, or `exists: <project path>`. Write any other condition in plain words.
+3. Never close, abandon, prune, or edit the plan of a dormant Maestro session.
+4. Work every open active Maestro session first.
+5. When no active Maestro session remains open, run `python3 scripts/sessions.py wake-check`.
+6. For each session reported `ready` or `judge conditions`, decide each plain-word condition from current evidence, then ask the user for permission to resume every session whose conditions are met or that has none. Name the session, its reason, and each condition with its result.
+7. Run `python3 scripts/sessions.py wake <session> "<user approval>"` only after the user approves, then resume it under Section 2.
+8. Leave a session dormant when its conditions are not met or the user declines, and report it in one line.
+
 Inspect [session examples](examples/session-lifecycle-and-recovery.md) for task state transitions and recovery patterns.
 
-## 10. Pre-completion checklist
+## 11. Pre-completion checklist
 
 Before marking a Maestro session complete, confirm evidence exists for each item:
 
@@ -138,7 +151,8 @@ Before marking a Maestro session complete, confirm evidence exists for each item
 - [ ] All changed narrative or instruction files read manually in full from start to finish.
 - [ ] Durable knowledge and decisions recorded in `.agents/MEMORY.md` or topic files.
 - [ ] Steward check clean and every temporary artifact removed.
-- [ ] Maestro session closed with `DONE`, `PARTIAL`, `SUPERSEDED`, or `ABANDONED` and archived, or left active in an open state.
+- [ ] Maestro session closed with `DONE`, `PARTIAL`, `SUPERSEDED`, or `ABANDONED` and archived, parked as `DORMANT` with its reason and wake conditions, or left active in an open state.
+- [ ] Dormant Maestro sessions checked with `wake-check` once no active Maestro session remained open, and none woken without the user's approval.
 - [ ] Zero AI attribution across all session artifacts and commits.
 - [ ] No U+2014 em dashes in normal prose.
 

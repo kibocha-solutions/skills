@@ -1,6 +1,6 @@
 ---
 name: interface-design
-description: Design legendary, production-grade user interfaces, design systems, visual languages, and interactive blueprints for websites, responsive web applications, and mobile apps across phones and tablets in both portrait and landscape orientations. Use for interface design, UI/UX, product design, website design, mobile app design, design systems, design tokens, layout wireframes, Apple HIG, Material 3 Expressive, taste calibration, anti-slop rules, and Figma MCP extraction.
+description: Design legendary, production-grade user interfaces, design systems, visual languages, and interactive blueprints for websites, responsive web applications, and mobile apps across phones and tablets in both portrait and landscape orientations. Use for interface design, UI/UX, product design, website design, mobile app design, design systems, design tokens, layout wireframes, Apple HIG, Material 3 Expressive, Fluent, Carbon, GOV.UK and other design foundations, web standards by product category, taste calibration, anti-slop rules, and Figma MCP extraction.
 license: Complete terms in LICENSE.txt
 ---
 
@@ -18,6 +18,7 @@ license: Complete terms in LICENSE.txt
 4. Propose one concrete subject and target audience when the brief omits them.
 5. Confirm any assumption that would materially alter the design.
 6. Gather real content or write realistic domain-specific copy.
+7. Read the [web standards catalogue](references/web-standards-catalogue.md) and follow its Section 1 to classify the product category and select the governing standards. Treat every standard in this skill as the minimum.
 
 ## 2. Check and initialize multi-agent MCP tooling
 
@@ -57,21 +58,22 @@ license: Complete terms in LICENSE.txt
    - Bold Contemporary (vibrant accents, high-contrast type, expressive geometry).
 5. Restrain all secondary elements around the primary focal anchor.
 
-## 4. Select the platform design system
+## 4. Select one design foundation
 
 1. Read [design systems HIG and Material 3](references/design-systems-hig-and-material3.md) for component anatomy, official URLs, and platform selection matrices.
-2. Choose the authoritative design foundation:
-   - **Apple Human Interface Guidelines (HIG)**: For iOS and iPadOS applications. Enforce 44x44pt minimum touch targets, San Francisco typography, vibrancy materials, and standard navigation controllers.
-   - **Google Material 3 Expressive**: For Android applications. Enforce 48x48dp minimum touch targets, dynamic color tonal palettes, 35+ expressive shape corners, and container transforms.
-   - **Modern Web Synthesis**: For responsive cross-platform web applications. Combine Apple's typographic restraint and touch ergonomics with Material 3's semantic container token hierarchy.
-3. Inspect the official design guideline documentation for each requested component type:
-   - Apple HIG: `https://developer.apple.com/design/human-interface-guidelines/`
-   - Material 3 Components: `https://m3.material.io/components/`
+2. Select exactly one foundation for each product surface under Section 4 of the [web standards catalogue](references/web-standards-catalogue.md#4-keep-one-design-foundation):
+   - **Apple Human Interface Guidelines (HIG)**: For iOS and iPadOS applications and Apple-aligned web surfaces. Enforce 44x44pt minimum touch targets, San Francisco typography on Apple platforms, vibrancy materials, and standard navigation controllers.
+   - **Google Material 3 or Material 3 Expressive**: For Android applications and Android-aligned web surfaces. Enforce 48x48dp minimum touch targets, dynamic color tonal palettes, the Material shape scale, and container transforms.
+   - **A category design system**: Fluent 2, Carbon, Atlassian, Primer, Spectrum, Polaris, GOV.UK, or the U.S. Web Design System when the catalogue's category table names it.
+   - **The product's own system**: For brand-led websites and applications, with every token and component defined in `DESIGN.md`.
+3. Never blend two foundations on one surface.
+4. Continue the foundation a project already uses, and propose any change in chat first.
+5. Inspect the selected foundation's official documentation for each requested component type, using the URLs in the catalogue.
 
 ## 5. Formulate the token contract
 
 1. Create a project-local `DESIGN.md` file defining all design tokens before implementation.
-2. Define semantic color roles:
+2. Use the selected foundation's color roles and token names when it defines them, such as Material 3 `primary`, `on-primary`, and `surface-container`. For a product's own system, define these semantic color roles:
    - `surface-primary`, `surface-secondary`, `surface-elevated`
    - `content-primary`, `content-secondary`, `content-muted`
    - `accent-default`, `accent-hover`, `accent-subtle`
@@ -82,6 +84,8 @@ license: Complete terms in LICENSE.txt
    - Limit body line length to 65 to 75 characters.
 4. Define spacing tokens on a strict 4px or 8px baseline grid (4, 8, 12, 16, 24, 32, 48, 64px).
 5. Define container elevation, borders, and motion tokens.
+6. Write a `Standards` section naming the product category, the selected foundation, the Baseline target, and every standard selected from the catalogue.
+7. Map brand colors and typefaces onto the selected foundation's roles instead of adding parallel tokens.
 
 ## 6. Plan layout and ergonomic geometry
 
@@ -110,7 +114,9 @@ license: Complete terms in LICENSE.txt
    - Automatic right arrows (`→`) appended to every button and link.
    - Hover zoom animations applied to every card container.
 3. Replace any choice that cannot be justified by the brief or brand constraints.
-4. Record confirmed choices in `DESIGN.md`.
+4. Apply Section 5 of the [web standards catalogue](references/web-standards-catalogue.md#5-reject-slop-practices) to every design rule and practice.
+5. Run `python3 <steward-skill-dir>/scripts/steward.py tool ensure impeccable`, then run `impeccable detect --json <markup files or directories>` on any built markup, mockup, or prototype. Resolve each finding or record the brief requirement that justifies it.
+6. Record confirmed choices in `DESIGN.md`.
 
 ## 8. Write interface content and copy
 
@@ -135,9 +141,11 @@ Before delivering any interface design specification or routing to implementatio
 - [ ] Brief and form factor identified, including phone/tablet portrait and landscape requirements.
 - [ ] Active agent host detected and required MCPs inspected/pre-configured.
 - [ ] Taste dials (density and variance) calibrated and archetype selected.
-- [ ] Platform foundation chosen (Apple HIG, Material 3, or Web Synthesis) with component URLs referenced.
-- [ ] Project token contract written to `DESIGN.md`.
+- [ ] Product category classified and governing standards selected from the web standards catalogue.
+- [ ] Exactly one design foundation chosen per surface, with no blended components or tokens, and component URLs referenced.
+- [ ] Project token contract and `Standards` section written to `DESIGN.md`.
 - [ ] Nested border radius formula applied to all nested containers.
-- [ ] All items on the anti-slop exclusion list checked and rejected.
+- [ ] All items on the anti-slop exclusion list checked and rejected; every rule traced to a source.
+- [ ] `impeccable detect` clean, or each finding justified by the brief in `DESIGN.md`.
 - [ ] Zero AI attribution across all specifications, documentation, and metadata.
 - [ ] No U+2014 em dashes in any file or deliverable.

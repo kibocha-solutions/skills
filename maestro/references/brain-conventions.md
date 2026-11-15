@@ -10,6 +10,7 @@
     ├── handoffs/
     └── sessions/
         ├── active/
+        ├── dormant/
         └── archive/
 ```
 
@@ -31,13 +32,15 @@ Use `YYYY-MM-DD-HHMM-<slug>`.
 ├── implementation_plan.md
 ├── tasks.md
 ├── walkthrough.md
-└── goal.md
+├── goal.md
+└── wake.md
 ```
 
 1. Require `implementation_plan.md`, `tasks.md`, and `walkthrough.md` for a full session.
 2. Use `meta/` for text sources and research notes. Keep screenshots, renders, logs, traces, and other evidence in `~/.agents/evidence/` through `steward.py store path evidence`.
 3. Create `goal.md` only when authorized or required.
-4. Keep generated binaries and downloaded datasets out of version control.
+4. Let `sessions.py dormant` create `wake.md`; it exists only for a session that has been parked.
+5. Keep generated binaries and downloaded datasets out of version control.
 
 ## Handoffs
 

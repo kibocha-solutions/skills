@@ -17,6 +17,8 @@ license: Complete terms in LICENSE.txt
    - **Portrait**: One-handed thumb reach, bottom navigation, vertical scroll stacks.
    - **Landscape**: Horizontal split panes, compact side rails, minimized vertical headers.
 4. Ingest the project `DESIGN.md` contract. If absent, invoke `interface-design` to establish tokens, archetypes, and platform foundation.
+5. Implement only the foundation `DESIGN.md` names for each platform: Apple HIG on iOS and iPadOS, Material 3 or Material 3 Expressive on Android, or the product's own system. Never combine two foundations on one surface; follow Section 4 of the [web standards catalogue](../interface-design/references/web-standards-catalogue.md#4-keep-one-design-foundation).
+6. For a progressive web application or mobile web surface, apply Section 2 of `web-design/SKILL.md` for Baseline and Modern Web Guidance before writing platform code, and Section 8 of `web-design/SKILL.md` for verification.
 
 ## 2. Enforce touch targets and safe area insets
 
@@ -24,9 +26,9 @@ license: Complete terms in LICENSE.txt
 2. Implement platform-specific minimum touch hit areas:
    - Apple iOS / iPadOS: minimum 44x44pt hit target.
    - Google Android / Material 3: minimum 48x48dp hit target.
-2. Expand visual icons smaller than 44pt to minimum touch boundaries using negative margins, padding, or pseudo-elements (`::after` hit area).
-3. Provide minimum 8px spacing between adjacent touch targets to eliminate mis-taps.
-4. Bind layouts to device hardware cutouts and home indicators using safe area insets:
+3. Expand visual icons smaller than 44pt to minimum touch boundaries using negative margins, padding, or pseudo-elements (`::after` hit area).
+4. Provide minimum 8px spacing between adjacent touch targets to eliminate mis-taps.
+5. Bind layouts to device hardware cutouts and home indicators using safe area insets:
    ```css
    padding-top: env(safe-area-inset-top, 0px);
    padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -72,20 +74,22 @@ license: Complete terms in LICENSE.txt
      transition: transform 80ms ease-out;
    }
    ```
-2. Disable text selection and mobile callout bubbles on interactive touch surfaces:
+3. Disable text selection and mobile callout bubbles on interactive touch surfaces:
    ```css
    user-select: none;
    -webkit-touch-callout: none;
    ```
-3. Implement velocity-aware sheet drag gestures:
+4. Implement velocity-aware sheet drag gestures:
    - If drag velocity exceeds threshold, complete the dismissal or expansion.
    - If released below threshold, snap back to nearest detent (half-height or full-height) using spring physics (`stiffness: 300, damping: 30`).
-4. Implement pull-to-refresh with clear resistance curves and haptic feedback triggers.
+5. Implement pull-to-refresh with clear resistance curves and haptic feedback triggers.
 
 ## 7. Pre-completion checklist
 
 Before delivering mobile or tablet application designs, confirm evidence exists for each item:
 
+- [ ] One design foundation per platform surface applied without blending.
+- [ ] Progressive web application and mobile web surfaces checked against Baseline, Modern Web Guidance, and the `web-design` verification steps.
 - [ ] Touch targets verified: minimum 44x44pt (iOS) or 48x48dp (Android).
 - [ ] Safe area insets (`env(safe-area-inset-*)`) handled on all edges.
 - [ ] Phone portrait layout keeps primary actions in the lower thumb zone.

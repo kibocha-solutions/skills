@@ -35,9 +35,10 @@ import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-VERSION = "2.3.0"
+VERSION = "2.4.0"
 IMAGE_REPO = "docker.io/jetbrains/writerside-builder"
-DEFAULT_IMAGE_TAG = "2026.08.0328"
+STABLE = "stable"  # follow the newest dated builder image
+DATED_TAG = re.compile(r"\d{4}\.\d{2}\.\d+")
 NGINX_IMAGE = "docker.io/library/nginx:alpine"
 DEFAULT_SENSITIVITY = ["public", "internal", "restricted", "confidential"]
 DEFAULT_PORT_BASE = 44190
@@ -313,7 +314,8 @@ class Instance:
 @dataclass
 class Config:
     runtime: str = ""
-    image_tag: str = DEFAULT_IMAGE_TAG
+    image_tag: str = STABLE
+    pinned: bool = False
     port_base: int = DEFAULT_PORT_BASE
     jobs: int = 0
     sensitivity: list[str] = field(default_factory=lambda: list(DEFAULT_SENSITIVITY))
@@ -379,6 +381,17 @@ class Project:
                        f"available: {', '.join(i.id for i in self.instances)}")
 
 
+def tag_key(tag: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in tag.split("."))
+
+
+def resolve_image(cfg: "Config", rt: "Runtime") -> None:
+    """Point an unpinned configuration at the newest local dated builder image."""
+    if not cfg.pinned:
+        tags = rt.builder_tags()
+        cfg.image_tag = tags[-1] if tags else STABLE
+
+
 class WrsError(Exception):
     def __init__(self, msg: str, hint: str = "", code: int = EXIT_FAIL):
         super().__init__(msg)
@@ -406,8 +419,9 @@ def load_config(root: Path, args: argparse.Namespace) -> Config:
                 file_values.update(tomllib.load(fh))
     env = os.environ
     cfg.runtime = getattr(args, "runtime", None) or env.get("WRS_RUNTIME") or file_values.get("runtime", "")
-    cfg.image_tag = getattr(args, "image_tag", None) or env.get("WRS_IMAGE_TAG") or file_values.get(
-        "image_tag", DEFAULT_IMAGE_TAG)
+    pin = getattr(args, "image_tag", None) or env.get("WRS_IMAGE_TAG") or file_values.get("image_tag", "")
+    cfg.pinned = bool(pin) and pin != STABLE
+    cfg.image_tag = pin if cfg.pinned else STABLE
     cfg.port_base = int(getattr(args, "port_base", None) or env.get("WRS_PORT_BASE") or file_values.get(
         "port_base", DEFAULT_PORT_BASE))
     cfg.jobs = int(getattr(args, "jobs", None) or env.get("WRS_JOBS") or file_values.get("jobs", 0))
@@ -481,6 +495,13 @@ class Runtime:
         except json.JSONDecodeError:
             return "present"
         return next((d.split("@", 1)[1] for d in digests if "@" in d), "present")
+
+    def builder_tags(self) -> list[str]:
+        """Dated Writerside builder tags present locally, oldest first."""
+        r = self.run("images", "--format", "{{.Repository}}|{{.Tag}}")
+        tags = {line.split("|", 1)[1] for line in r.stdout.splitlines()
+                if "|" in line and line.split("|", 1)[0].endswith("jetbrains/writerside-builder")}
+        return sorted((t for t in tags if DATED_TAG.fullmatch(t)), key=tag_key)
 
     def relabel(self) -> str:
         return ":Z" if sys.platform.startswith("linux") else ""
@@ -1101,6 +1122,9 @@ def cmd_build(args: argparse.Namespace, ui: UI) -> int:
     project = load_project(args)
     rt = Runtime(project.config.runtime)
     targets = [project.get(n) for n in args.instances] if args.instances else project.instances
+    resolve_image(project.config, rt)
+    if project.config.image_tag == STABLE:
+        raise WrsError("no Writerside builder image present", "run: wrs update")
     if not rt.image_digest(project.config.image):
         raise WrsError(f"builder image not present: {project.config.image}",
                        f"run: wrs update --pull  (or {rt.cmd} pull {project.config.image})")
@@ -1452,6 +1476,7 @@ def follow_server(ui: UI, rt: Runtime, name: str, state: dict) -> int:
 def cmd_status(args: argparse.Namespace, ui: UI) -> int:
     project = load_project(args)
     rt = Runtime(project.config.runtime)
+    resolve_image(project.config, rt)
     running = dict(rt.containers(f"wrs.project={project.slug}"))
     state_file = serve_state_path(project)
     serving = state_file.is_file() and any(n.startswith("wrs-serve-") and s.lower().startswith("up")
@@ -1595,25 +1620,29 @@ def cmd_update(args: argparse.Namespace, ui: UI) -> int:
     rt = Runtime(cfg.runtime)
     with Spinner(ui, "Checking Docker Hub for the latest Writerside builder"):
         tag, digest = latest_tag()
-    current = cfg.image_tag
-    ui.info(f"configured {current}  {ui.sym('arrow')}  latest {tag}")
-    if args.pull or tag != current:
-        target = f"{IMAGE_REPO}:{tag}"
-        if not rt.image_digest(target) or args.pull:
-            with Spinner(ui, f"Pulling {target}"):
-                r = rt.run("pull", target, timeout=1800)
-            if r.returncode != 0:
-                raise WrsError("pull failed", r.stderr.strip()[-400:])
-        local = rt.image_digest(target)
-        if digest and local and local != "present" and local != digest:
-            raise WrsError("digest mismatch between Docker Hub and the pulled image",
-                           f"hub {digest}\nlocal {local}")
-        ui.ok(f"{target} present ({local or digest})")
-    if tag != current:
-        where = project.root / ".wrs.toml" if project else Path.home() / ".config/wrs/config.toml"
-        ui.hint(f'pin it for the team: add image_tag = "{tag}" to {where}')
-    else:
-        ui.ok("Builder image is current")
+    local = rt.builder_tags()
+    ui.info(f"newest local {local[-1] if local else 'none'}  {ui.sym('arrow')}  latest {tag}")
+    target = f"{IMAGE_REPO}:{tag}"
+    if args.pull or tag not in local:
+        with Spinner(ui, f"Pulling {target}"):
+            r = rt.run("pull", target, timeout=1800)
+        if r.returncode != 0:
+            raise WrsError("pull failed", r.stderr.strip()[-400:])
+    present = rt.image_digest(target)
+    if digest and present and present != "present" and present != digest:
+        raise WrsError("digest mismatch between Docker Hub and the pulled image",
+                       f"hub {digest}\nlocal {present}")
+    ui.ok(f"{target} present ({present or digest})")
+    keep = {tag} | ({cfg.image_tag} if cfg.pinned else set())
+    if not args.keep_old:
+        for old in [t for t in rt.builder_tags() if t not in keep]:
+            r = rt.run("rmi", f"{IMAGE_REPO}:{old}", timeout=300)
+            if r.returncode == 0:
+                ui.ok(f"removed superseded builder {old}")
+            else:
+                ui.warn(f"could not remove builder {old}: {r.stderr.strip()[-200:]}")
+    if cfg.pinned and cfg.image_tag != tag:
+        ui.hint(f"this project pins image_tag = \"{cfg.image_tag}\"; remove the pin to follow the latest builder")
     return EXIT_OK
 
 
@@ -1631,6 +1660,7 @@ def cmd_doctor(args: argparse.Namespace, ui: UI) -> int:
     try:
         rt = Runtime(cfg.runtime)
         checks.append(("runtime", rt.reachable(), f"{rt.cmd} ({rt.version()})"))
+        resolve_image(cfg, rt)
         digest = rt.image_digest(cfg.image)
         checks.append(("builder image", bool(digest), f"{cfg.image} {digest[:19] if digest else 'missing'}"))
         checks.append(("nginx image", True,
@@ -1648,8 +1678,8 @@ def cmd_doctor(args: argparse.Namespace, ui: UI) -> int:
     if args.online:
         try:
             tag, _ = latest_tag()
-            checks.append(("latest image", tag == cfg.image_tag,
-                           tag + ("" if tag == cfg.image_tag else " (run: wrs update --pull)")))
+            hint = " (pinned in configuration)" if cfg.pinned else " (run: wrs update)"
+            checks.append(("latest image", tag == cfg.image_tag, tag + ("" if tag == cfg.image_tag else hint)))
         except (urllib.error.URLError, OSError, WrsError) as exc:
             checks.append(("latest image", False, f"lookup failed: {exc}"))
     if args.json:
@@ -1673,11 +1703,11 @@ EPILOG = """examples:
   wrs serve -f              serve and follow request logs in the foreground
   wrs check                 confirm no lower-tier page references a higher tier
   wrs status                builds, pages, and URLs at a glance
-  wrs update --pull         fetch the latest builder image
+  wrs update                pull the latest builder image and remove superseded ones
 
 configuration (highest first): flags, WRS_* environment variables,
 .wrs.toml beside writerside.cfg, ~/.config/wrs/config.toml.
-keys: runtime, image_tag, port_base, jobs, sensitivity (list, lowest first),
+keys: runtime, image_tag (default: the newest local dated builder), port_base, jobs, sensitivity (list, lowest first),
 gated_from (first gated tier, default restricted), dev_item (default wrs-dev;
 op://<vault>/<item> selects 1Password), password_manager (bitwarden or 1password;
 default: from dev_item, else the installed CLI, Bitwarden first).
@@ -1751,8 +1781,9 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("--all", action="store_true", help="also remove sites, artifacts, and logs")
     c.set_defaults(func=cmd_clean)
 
-    u = sub.add_parser("update", parents=[common], help="check for and pull the latest builder image")
-    u.add_argument("--pull", action="store_true", help="pull even when the tag is unchanged")
+    u = sub.add_parser("update", parents=[common], help="pull the latest builder image and remove superseded ones")
+    u.add_argument("--pull", action="store_true", help="pull even when the tag is already present")
+    u.add_argument("--keep-old", action="store_true", help="keep superseded builder images")
     u.set_defaults(func=cmd_update)
 
     d = sub.add_parser("doctor", parents=[common], help="check the environment")

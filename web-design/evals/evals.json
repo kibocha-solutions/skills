@@ -21,6 +21,19 @@
         "Enforces frequency-based duration brackets",
         "Wraps animations in @media (prefers-reduced-motion: reduce)"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add a delete confirmation to the project list page. The repository AGENTS.md says the Baseline target is Baseline 2024.",
+      "expected_output": "Ensure modern-web-guidance through steward, search for a confirmation dialog capability without framework names, retrieve the matching guide, implement the native dialog pattern with every fallback the Baseline 2024 target requires, take appearance from DESIGN.md, run impeccable detect on the changed markup, and report the guide IDs applied.",
+      "files": [],
+      "expectations": [
+        "Runs steward.py tool ensure modern-web-guidance before searching",
+        "Searches with a two to five word capability query such as 'confirmation modal dialog' and retrieves a matching guide",
+        "Uses the native dialog element and applies fallbacks for features outside Baseline 2024",
+        "Runs impeccable detect on the changed markup and resolves or justifies findings",
+        "Reports the Modern Web Guidance guide IDs applied"
+      ]
     }
   ]
 }

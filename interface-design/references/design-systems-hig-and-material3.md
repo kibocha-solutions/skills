@@ -48,9 +48,9 @@ When designing or implementing a specific component, read the official design gu
 
 ---
 
-## 3. Platform Selection and Synthesis Decision Matrix
+## 3. Platform Selection Decision Matrix
 
-Use this matrix to select the foundation based on target product and audience:
+Use this matrix to select one foundation based on target product and audience. Select foundations outside Apple HIG and Material 3 through the [web standards catalogue](web-standards-catalogue.md#3-standards-by-product-category).
 
 ### Native iOS / iPadOS Target
 1. Follow Apple HIG strictly.
@@ -66,9 +66,11 @@ Use this matrix to select the foundation based on target product and audience:
 4. Use expressive asymmetric shapes and rounded corner tokens.
 5. Enforce 48x48dp minimum touch hit areas.
 
-### Cross-Platform Web / SaaS Synthesis
+### Web and Cross-Platform Targets
 When building responsive web applications or hybrid cross-platform apps:
-1. **Typography**: Adopt Apple's typographic restraint. Restrict to one crisp sans-serif (e.g. Inter, SF Pro, Geist) and one optional code/mono face. Keep line lengths strictly between 65 and 75 characters.
-2. **Color & Containers**: Adopt Material 3's semantic container hierarchy (`surface-primary`, `surface-secondary`, `surface-elevated`). Use background color shifts rather than heavy drop shadows to denote layering.
-3. **Touch Targets**: Apply the stricter 48x48px target size for mobile viewports, relaxing to 36x36px for pointer/mouse controls on desktop.
-4. **Motion**: Use Emil Kowalski spring curves (`stiffness: 300, damping: 30`) and snappy durations (100 to 150ms for buttons, 150 to 200ms for menus).
+1. Select one foundation per surface under Section 4 of the [web standards catalogue](web-standards-catalogue.md#4-keep-one-design-foundation). Never combine Apple HIG typography or materials with Material 3 tokens or components.
+2. **Material 3 on the web**: Take color roles, type scale, shape scale, elevation, and motion from Material 3 throughout. `@material/web` is in maintenance mode and does not implement Material 3 Expressive; implement Expressive from the published specifications and tokens or a maintained library that states its Material 3 version.
+3. **Apple HIG on the web**: Take hierarchy, controls, spacing, and materials from Apple HIG throughout. Use the `system-ui` font stack, which renders San Francisco on Apple devices; never bundle San Francisco font files.
+4. **Product's own system**: Choose typefaces from the brief and brand, not a default family. Define color, containers, elevation, and motion as one set of tokens in `DESIGN.md`.
+5. **Touch Targets**: Apply the selected foundation's minimum: 48x48dp for Material 3 and 44x44pt for Apple HIG; for a product's own system, use at least 44x44px on touch viewports and 24x24px for pointer controls (WCAG 2.2 SC 2.5.8).
+6. **Motion**: Take curves and durations from the selected foundation. Apply the `web-design` duration brackets only within a product's own system.

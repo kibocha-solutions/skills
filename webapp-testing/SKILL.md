@@ -35,7 +35,10 @@ For two servers from separate directories, pass repeated `--server`, `--port`, a
 7. Inspect the rendered DOM and take a baseline screenshot.
 8. Select elements by accessible role, label, visible name, test identifier, or stable project selector.
 9. Perform the user workflow and assert visible outcomes after every state-changing action across initial load, primary path, validation/error, loading/empty, keyboard interaction, focus visibility, and requested responsive widths.
-10. Save final screenshots outside the repository unless the project prescribes a test-artifact directory; do not expose secrets, tokens, cookies, or private page content in logs or screenshots.
+10. Launch Playwright's bundled Chromium from the shared browser cache unless the project names another browser; never require an installed Google Chrome.
+11. When the change used a Modern Web Guidance guide, assert the behavior the guide specifies, including its fallback in a browser outside the Baseline target when the project tests one.
+12. When the change affects loading, rendering, or interaction, record a lab performance trace and compare LCP, INP, and CLS with the thresholds in the [web standards catalogue](../interface-design/references/web-standards-catalogue.md#2-universal-floor).
+13. Save final screenshots under `steward.py store path evidence <project>/<maestro-session>` unless the project prescribes a test-artifact directory; do not expose secrets, tokens, cookies, or private page content in logs or screenshots.
 
 ## 3. Verify and clean up
 
@@ -50,6 +53,8 @@ For two servers from separate directories, pass repeated `--server`, `--port`, a
 - [ ] The tested route is recorded.
 - [ ] Assertions cover the requested behavior using semantic role locators.
 - [ ] Zero unhandled console errors or failed network requests recorded during test execution.
+- [ ] Behavior specified by each applied Modern Web Guidance guide asserted.
+- [ ] Core Web Vitals compared with the catalogue thresholds when loading, rendering, or interaction changed.
 - [ ] Screenshots come from the exact final application state.
 - [ ] Every delivered screenshot was visually inspected.
 - [ ] No managed server or browser process remains running.

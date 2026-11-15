@@ -36,6 +36,7 @@ The agent store is `~/.agents/` on the user's home drive. It holds everything ag
 | Path | Holds | Retention since last use |
 | :--- | :--- | :--- |
 | `~/.agents/system-profile.md` | Machine capacity profile | Rewritten each session |
+| `~/.agents/device.md` | Stable device facts, installed shared tools, and lasting defaults | Permanent |
 | `~/.agents/steward/ledger.tsv` | Steward ledger | Permanent |
 | `~/.agents/evidence/<project>/<maestro-session>/` | Screenshots, renders, logs, traces, verification exports | 90 days |
 | `~/.agents/envs/<project>-<purpose>/` | Python virtual environments and other toolchain environments | 30 days |
@@ -49,6 +50,19 @@ The agent store is `~/.agents/` on the user's home drive. It holds everything ag
 | Python with venv | `python3 -m venv "$(python3 steward.py store path env <project>-py)"` |
 | Node.js | Install with `pnpm`; its content-addressed store shares packages across projects. Keep `node_modules` in the project, where Node resolves it. |
 | Playwright browsers | Keep the shared default browser cache; never download a second copy per project. |
+
+## Tool registry
+
+`steward.py tool ensure <name>` installs a missing tool with `npm install -g <package>@latest`, compares a recorded tool with the latest release on the registry when its record is 30 days old or `--update` is passed, and writes the version, source, install date, and check date to the Tools section of `~/.agents/device.md`.
+
+| Tool | Package | Used by | Command |
+| :--- | :--- | :--- | :--- |
+| `modern-web-guidance` | npm `modern-web-guidance` | `web-design`, `mobile-app-design`, `webapp-testing` | `modern-web-guidance search "<query>"`, `retrieve <id>`, `legacy-scan <path> --json` |
+| `impeccable` | npm `impeccable` | `interface-design`, `web-design` | `impeccable detect --json <markup files or directories>` |
+
+`modern-web-guidance retrieve` saves output larger than 9.5 KB to `/tmp/mwg-guide-*.md`. Delete each saved guide after reading it.
+
+A global npm install belongs to the active Node.js version. After a Node.js upgrade, `tool ensure` finds the command missing and installs it again.
 
 ## Ledger
 
