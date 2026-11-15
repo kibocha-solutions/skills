@@ -280,16 +280,18 @@ args = []
 
 ## 6. Steward Guard and System Profile Hooks
 
-Register these hooks on every installed host. `steward.py pre` and `steward.py stop` refuse by exiting with code `2` and writing the reason to stderr; `system-profile.sh` prints a capacity summary on stdout.
+Register these hooks on every installed host. `steward.py pre` refuses a command and `steward.py stop` refuses to end a turn while leftovers remain, each in the host's format below; `system-profile.sh` prints a capacity summary on stdout.
 
-| Host | Pre-tool event and matcher | Session-end event | Session-start event |
-| :--- | :--- | :--- | :--- |
-| Claude Code (`~/.claude/settings.json`) | `PreToolUse`, `Bash` | `Stop` | `SessionStart` |
-| Codex (`~/.codex/hooks.json`) | `PreToolUse`, `Bash` | `Stop` | `SessionStart` (`startup\|resume`) |
-| Gemini CLI (`~/.gemini/settings.json`) | `BeforeTool`, `run_shell_command` | `AfterAgent` | `SessionStart` |
-| GitHub Copilot CLI (`~/.copilot/hooks/steward.json`) | `preToolUse` | `sessionEnd` | `sessionStart` |
+| Host | Configuration | Pre-tool event | End-of-turn event | Session-start event |
+| :--- | :--- | :--- | :--- | :--- |
+| Claude Code | `~/.claude/settings.json` | `PreToolUse`, matcher `Bash` | `Stop` | `SessionStart` |
+| Codex (CLI and the ChatGPT app) | `~/.codex/hooks.json` | `PreToolUse`, matcher `Bash` | `Stop` | `SessionStart` (`startup\|resume`) |
+| Antigravity | `~/.gemini/config/hooks.json`, group `steward-guard` | `PreToolUse`, matcher `run_command` | `Stop` | `SessionStart` |
+| GitHub Copilot CLI | `~/.copilot/hooks/steward.json` | `preToolUse`, matcher `bash` | `agentStop` | `sessionStart` |
 
-Before registering a Codex, Gemini, or Copilot entry, confirm in the host's current hook documentation that the event exists and that exit code `2` blocks it. Register a non-blocking event only as a reminder, and report every host where blocking is unavailable.
+`steward.py` detects the host from its input and answers in that host's format: exit code `2` with the reason on stderr for Claude Code and Codex, `{"decision": "deny"}` and `{"decision": "continue"}` for Antigravity, and `{"permissionDecision": "deny"}` and `{"decision": "block"}` for Copilot. Gemini CLI is registered only when the `gemini` command is installed.
+
+Codex skips new or changed hooks until the user trusts them in the `/hooks` review; tell the user to approve the steward hooks there after registration.
 
 Claude Code entries to merge into `hooks`:
 

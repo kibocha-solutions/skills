@@ -195,14 +195,55 @@ def check_copy(tokens: list[str], cwd: str) -> str | None:
             "commit, stash, or use the checkpoint branch, and edit or move the original in place.")
 
 
+def host_of(payload: dict) -> str:
+    if "toolCall" in payload or "conversationId" in payload or "fullyIdle" in payload:
+        return "antigravity"
+    if "toolName" in payload or "stopReason" in payload or "sessionId" in payload:
+        return "copilot"
+    return "standard"
+
+
+def as_dict(value: object) -> dict:
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            return {"command": value}
+    return value if isinstance(value, dict) else {}
+
+
+def command_and_cwd(payload: dict, host: str) -> tuple[str, str]:
+    if host == "antigravity":
+        call = payload.get("toolCall") or {}
+        args = as_dict(call.get("args"))
+        if call.get("name") not in (None, "run_command"):
+            return "", ""
+        workspaces = payload.get("workspacePaths") or [os.getcwd()]
+        return args.get("CommandLine") or "", args.get("Cwd") or workspaces[0]
+    if host == "copilot" and "toolName" in payload:
+        if str(payload.get("toolName")).lower() not in ("bash", "shell"):
+            return "", ""
+        args = as_dict(payload.get("toolArgs"))
+        return args.get("command") or "", payload.get("cwd") or os.getcwd()
+    args = as_dict(payload.get("tool_input") or payload.get("arguments"))
+    return args.get("command") or args.get("cmd") or "", payload.get("cwd") or os.getcwd()
+
+
+def refuse(host: str, reason: str) -> int:
+    if host == "antigravity":
+        print(json.dumps({"decision": "deny", "reason": reason}))
+        return 0
+    if host == "copilot":
+        print(json.dumps({"permissionDecision": "deny", "permissionDecisionReason": reason}))
+    print(reason, file=sys.stderr)
+    return 2
+
+
 def pre(payload: dict) -> int:
-    tool_input = payload.get("tool_input") or payload.get("toolArgs") or payload.get("arguments") or {}
-    command = ""
-    if isinstance(tool_input, dict):
-        command = tool_input.get("command") or tool_input.get("cmd") or ""
+    host = host_of(payload)
+    command, cwd = command_and_cwd(payload, host)
     if not command:
         return 0
-    cwd = payload.get("cwd") or os.getcwd()
     for raw in segments(command):
         tokens = strip_prefix(raw)
         if not tokens:
@@ -214,8 +255,7 @@ def pre(payload: dict) -> int:
         elif program in ("cp", "rsync", "mv"):
             reason = check_copy(tokens, cwd)
         if reason:
-            print(reason, file=sys.stderr)
-            return 2
+            return refuse(host, reason)
     return 0
 
 
@@ -286,15 +326,30 @@ def findings(cwd: str) -> list[str]:
 
 
 def stop(payload: dict) -> int:
-    cwd = payload.get("cwd") or os.getcwd()
+    host = host_of(payload)
+    workspaces = payload.get("workspacePaths") or []
+    cwd = payload.get("cwd") or (workspaces[0] if workspaces else os.getcwd())
     found = findings(cwd)
     if not found:
         return 0
     message = ("Steward: leftovers remain. Delete them before finishing, or keep one only with the "
                "user's explicit approval recorded through 'steward.py ledger close <target> --kept "
                "<approval>'. Report what you deleted.\n- " + "\n- ".join(found))
+    if host == "antigravity":
+        marker = AGENTS_HOME / "steward" / "stop-continued" / re.sub(r"[^A-Za-z0-9_-]", "_", str(payload.get("conversationId") or "default"))
+        if marker.exists() and datetime.datetime.now().timestamp() - marker.stat().st_mtime < 600:
+            marker.unlink()
+            return 0
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.touch()
+        print(json.dumps({"decision": "continue", "reason": message}))
+        return 0
     if payload.get("stop_hook_active"):
-        print(json.dumps({"systemMessage": message}))
+        if host == "standard":
+            print(json.dumps({"systemMessage": message}))
+        return 0
+    if host == "copilot":
+        print(json.dumps({"decision": "block", "reason": message}))
         return 0
     print(message, file=sys.stderr)
     return 2
