@@ -1,6 +1,6 @@
 # Tasks: Skills Deepening, References & Good vs Bad Examples
 
-State: DONE
+## State: DONE
 
 ## Phase 1: Orchestration & Infrastructure Skills (Group A)
 - [x] Deepen `maestro/`: step-by-step directives, `examples/` for session lifecycle & threshold recovery

@@ -1,6 +1,6 @@
 # Tasks: Standing Rules Migration
 
-State: DONE (amended into the day's commit, pushed, bootstrapped on user approval)
+## State: DONE
 
 - [x] Map msngi rules 1 to 20 against shared AGENTS.md and skills (read legalese, system-design, documentation references in full)
 - [x] Snapshot documentation and system-design from HEAD

@@ -1,6 +1,6 @@
 # Tasks: Production wrs Writerside Wrapper
 
-State: DONE (537114d pushed and synced to every installed host)
+## State: DONE
 
 ## Phase 0: Orientation
 

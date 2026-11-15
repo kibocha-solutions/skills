@@ -1,7 +1,5 @@
 # Tasks: Steward Skill and Rule Tiers
-
-## State: AWAITING USER AUTHORIZATION (merge into main, bootstrap rollout)
-
+## State: DONE
 ## Phase 1: Shared rules
 - [x] Add rule-strength clause and steward routing to `AGENTS.md` below 2,500 words
 - [x] Strengthen the five enforce-rules directives
@@ -23,7 +21,7 @@
 - [x] Checkpoint commit on `checkpoint/steward-skill`
 
 ## Phase 5: Rollout (requires authorization)
-- [ ] Consolidate into one durable commit on `main` and push
-- [ ] Run `bootstrap` alignment and register steward hooks for installed hosts
-- [ ] Verify hooks fire in a fresh session
-- [ ] Retire the TalentSphere project-level container guard
+- [x] Consolidate into one durable commit on `main` and push
+- [x] Run `bootstrap` alignment and register steward hooks for installed hosts
+- [x] Verify hooks fire live in the running session
+- [x] Retire the TalentSphere project-level container guard

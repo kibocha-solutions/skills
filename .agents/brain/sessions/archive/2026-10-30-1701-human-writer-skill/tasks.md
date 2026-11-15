@@ -1,6 +1,7 @@
 # Tasks: Human-Writer Skill
 
-State: PLANNING
+## State: ABANDONED (closed 2026-11-15: idle since 2026-10-30)
+Closed automatically by workspace cleanup; reopen by moving the folder back to sessions/active/.
 
 ## Phase 1: Research and Skill Creation
 - [ ] Locate and read the full “Storyscope: Investigating Idiosyncrasies in AI Fiction” paper from a primary source

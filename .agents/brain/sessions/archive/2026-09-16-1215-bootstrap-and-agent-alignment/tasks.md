@@ -1,6 +1,6 @@
 # Tasks: Multi-Agent Bootstrap Alignment, MCP Standardization & Rule Enforcement
 
-State: DONE
+## State: DONE
 
 ## Phase 1: Cleanups & Script Alignment
 - [x] Implement host `AGENTS.md` cleanup helper in `bootstrap/scripts/lib.sh`

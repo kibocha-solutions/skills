@@ -1,6 +1,7 @@
 # Tasks: Coordinator Skill Proposal
 
-State: VERIFYING
+## State: ABANDONED (closed 2026-11-15: idle since 2026-10-30)
+Closed automatically by workspace cleanup; reopen by moving the folder back to sessions/active/.
 
 ## Phase 1: Research and Design
 - [x] Identify current global, session, and Git guidance

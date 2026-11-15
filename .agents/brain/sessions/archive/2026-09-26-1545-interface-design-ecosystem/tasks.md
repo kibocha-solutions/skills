@@ -1,6 +1,6 @@
 # Tasks: Interface Design & Engineering Ecosystem
 
-STATE: DONE
+## State: DONE
 
 ## Phase 1: Master Entry Skill (`interface-design`)
 - [x] Create `interface-design/SKILL.md` with entry workflow, brief definition, Taste dials, HIG/M3 selection, anti-slop rules, and routing

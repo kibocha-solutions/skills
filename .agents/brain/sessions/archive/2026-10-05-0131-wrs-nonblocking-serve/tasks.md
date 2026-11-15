@@ -1,6 +1,6 @@
 # Tasks: Non-Blocking Writerside Serve Wrapper and Bootstrap Deployment
 
-State: DONE
+## State: DONE
 
 ## Phase 1: Writerside Script Non-Blocking Implementation
 - [x] Inspect existing `~/.local/bin/wrs` and `documentation/scripts/wrs` serve logic

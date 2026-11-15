@@ -1,6 +1,6 @@
 # Tasks: Universal Rules Deduplication, PBO Integration & Compliance Checklists
 
-State: DONE
+## State: DONE
 
 ## Phase 1: AGENTS.md Deduplication & Universal Core Integration
 - [x] Remove duplicate headers and doubled Section 1 commands from `AGENTS.md`

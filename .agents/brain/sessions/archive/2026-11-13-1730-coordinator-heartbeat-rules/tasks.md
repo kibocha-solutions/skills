@@ -1,6 +1,6 @@
 # Tasks
 
-State: DONE
+## State: DONE
 
 ## Phase 1: Governing reads
 - [x] Read skill-creator SKILL.md, authoring standard, schemas, examples

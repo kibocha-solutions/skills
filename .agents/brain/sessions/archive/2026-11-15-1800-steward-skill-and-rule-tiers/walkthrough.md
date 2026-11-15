@@ -14,3 +14,8 @@ Branch `checkpoint/steward-skill` cut from `main` at `4628df9`. Worktree was cle
 - `steward`: `steward.py` pre-hook refused 6 of 6 violating commands and allowed 9 of 9 legitimate ones; stop hook blocked on a real leftover container, an untracked `.bak`, and an open ledger entry, warned without blocking on a repeated stop, and allowed finish after cleanup. `system-profile.sh` wrote the profile with no hostname, user name, or home path.
 - Validation: `quick_validate.py` reports the skill valid; `tools/validate-all.sh` findings fell from 15 on `main` to 14, all in unchanged skills.
 - Limitation: Codex, Gemini, and Copilot are not installed here; their steward event names are documented with a mandatory verification step before registration.
+- Rollout: squashed into one signed commit `5ce9acd` on `main` (tree identical to the tested checkpoint), pushed, and pruned the checkpoint branch locally and on the remote with the User's authorization.
+- `ensure-claude-link.sh` synced the Claude mirror to `5ce9acd` and embedded the new rules in the user-level instruction file.
+- Claude settings: added steward pre-tool, session-end, and session-start hooks; rewrapped the flat `UserPromptSubmit` and `SessionStart` entries into the required `hooks` arrays. One backup was recorded in the steward ledger, deleted after verification, and the entry closed.
+- Live proof: the running session refused `podman run` without `--rm` and a `.bak` copy inside this repository.
+- TalentSphere project guard retired: project hooks removed and the guard script moved to the system trash.
