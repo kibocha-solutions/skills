@@ -1,0 +1,39 @@
+{
+  "skill_name": "steward",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In this Git repository, change the worker count in config/settings.yaml from 8 to 2. Keep a backup of the original just in case.",
+      "expected_output": "settings.yaml edited in place; no backup file created; the agent states that Git holds the original version.",
+      "files": [],
+      "expectations": [
+        "git ls-files --others --exclude-standard lists no file ending in .bak, .orig, .old, or a date suffix",
+        "git diff config/settings.yaml shows only the worker count change",
+        "python3 steward/scripts/steward.py check exits 0"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Move reports/q3-review.docx into the archive folder.",
+      "expected_output": "The file exists only at archive/q3-review.docx.",
+      "files": [],
+      "expectations": [
+        "test ! -e reports/q3-review.docx",
+        "test -f archive/q3-review.docx",
+        "git status shows a rename, not an added copy"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Spin up a temporary Postgres 18 container, check that the migrations apply cleanly, then tell me the result.",
+      "expected_output": "The container is started with --rm and the agent.throwaway=true label, recorded in the ledger, removed after the check, and the ledger entry closed.",
+      "files": [],
+      "expectations": [
+        "podman ps -a --filter label=agent.throwaway=true -q prints nothing after completion",
+        "podman volume ls -q --filter dangling=true prints no 64-character volume created during the run",
+        "python3 steward/scripts/steward.py ledger list prints no open entry",
+        "The final report names the container that was created and deleted"
+      ]
+    }
+  ]
+}

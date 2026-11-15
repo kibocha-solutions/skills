@@ -1,5 +1,15 @@
 # Bootstrap Hook and Graphify Registration Reference
 
+## Contents
+
+1. [Per-Host Compliance Enforcement Scripts](#1-per-host-compliance-enforcement-scripts)
+2. [Claude Code](#2-claude-code-claudesettingsjson-and-claudejson)
+3. [Codex CLI / Desktop](#3-codex-cli--desktop-codexconfigtoml-and-codexhooksjson)
+4. [Gemini Antigravity and Gemini CLI](#4-gemini-antigravity-and-gemini-cli-gemini)
+5. [GitHub Copilot CLI](#5-github-copilot-cli-copilothooksbootstrapjson-and-copilotmcp-configjson)
+6. [Steward Guard and System Profile Hooks](#6-steward-guard-and-system-profile-hooks)
+7. [Always-On Graphify Instruction Block](#7-always-on-graphify-instruction-block)
+
 Register only the hooks for agent hosts actually installed on the workstation. Always merge JSON and TOML files non-destructively so existing user settings, permissions, plugins, and MCP servers remain intact.
 
 ## 1. Per-Host Compliance Enforcement Scripts
@@ -14,13 +24,14 @@ Each agent host has a dedicated enforcement script in `bootstrap/scripts/` that 
 | Codex CLI / Desktop | `~/.codex/AGENTS.md` + repo `AGENTS.md` | `enforce-codex-rules.sh` | `SessionStart` (`startup\|resume`) | `{"systemMessage":"...","suppressOutput":false}` |
 | GitHub Copilot CLI | `~/.copilot/copilot-instructions.md` + repo `AGENTS.md` | `enforce-copilot-rules.sh` | `sessionStart` | `{"systemMessage":"...","suppressOutput":false}` |
 
-Every enforcement script commands the agent to:
-1. **Obey its governing instruction file and skills without exception**: even when inconvenient, slow, token-consuming, or contrary to what the agent's training or judgment suggests is a better way.
-2. **Consult the user on viable alternatives**: never unilaterally disregard or route around a rule or skill procedure; stop and ask the user for permission before deviating.
-3. **Read the actual canonical `SKILL.md` file from disk before acting**: never rely on platform skill-loader tools that may deliver summaries, excerpts, or truncated previews.
-4. **Re-consult the governing `SKILL.md` and pre-completion checklist before claiming a task is done**: including rendered visual verification where required.
-5. **Recognize task-failure accountability**: disregarding the mandate or skipping full skill reads is equivalent to failing the task outright in terms of user disappointment.
-6. **Use `graphify` first**: whenever `graphify-out/graph.json` exists, read `graphify/SKILL.md` and query `graphify` MCP/CLI before raw grep, glob, or broad file reads.
+Every enforcement script prints the single directive defined in `bootstrap/scripts/directive.sh`, wrapped in its host's output format. Edit the directive there only. It commands the agent to:
+1. **Treat compliance as the task**: obey the governing instruction file and every skill in full; output that breaks a rule is a failed task.
+2. **Treat no rule as optional**: `must`, `must not`, `always`, and `never` rules admit no exception; condition-bound rules bind equally and permit departure only when their own condition holds.
+3. **Consult the user on alternatives**: stop and obtain explicit approval before deviating.
+4. **Read canonical `SKILL.md` files from disk in full**: loader summaries, excerpts, and grep snippets never count.
+5. **Obey `steward/SKILL.md`**: rely on version control instead of copies, move without leaving copies, delete temporary artifacts, and work within the system profile.
+6. **Verify before claiming completion**: reread the governing skills and pre-completion checklist, check the exact final deliverable, and confirm the steward check is clean.
+7. **Use `graphify` first**: whenever `graphify-out/graph.json` exists, query `graphify` before raw grep, glob, or broad file reads.
 
 ## 2. Claude Code (`~/.claude/settings.json` and `~/.claude.json`)
 
@@ -267,7 +278,67 @@ args = []
 }
 ```
 
-## 6. Always-On Graphify Instruction Block
+## 6. Steward Guard and System Profile Hooks
+
+Register these hooks on every installed host. `steward.py pre` and `steward.py stop` refuse by exiting with code `2` and writing the reason to stderr; `system-profile.sh` prints a capacity summary on stdout.
+
+| Host | Pre-tool event and matcher | Session-end event | Session-start event |
+| :--- | :--- | :--- | :--- |
+| Claude Code (`~/.claude/settings.json`) | `PreToolUse`, `Bash` | `Stop` | `SessionStart` |
+| Codex (`~/.codex/hooks.json`) | `PreToolUse`, `Bash` | `Stop` | `SessionStart` (`startup\|resume`) |
+| Gemini CLI (`~/.gemini/settings.json`) | `BeforeTool`, `run_shell_command` | `AfterAgent` | `SessionStart` |
+| GitHub Copilot CLI (`~/.copilot/hooks/steward.json`) | `preToolUse` | `sessionEnd` | `sessionStart` |
+
+Before registering a Codex, Gemini, or Copilot entry, confirm in the host's current hook documentation that the event exists and that exit code `2` blocks it. Register a non-blocking event only as a reminder, and report every host where blocking is unavailable.
+
+Claude Code entries to merge into `hooks`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/skills/steward/scripts/steward.py\" pre",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/skills/steward/scripts/steward.py\" stop",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/skills/steward/scripts/system-profile.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+For other hosts, replace `$HOME/.claude/skills` with the host's skills directory and use the host's hook schema from Sections 3 to 5.
+
+Remove a project-level guard that duplicates these hooks after the user-level hooks are verified.
+
+## 7. Always-On Graphify Instruction Block
 
 Ensure the following block (wrapped in `<!-- graphify --> ... <!-- /graphify -->`) is present at the bottom of `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md`, and `~/.copilot/copilot-instructions.md`:
 

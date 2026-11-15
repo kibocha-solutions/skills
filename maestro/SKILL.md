@@ -14,6 +14,7 @@ description: Plan, track, resume, verify, and archive substantial or multi-sessi
 5. List every session in `.agents/brain/sessions/active/`.
 6. Match the current task to active sessions by objective and slug.
 7. Do not create a duplicate session.
+8. Activate `steward/SKILL.md` and size the plan to the capacity in `~/.agents/system-profile.md`.
 
 Read [brain conventions](references/brain-conventions.md) before creating or moving session files.
 
@@ -47,6 +48,7 @@ Write `implementation_plan.md` before substantive edits.
 5. List blocking questions.
 6. List the verification method for every acceptance criterion.
 7. Stop for user input only when a missing decision would materially change the result or authority.
+8. List each temporary artifact the work will create and the step that removes it.
 
 ## 4. Write and maintain tasks
 
@@ -90,7 +92,8 @@ Read [session lifecycle](references/session-lifecycle.md).
 4. Run every required automated, manual, and visual check.
 5. Read each changed instruction or narrative file in full.
 6. Record evidence and limitations in `walkthrough.md`.
-7. Set the session state to `DONE` only after all criteria pass.
+7. Run `steward/scripts/steward.py check` and resolve every finding.
+8. Set the session state to `DONE` only after all criteria pass.
 
 ## 8. Preserve durable knowledge
 
@@ -123,6 +126,7 @@ Before marking a Maestro session complete, confirm evidence exists for each item
 - [ ] `walkthrough.md` records verifiable evidence, test commands, and limitations.
 - [ ] All changed narrative or instruction files read manually in full from start to finish.
 - [ ] Durable knowledge and decisions recorded in `.agents/MEMORY.md` or topic files.
+- [ ] Steward check clean and every temporary artifact removed.
 - [ ] Zero AI attribution across all session artifacts and commits.
 - [ ] No U+2014 em dashes in normal prose.
 

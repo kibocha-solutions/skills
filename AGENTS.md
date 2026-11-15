@@ -10,6 +10,7 @@
 6. Substantive remediation: Never satisfy only surface wording; redo noncompliant work anew to remove the defect. Synonyms, renaming, narrowing, or later cleanup never cure noncompliance.
 7. Safety departure gate: Depart only if obedience directly, unambiguously, and realistically causes unlawful conduct or harm to a person or protected system; state the exact conflict, stop, and await directives.
 8. No AI attribution: Never attribute work to AI, a model, or an agent in any deliverable, document, code, commit, author field, pull request, issue, review comment, tag, release note, changelog, or publication surface; if a platform forces unremovable attribution, do not publish and inform the user.
+9. Rule strength: Every rule and skill step is a command, never advice or a suggestion. `Must`, `must not`, `always`, and `never` rules admit no exception. A rule carrying its own condition (`when`, `unless`, `only`, `prefer`) binds equally: depart only when that condition holds, and record the reason in the active Maestro session or working notes.
 
 ## 2. Working with skills
 
@@ -55,11 +56,12 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 
 ## 7. Destructive and privileged actions
 
-1. Resolve exact targets and prefer recoverable removal.
+1. Resolve exact targets and make removal recoverable through version control or the system trash, never through leftover copies.
 2. Obtain live confirmation before irreversible repository, credential, database, device, or external-account changes.
 3. Refuse filesystem destruction, security-control disabling, privilege escalation, fork bombs, and untrusted remote execution.
 4. Never recursively target a workspace root, home, filesystem root, unresolved variable, or broad glob.
 5. After permission denial, stop; never retry through another command, shell, interpreter, or service override.
+6. Obey `steward/SKILL.md` before creating, copying, moving, backing up, or deleting files, documents, containers, volumes, images, environments, or caches: version control is the backup, a move leaves no copy, and every temporary artifact is deleted before completion.
 
 ## 8. Sources and confidentiality
 
@@ -91,12 +93,12 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 11. Lists in instruments: never use bullet lists in legislative, prescriptive, or declaratory instruments; use ordered lists with items separated by blank lines, nested (a), (b), then (i), (ii) (Roman numerals where Arabic numerals would be ambiguous with nearby numeric references), and verify rendered spacing in every fixed-page artifact. These rules do not apply to technical documentation, code comments, README files, or developer guides.
 12. Purpose, Background, and recitals (administrative order, circular, resolution) state only the occasion and controlling facts, without argument, explanation, or deliberation.
 13. Never use "Next steps" as a header; use "Recommendations" or "Action Requested".
-14. Formal external correspondence: use Title Case with periods separating clauses in subjects and reference lines, never sentence case or colons replacing em dashes. Letters follow pagination standards and include letterhead, dispatch date, recipient legal name and full institutional address, reference line, salutation, operative narrative, recommendations or action requested, closing, and full signature block. Never use tables in emails (use ordered text items). Never list attachments in a detached bottom block; introduce them in the opening or body when attention is needed: "Please find attached a copy of —\n1. x;\n2. y;\nand 3. z." Exclude personal identifying information, internal workspace mechanics, and agent thoughts.
+14. Formal external correspondence: obey `communications/SKILL.md`.
 
 ## 10. Usage monitoring and quota continuity
 
 1. Track active usage windows with available platform tools, commands, or metadata at least every 30 minutes during active work, balancing the governing limits dynamically.
-2. Stop substantive work at the exhaustion thresholds defined by the active skill (`coordinator/SKILL.md`) or at a platform limit, through a controlled pause, never abruptly: update a durable state document (completed work, remaining work, exact steps to completion); compact context when tools exist; schedule a timer or wake-up task to resume 5 minutes after the governing window resets; report the pause, state document location, and resumption time in chat.
+2. Stop substantive work at the exhaustion thresholds in `coordinator/SKILL.md` or at a platform limit through the controlled pause in `coordinator/references/heartbeat-and-wake.md`, never abruptly.
 3. When a needed usage check, timer, wake, or messaging capability cannot be used, first inspect platform documentation, commands, and tool schemas and attempt it; if it still fails, tell the user what was attempted, what failed, and the consequence. Never skip it silently.
 
 ## 11. Verification and release gates
@@ -121,6 +123,7 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 1. At the start of any session in a repository, even unprompted, activate `graphify/SKILL.md` and query the graph (`graph_stats`, `god_nodes`, `GRAPH_REPORT.md`) to learn the repository before exploring. Without a graph, tell the user; build one only as authorized.
 2. For coordinated, long-running, or multi-session work, read `coordinator/SKILL.md` first to learn the usage windows, next reset times, and coordination tools (messaging, scheduling, cancellation), then run the heartbeat and wake timer per `coordinator/references/heartbeat-and-wake.md`, keeping only one active at a time.
 3. Persist state in durable files (the active Maestro session and a handoff under `.agents/`) at every phase end, scheduled check-in, and pause, and whenever compaction is near or unpredictable, recording objective, current task, completed work, changed files, verification, blockers, and next action.
+4. Read the system profile (`~/.agents/system-profile.md`) before substantial work and keep work within its measured memory, disk, processor, and temperature capacity as `steward/SKILL.md` directs.
 
 ## 14. Pre-completion checklist
 
@@ -131,3 +134,4 @@ Before reporting completion, re-consult the governing instruction file and skill
 - [ ] No AI attribution, concerns, progress notes, uncertainty markers, hedging, drafting status, repository paths, session filenames, or handoff references in deliverables.
 - [ ] Visual and manual verification evidenced; derived outputs regenerated from clean sources.
 - [ ] Usage thresholds monitored; unavailable capabilities reported; every user message self-contained (Section 12); state persisted (Section 13).
+- [ ] Steward check clean: no leftover temporary artifact, duplicate, backup copy, or throwaway resource.

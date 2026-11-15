@@ -6,6 +6,12 @@
       "parent": "origin/main",
       "recorded_at": "2026-11-13T02:13:17+03:00",
       "source": "discovered-upstream-tracking"
+    },
+    {
+      "branch": "checkpoint/steward-skill",
+      "parent": "main",
+      "recorded_at": "2026-11-15T17:28:58+03:00",
+      "source": "created-from-main"
     }
   ]
 }

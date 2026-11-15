@@ -32,6 +32,8 @@ references without project-specific residue.
     substantive answer, once per conversation, inviting the user's own
     scrutiny of facts/reasoning/missing context
   - `skill-creator`: create, evaluate, and improve local skills
+  - `steward`: version-first backups, move-without-copy, throwaway cleanup,
+    and work within the measured system capacity
   - `graphify`, `maestro`, `bootstrap`, `system-init`, `system-design`,
     `ssh`: repo/session infrastructure and planning support
 - Primary documentation target: JetBrains Writerside-compatible docs

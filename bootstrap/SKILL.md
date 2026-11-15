@@ -53,6 +53,7 @@ Open `references/hook-registration.md` and verify that each installed host has:
 3. Its `graphify` MCP server (`graphify-mcp`) and `graphify` PreToolUse/PostToolUse/BeforeTool hooks configured when `graphify` is installed on the workstation:
    - Run `graphify claude install`, `graphify codex install`, `graphify gemini install`, or `graphify hook install` as appropriate for the host.
    - Ensure the `<!-- graphify -->` always-on rule block is present in the host's instruction file (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, `copilot-instructions.md`) so agents invoke the `graphify` skill and query `graphify` MCP/CLI before raw `grep`/`glob`/file reads whenever `graphify-out/graph.json` is present.
+4. Its steward pre-tool guard, session-end guard, and session-start system profile hooks, registered per Section 6 of `references/hook-registration.md`.
 
 Merge JSON and TOML settings non-destructively using `python3` or `jq`; never overwrite existing user permissions, plugins, or unrelated MCP servers.
 
@@ -61,7 +62,8 @@ Merge JSON and TOML settings non-destructively using `python3` or `jq`; never ov
 Run the verification checks before reporting completion:
 
 1. Confirm each installed host's instruction file contains both the `<!-- BEGIN SHARED SKILLS RULES --> ... <!-- END SHARED SKILLS RULES -->` block and the `<!-- graphify -->` rule block.
-2. Confirm `~/.<tool>/skills/` is a clean git sparse checkout on `main` and all 25 skill directories exist.
+2. Confirm `~/.<tool>/skills/` is a clean git sparse checkout on `main` and every top-level skill directory of the repository exists.
 3. Execute each `ensure-<tool>-link.sh` and `enforce-<tool>-rules.sh` script once from the shell and confirm exit code `0` and valid output.
-4. Validate every modified JSON/TOML settings file (`python3 -m json.tool` / `tomllib`).
-5. Present a concise status table patterned after `examples/bootstrap-audit-report.md`.
+4. Pipe a `podman run` command without `--rm` through `steward.py pre` and confirm exit code `2`; run `steward.py check` and `system-profile.sh --brief` and confirm exit code `0` on a clean machine.
+5. Validate every modified JSON/TOML settings file (`python3 -m json.tool` / `tomllib`).
+6. Present a concise status table patterned after `examples/bootstrap-audit-report.md`.
