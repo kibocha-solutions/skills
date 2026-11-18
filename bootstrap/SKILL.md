@@ -9,7 +9,7 @@ description: Verify and align shared agent rules, skill mirrors, per-host compli
 
 Bootstrap aligns shared agent rules (`AGENTS.md`), skill mirrors, per-host compliance enforcement hooks, and `graphify` codebase-graph hooks across Claude Code, Codex CLI/Desktop, Gemini CLI, Gemini Antigravity, and GitHub Copilot CLI on Linux, macOS, and WSL.
 
-Read `references/hook-registration.md` before modifying host settings or hook files. Inspect `examples/bootstrap-audit-report.md` for the expected verification report format.
+Read [hook registration](references/hook-registration.md) before modifying host settings or hook files. Inspect [bootstrap audit report example](examples/bootstrap-audit-report.md) for the expected verification report format.
 
 ## Step 1: Detect Installed Agent Hosts
 
@@ -26,7 +26,7 @@ Do not create host directories for tools that are not installed on the workstati
 
 ## Step 2: Run the Bootstrap Alignment Scripts
 
-Run only the alignment scripts for the detected hosts from `bootstrap/scripts/`:
+Inspect [multi-host alignment examples](examples/multi-host-alignment-and-conflict-handling.md) for non-destructive marker-block rules, then run only the alignment scripts for the detected hosts from `bootstrap/scripts/`:
 
 ```bash
 bash bootstrap/scripts/ensure-claude-link.sh
@@ -66,4 +66,4 @@ Run the verification checks before reporting completion:
 3. Execute each `ensure-<tool>-link.sh` and `enforce-<tool>-rules.sh` script once from the shell and confirm exit code `0` and valid output.
 4. Pipe a `podman run` command without `--rm` through `steward.py pre` and confirm exit code `2`; run `steward.py check` and `system-profile.sh --brief` and confirm exit code `0` on a clean machine.
 5. Validate every modified JSON/TOML settings file (`python3 -m json.tool` / `tomllib`).
-6. Present a concise status table patterned after `examples/bootstrap-audit-report.md`.
+6. Present a concise status table patterned after [bootstrap audit report example](examples/bootstrap-audit-report.md).
