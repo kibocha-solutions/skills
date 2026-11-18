@@ -7,6 +7,8 @@
 ├── MEMORY.md
 ├── memory/
 └── brain/
+    ├── approvals.json
+    ├── workers.json
     ├── handoffs/
     └── sessions/
         ├── active/
@@ -58,6 +60,11 @@ Use `YYYY-MM-DD-HHMM-<slug>`.
 3. Keep independent tasks in separate sessions.
 4. Do not merge sessions.
 5. Close sessions under the rules in [session lifecycle](session-lifecycle.md#close).
+
+## Persistent approval and worker state
+
+1. `approvals.json` records the repository's active approval mode (`ask`, `true`, or `false`), synced with `~/.agents/steward/approvals.tsv` through `sessions.py approval` and `steward.py approval`.
+2. `workers.json` records every worker chat and sub-agent under an active coordinator, including coordination ID, platform identifier, channel kind (`chat` or `subagent`), role, parent ID, model, current state, and deletion confirmation.
 
 ## Version control
 

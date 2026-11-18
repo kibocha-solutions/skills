@@ -9,7 +9,7 @@
 5. Use a short-lived topic branch or worktree for isolated work.
 6. Create temporary local commits only when they support safe iteration.
 7. Convert repair commits into fixup commits when appropriate.
-8. Obtain explicit user authorization before any squash or consolidation; run interactive autosquash only on unshared history.
+8. Apply `approval_mode`: in `true` mode, run unshared local `git rebase -i --autosquash` cleanup automatically; in `ask` or `false` mode, obtain explicit user authorization before any squash or consolidation. Run interactive autosquash only on unshared history.
 9. Verify the final diff and commit sequence.
 10. Publish only when the user requests publication, except for checkpoint pushes to a dedicated checkpoint branch under the global checkpoint rule.
 
@@ -21,7 +21,7 @@
 4. Treat uncertain ownership as shared.
 5. Preserve commit boundaries the user requests.
 6. Keep one coherent final commit when independent boundaries add no review value.
-7. Obtain explicit user authorization before every merge, squash, or consolidation.
+7. Apply `approval_mode` for merges, squashes, and consolidation: `true` permits local unshared consolidation and full-repo staging without asking; `ask` and `false` require explicit user authorization before any merge, squash, or consolidation.
 
 ## Branch procedure
 

@@ -42,10 +42,9 @@ thresholds:
 1. Count original tasks.
 2. Count tasks under `## Added`.
 3. Calculate the added-task percentage.
-4. Stop when the approved threshold is reached.
-5. Report the original count, added count, percentage, and added scope.
-6. Ask the user whether to accept, trim, or separate the added work.
-7. Continue only after the user decides.
+4. Check the repository `approval_mode` (`sessions.py approval`): in `true` mode, record and execute bounded in-repository additions in `walkthrough.md`; in `ask` mode, stop when added scope crosses the approved threshold; in `false` mode, stop before any added work.
+5. Report the original count, added count, percentage, and added scope when stopping.
+6. Ask the user whether to accept, trim, or separate the added work when stopped under `ask` or `false` mode, and continue after the decision.
 
 ## Update the goal
 

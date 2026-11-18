@@ -140,6 +140,17 @@
         "The summary excludes step-by-step developer task narration and mechanics.",
         "No personal or sensitive identifying information is included."
       ]
+    },
+    {
+      "id": 17,
+      "prompt": "This repository has approval_mode=true persisted, and there are modified files from an earlier unagented edit alongside my changes. How should staging, committing, and local cleanup handle them?",
+      "expected_output": "Read approval_mode=true from .agents/brain/approvals.json (or steward.py approval), include all non-secret, non-ignored repository changes in staging and commits even when not created by this agent, and perform local unshared cleanup automatically without asking the user.",
+      "files": [],
+      "expectations": [
+        "Reads approval_mode before staging or committing",
+        "Includes all non-secret, non-ignored in-repository changes in true mode without ignoring edits made outside this agent",
+        "Applies ask or false confirmation boundaries when approval_mode is not true"
+      ]
     }
   ]
 }

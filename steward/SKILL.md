@@ -1,6 +1,6 @@
 ---
 name: steward
-description: "Govern every agent action that creates, copies, moves, backs up, or deletes files, documents, containers, volumes, images, environments, or caches, and keep work within the measured capacity of the machine. Use before any copy, move, rename, backup, removal, container or pod start, virtual environment or dependency install, scratch or temporary file, screenshot or verification evidence, build, or cleanup; when a task risks leaving duplicates or backups behind; at session start to read the system profile and the device record; before installing or first using a shared agent tool such as modern-web-guidance or impeccable; when recording a lasting device default; and before reporting completion to run the steward check."
+description: "Govern every agent action that creates, copies, moves, backs up, or deletes files, documents, containers, volumes, images, environments, or caches, persist and enforce per-repository approval modes (ask, true, false), and keep work within the measured capacity of the machine. Use before any copy, move, rename, backup, removal, container or pod start, virtual environment or dependency install, scratch or temporary file, screenshot or verification evidence, build, commit scope decision, or cleanup; when reading or updating repository approval modes; when a task risks leaving duplicates or backups behind; at session start to read the system profile and the device record; before installing or first using a shared agent tool such as modern-web-guidance or impeccable; when recording a lasting device default; and before reporting completion to run the steward check."
 compatibility: "Requires python3. Uses git, podman or docker, and gio or trash-put when present."
 ---
 
@@ -8,7 +8,7 @@ compatibility: "Requires python3. Uses git, podman or docker, and gio or trash-p
 
 Run every script with the skill directory as the base path, for example `python3 <skill-dir>/scripts/steward.py`.
 
-## 1. Read the system profile and device record
+## 1. Read the system profile, device record, and approval mode
 
 1. Read `~/.agents/system-profile.md`.
 2. Run `bash scripts/system-profile.sh` first when the file is missing or older than 24 hours.
@@ -17,6 +17,11 @@ Run every script with the skill directory as the base path, for example `python3
 5. Apply every entry under Defaults in `~/.agents/device.md` unless the user or the project instructions state otherwise.
 6. Record a lasting user choice about tools or device use under Defaults, one table row per choice.
 7. Never copy the profile or the device record into a project file or record a hostname, user name, or home path in a project file.
+8. Read the repository approval mode with `python3 scripts/steward.py approval` (default `ask`). Read [approval modes](references/decision-rules.md#approval-modes).
+9. Record an explicit user approval directive immediately with `python3 scripts/steward.py approval set <ask|true|false> "<note>"` and obey it:
+   - `true`: auto-act within the repository; include all repository changes, cleanup, and leftover remediation even when not created by this agent, without asking the user.
+   - `ask`: auto-act on in-scope work and agent-created throwaway resources; ask the user first before deleting, committing, or absorbing pre-existing or out-of-scope repository items.
+   - `false`: request explicit user approval before every state-changing action, deletion, commit, or cleanup.
 
 ## 2. Install shared tools
 
@@ -67,8 +72,9 @@ Read [the agent store](references/decision-rules.md#agent-store) before creating
 ## 7. Obey the guard hooks
 
 1. Treat a refusal from `steward.py pre` or `steward.py stop` as a binding instruction.
-2. Correct the refused action as the refusal directs.
-3. Never route around a refusal through another tool, interpreter, file operation, or command form.
+2. Let `steward.py stop` auto-clean permitted leftovers for the active `approval_mode`; resolve any remaining findings according to `approval_mode` instead of ignoring them or escalating in-scope work.
+3. Correct the refused action as the refusal directs.
+4. Never route around a refusal through another tool, interpreter, file operation, or command form.
 
 ## 8. Work within capacity
 
@@ -79,8 +85,8 @@ Read [the agent store](references/decision-rules.md#agent-store) before creating
 
 ## 9. Verify before completion
 
-1. Run `python3 scripts/steward.py check` from the project root.
-2. Resolve every finding by deleting the leftover.
+1. Run `python3 scripts/steward.py check` from the project root (or `python3 scripts/steward.py check --fix` when `approval_mode` is `true` or in-scope auto-remediation is authorized).
+2. Resolve every remaining finding by deleting the leftover (after user approval when `approval_mode` is `false` or when out-of-scope in `ask` mode).
 3. Keep a finding only with the user's explicit approval, and record it with `python3 scripts/steward.py ledger close <target> --kept "<approval>"`.
 4. Report what you created, what you deleted, and anything kept with approval.
 
@@ -88,7 +94,7 @@ Inspect [examples](examples/good-vs-bad-stewardship.md) for contrasting actions.
 
 ## 10. Pre-completion checklist
 
-- [ ] System profile and device record read; capacity budgets and recorded defaults respected.
+- [ ] System profile, device record, and repository `approval_mode` (`ask`, `true`, `false`) read and obeyed.
 - [ ] Every registered tool used was ensured through `steward.py tool ensure`.
 - [ ] No backup, duplicate, or dated copy left inside a Git worktree.
 - [ ] Every backup outside version control recorded, then deleted or kept with approval.

@@ -93,8 +93,8 @@ Write the state as the first state line of `tasks.md`, exactly `## State: <STATE
 4. A session with no condition is ready whenever no active session remains open.
 5. `sessions.py stale --apply` moves an active session whose state is `DORMANT` to `sessions/dormant/` instead of closing it.
 6. `sessions.py close`, `stale`, and `prune` never act on `sessions/dormant/`.
-7. Run `python3 scripts/sessions.py wake-check` after the last open active session closes. It reports `waiting`, `judge conditions`, or `ready: ask the user` for each dormant session.
-8. Ask the user before waking any session. Run `python3 scripts/sessions.py wake <session> "<approval>"` after approval; it restores the state the session was parked from, or `PLANNING`, appends to the history, and moves the folder back to `sessions/active/`.
+7. Run `python3 scripts/sessions.py wake-check` after the last open active session closes. It reports `waiting`, `judge conditions`, `ready: auto-wake (approval_mode=true)`, or `ready: ask the user` for each dormant session.
+8. Wake ready sessions according to `approval_mode`: in `true` mode, run `python3 scripts/sessions.py wake <session> "auto-wake under approval_mode=true"`; in `ask` or `false` mode, ask the user before running `python3 scripts/sessions.py wake <session> "<approval>"`. Waking restores the state the session was parked from, or `PLANNING`, appends to the history, and moves the folder back to `sessions/active/`.
 
 ## Resume
 

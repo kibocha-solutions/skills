@@ -4,7 +4,10 @@
 #        system-profile.sh --brief  print one summary line without writing the profile
 # Records no hostname, user name, or home path. Works on Linux, macOS, and WSL.
 set -uo pipefail
-[ -t 0 ] || cat >/dev/null 2>&1 || true
+hook_input=""
+if [ ! -t 0 ]; then
+  hook_input="$(cat 2>/dev/null || true)"
+fi
 
 OUT="$HOME/.agents/system-profile.md"
 os="$(uname -s)"
@@ -75,6 +78,29 @@ mkdir -p "$(dirname "$OUT")"
   echo "| :--- | :--- | :--- | :--- |"
   echo "$disks"
 } > "$OUT"
+
+if [ -n "$hook_input" ] && command -v python3 >/dev/null 2>&1; then
+  if python3 - "$hook_input" "${summary} Profile: ~/.agents/system-profile.md." <<'PY'
+import json, sys
+try:
+    data = json.loads(sys.argv[1])
+except Exception:
+    raise SystemExit(1)
+if not isinstance(data, dict):
+    raise SystemExit(1)
+msg = sys.argv[2]
+if any(k in data for k in ("conversationId", "workspacePaths", "hookEventName")):
+    print(json.dumps({"injectSteps": [{"systemMessage": {"systemMessage": msg}}]}))
+    raise SystemExit(0)
+if any(k in data for k in ("session_id", "sessionId")):
+    print(json.dumps({"systemMessage": msg, "suppressOutput": False}))
+    raise SystemExit(0)
+raise SystemExit(1)
+PY
+  then
+    exit 0
+  fi
+fi
 
 echo "$summary"
 echo "Profile: ~/.agents/system-profile.md. Apply the steward capacity budgets before heavy work."

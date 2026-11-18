@@ -97,3 +97,18 @@ bash steward/scripts/system-profile.sh --brief
 ```
 
 The summary reports 1.4 GiB available, below the 2 GiB budget. Stop the idle processes you started, rerun the summary, and report to the user when memory stays below budget.
+
+## 6. Respecting repository approval mode
+
+### Bad
+
+Ignoring the user's directive to auto-handle everything in a repository, asking for permission before cleaning pre-existing `.bak` leftovers, or leaving unrelated pre-existing edits unstaged when the repository `approval_mode` is `true`.
+
+### Good
+
+```bash
+python3 steward/scripts/steward.py approval set true "User authorized auto-effected changes and cleanup across this repo"
+python3 steward/scripts/steward.py check --fix
+```
+
+In `true` mode, `check --fix` and `stop` automatically remove untracked backup files and throwaway containers, move `.agents/` evidence to the store, and commits absorb all repository changes cleanly. In `ask` mode, in-scope throwaway resources are cleaned automatically while pre-existing out-of-scope edits are preserved and confirmed first. In `false` mode, every destructive or committing act waits for explicit user approval.

@@ -80,7 +80,11 @@ git log --show-signature -2 --date=iso-strict --format=fuller
 4. Identify the current branch, intended base, publication state, review state,
    and collaborator use.
 5. Identify required checks and release gates.
-6. Stop when the requested mutation lacks authorization. Checkpoint commits and pushes to a dedicated checkpoint branch are authorized by the global checkpoint rule; merges, squashes, and consolidation require explicit user authorization.
+6. Read the repository `approval_mode` (`ask`, `true`, `false`) from `.agents/brain/approvals.json` (`steward.py approval` or `sessions.py approval`):
+   - `true`: auto-include all non-secret, non-ignored in-repository changes (including modified and untracked files not created by the current agent) in staging, commits, and local unshared history cleanup without asking the user.
+   - `ask`: commit and clean in-scope task material automatically; preserve unrelated worktree changes and obtain explicit authorization before absorbing out-of-scope edits, merging, squashing, or consolidating.
+   - `false`: stop and obtain explicit user authorization before every commit, branch, merge, squash, or history action.
+7. Checkpoint commits and pushes to a dedicated checkpoint branch are authorized by the global checkpoint rule and respect `approval_mode` for included files.
 
 ## 5. Select the workflow
 
@@ -115,7 +119,7 @@ Keep the steps limited to the selected path.
    validation record, generated artifact, or session record.
 10. When one final commit is authorized, include the entire intended change set
     in that one commit.
-11. Stage only the intended files.
+11. Stage files according to `approval_mode`: in `true` mode stage all non-secret, non-ignored repository changes (including changes not created by this agent); in `ask` or `false` mode stage only the authorized intended files.
 12. Inspect:
 
 ```bash
@@ -235,7 +239,7 @@ git log -1 --format=%B
 2. Treat unclear ownership or publication state as shared.
 3. Use a disposable branch or worktree for risky cleanup.
 4. Use `git commit --fixup` for repair commits when authorized.
-5. Obtain explicit user authorization before squashing or consolidating commits, including `git rebase -i --autosquash`.
+5. Check `approval_mode`: on unshared local branches in `true` mode, local cleanup and `git rebase -i --autosquash` may proceed automatically; in `ask` or `false` mode, obtain explicit user authorization before squashing, merging, or consolidating commits.
 6. Rebase onto the latest parent before shipping.
 7. Verify the final diff and final commit.
 8. Advance one level at a time through the recorded ancestry chain.
@@ -336,6 +340,7 @@ Record these fields when work continues in another session:
 ## 15. Pre-completion checklist
 
 - [ ] Repository health snapshot refreshed and verified.
+- [ ] Repository `approval_mode` (`ask`, `true`, or `false`) read and applied to staging, commit, and cleanup scope.
 - [ ] Staged change set matches single predominant purpose.
 - [ ] Commit message written for a new reader stating durable outcome and behavioral change.
 - [ ] Commit message leaves out work narration, workspace mechanics, and diff-evident changes.

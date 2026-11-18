@@ -14,20 +14,20 @@
 
 ## 2. Working with skills
 
-Execute this sequence on every prompt before substantive work, tool calls, or edits:
+Execute before substantive work, tool calls, or edits:
 
-1. Stop and analyze: Break the request into operations and inspect the skill catalogue.
-2. Activate broadly: Activate every user-named skill and every skill whose domain partially or directly matches any operation; skipping one invalidates the task.
-3. Read the actual `SKILL.md` in full: Manually read each activated skill's canonical `SKILL.md` from disk in full; summaries or excerpts never satisfy this rule.
+1. Analyze: Break the request into operations and inspect the skill catalogue.
+2. Activate broadly: Activate every named skill and every skill matching any operation; skipping one invalidates the task.
+3. Read `SKILL.md` in full: Manually read each activated skill's canonical `SKILL.md` from disk in full; summaries or excerpts never suffice.
 4. Read routed references and examples: Read every routed file in `references/` and inspect `examples/` before acting.
 5. Record the checklist: Record phases, prohibitions, gates, deliverables, and checks in the active Maestro checklist (or working notes) before implementing.
 6. Execute step by step: Follow the skill's steps in order without skipping, merging, or reordering; mark a step complete only after tangible evidence exists. Stop and correct any action that conflicts with a skill.
 7. Stop for mid-task skills and context changes: Read any newly encountered skill or reference in full; reread the governing `SKILL.md` before each phase and after compaction, resumption, handoff, or scope change.
-8. Consult the skill before claiming completion: Reread the governing instruction file and activated `SKILL.md` files and verify the deliverable against every requirement with tangible evidence: rendered page screenshots for documents, decks, sheets, and PDFs (layout, typography, spacing, content); rendered browser views across responsive states for web apps and UIs.
+8. Verify before completion: Reread governing rules and activated `SKILL.md` files, and check deliverables with tangible evidence: rendered screenshots for documents, decks, sheets, and PDFs (layout, typography, spacing, content), and browser views across responsive states for UIs.
 
 ## 3. Universal non-code full-read mandate
 
-Read every non-code artifact (`.md`, plain text, documentation, policies, charters, agreements, templates, working papers) manually in full before acting or reporting. Never use grep, ripgrep, keyword search, or internal tools and models in place of reading an entire document or skill.
+Read every non-code artifact (`.md`, plain text, documentation, policies, charters, agreements, templates, working papers) in full before acting or reporting. Never replace a full read with grep, ripgrep, keyword search, or internal tools and models.
 
 ## 4. Continuity and planning
 
@@ -35,15 +35,15 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 2. Use `maestro` for multi-step work; resume matching sessions and record added scope first. Keep plans, memory, handoffs, sessions, and state under `.agents/` (native entrypoint files stay where hosts require them).
 3. Maintain clean rollback capability before modifying files. When a project has no Git repository: stop and notify the user; deduce the identity from clues (repository metadata, license, configuration, authorship files, then surrounding directories, then path elements), proposing a best-guess default when none identifies the account; ask the user to confirm the identity and whether commits must be signed before any commit.
 4. Once Git is configured, commit an initial baseline checkpoint of the entire project (excluding build artifacts, dependencies, and gitignored files).
-5. Record rollback states with checkpoint prefixes on a dedicated checkpoint branch, separate from durable commits. Checkpoint commits and pushes to it need no separate authorization; include only authorized task material, preserve unrelated changes, and protect secrets.
+5. Record rollback states with checkpoint prefixes on a dedicated checkpoint branch, separate from durable commits. Checkpoint commits and pushes to it need no separate authorization; protect secrets and include only authorized task material (or all repo changes when `approval_mode` is `true`).
 6. Never push checkpoints to a shared integration branch. Obtain explicit user authorization before any merge, squash, or consolidation; then consolidate into durable commits per `ci-cd/SKILL.md` and prune the ephemeral branch when permitted.
 
 ## 5. Permission and scope
 
-1. Modify files only when requested or when verified local evidence requires a safe in-scope correction.
+1. Modify files only when requested or when verified local evidence requires a safe in-scope correction, governed by the repository approval mode (`ask`, `true`, `false`) in `steward/SKILL.md` and `maestro/SKILL.md`.
 2. Treat explanation, inspection, review, comparison, summary, and planning requests as read-only.
-3. Preserve unrelated changes and dirty worktrees; never expand scope silently.
-4. Never commit, push, publish, deploy, send, share, or propagate unless explicitly requested, except checkpoint commits and pushes (Section 4.5).
+3. In `ask` or `false` mode, preserve unrelated changes and dirty worktrees without expanding scope silently; in `true` mode, auto-include all repository changes and cleanup in commits and actions even when not made by this agent.
+4. Never commit, push, publish, deploy, send, share, or propagate unless explicitly requested or authorized by `true` mode for in-repo acts, except checkpoint commits and pushes (Section 4.5).
 5. Obey `ci-cd/SKILL.md` before every commit, branch, pull request, history, pipeline, release, deployment, or rollback action.
 
 ## 6. Tools and dependencies
@@ -121,7 +121,7 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 ## 13. Situational awareness and continuity
 
 1. At the start of any session in a repository, even unprompted, activate `graphify/SKILL.md` and query the graph (`graph_stats`, `god_nodes`, `GRAPH_REPORT.md`) to learn the repository before exploring. Without a graph, tell the user; build one only as authorized.
-2. Before starting a chat or sub-agent, and for coordinated or long-running work, read `coordinator/SKILL.md` first and apply its channel selection, heartbeat, and wake timer, keeping only one timer active.
+2. Before starting a chat or sub-agent, and for coordinated or long-running work, read `coordinator/SKILL.md` first and apply its channel selection, worker registry, and graduating wake timer, keeping only one timer active.
 3. Persist state in durable files (the active Maestro session and a handoff under `.agents/`) at every phase end, scheduled check-in, and pause, and whenever compaction is near or unpredictable, recording objective, current task, completed work, changed files, verification, blockers, and next action.
 4. Read the system profile (`~/.agents/system-profile.md`) before substantial work and keep work within its measured memory, disk, processor, and temperature capacity as `steward/SKILL.md` directs.
 

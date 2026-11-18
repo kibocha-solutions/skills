@@ -10,7 +10,7 @@ Include each field in a delegation:
 4. Deliverables, acceptance criteria, evidence, and independent inspector.
 5. Time or tool-call budget, review point, stop condition, and escalation route.
 6. Inherited user constraints and applicable skills.
-7. The parent recipient, supported message channel, and requirement to notify the parent on completion, blockage, or a required decision; pass the same requirement to any children.
+7. The parent recipient, supported message channel, and explicit **Worker Rules**: inform the worker that it is a worker under a coordinator, that the user is with the coordinator and will not see unforwarded worker issues, and that ALL blockers, questions, concerns, and completion reports must go to the coordinator/parent WITHOUT EXCEPTION; require passing the exact same rules to any child worker.
 8. At least one relevant example to read before acting, and the corresponding principles to apply to the assignment.
 
 ## Result
@@ -36,6 +36,6 @@ Mark `DONE` only when all assigned criteria pass. A budget limit produces a part
 
 ## Parent question routing and self-contained escalations
 
-1. Every delegation contract must instruct the worker to direct all questions, blockers, and status reports exclusively to its parent, and to pass the same rule to any child workers it spawns.
-2. The parent must resolve worker questions using available authority, repository files, and verified evidence; the parent escalates to the user only when user action or authorization is required and the agent has no way to resolve it.
+1. Every delegation contract must instruct the worker that it is a worker under a coordinator, to presume the user is exclusively with the coordinator and will not catch any unforwarded issue, question, or blocker, to send ALL questions, blockers, concerns, and decisions exclusively to its parent/coordinator WITHOUT EXCEPTION, never to wait silently for user go-ahead, and to pass the same rules to any child workers it spawns.
+2. The parent/coordinator assumes the mantle of the user and must resolve worker questions only after searching, in order: (a) `.agents/MEMORY.md`, `.agents/memory/*.md`, and `.agents/brain/approvals.json`; (b) global and repo instruction files and active `SKILL.md` files; (c) user rulings in the active Maestro session and `.agents/brain/handoffs/`; and (d) repo docs and codebase (`graphify` first when present). Escalate to the user only when those four sources cannot resolve a required decision or when physical user action (such as approving a gated command) is required, naming the exact worker (`coordination_id`, `platform_id`, `kind`, `role`).
 3. Any escalation, status update, or request for user intervention must follow `AGENTS.md` Section 12 in full (never a summary), providing: plain problem statement, root cause from actual investigation, what was tried and its result, what was considered and why not tried, exact blocker, clearly defined options with consequences, recommended option and why, and exact action requested.

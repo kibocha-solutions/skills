@@ -41,9 +41,9 @@ Every agent applies these rules, with or without a coordinated team:
 5. Collect related audit findings before compatible fixes and refresh once for the batch when authorized.
 6. Preserve shared data and obtain required maintenance authorization before service, schema, or data changes.
 
-## Heartbeat, wake timer, and persistence checklist
+## Wake timer and persistence checklist
 
-1. Confirm at startup whether timers/cron, one-shot wake, usage-window checks, and messaging work; if any fails after inspecting docs/schemas and attempting it, report the failure to the user per `AGENTS.md` Section 12.
-2. Keep one 30-minute active heartbeat running during active work (`references/heartbeat-and-wake.md`), or one 90-minute blocked heartbeat if waiting exclusively on user action.
-3. Enforce strict mutual exclusion: cancel any active heartbeat before scheduling a wake timer, and cancel any active wake timer before starting a heartbeat.
-4. At a usage threshold in `SKILL.md` Section 4, persist state, cancel the heartbeat, and schedule a post-reset wake timer per `references/heartbeat-and-wake.md`.
+1. Confirm at startup whether one-shot wake scheduling, usage-window checks, and messaging work; if any fails after inspecting docs/schemas and attempting it, report the failure to the user per `AGENTS.md` Section 12.
+2. Run the graduating algorithmic wake timer (`1m -> 3m -> 5m -> 12m -> 15m -> 30m`, resetting to `1m` whenever action is needed) during active work (`references/heartbeat-and-wake.md`), or a `90m-120m` (`1h 30m` to `2h`) user-blocked timer if waiting exclusively on user action.
+3. Enforce strict single-timer exclusion: cancel any existing timer before scheduling the next timer, and cancel all timers when work completes.
+4. At a usage threshold in `SKILL.md` Section 4, persist state, cancel the active timer, and schedule a post-reset wake timer per `references/heartbeat-and-wake.md`.

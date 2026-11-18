@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Steward guard, completion check, and ledger.
+"""Steward guard, completion check, approval policy, and ledger.
 
 Usage:
-  steward.py pre                      Pre-tool hook; reads hook JSON on stdin.
-  steward.py stop                     Session-end hook; reads hook JSON on stdin.
-  steward.py check                    Completion check for the current directory.
+  steward.py pre                                   Pre-tool hook; reads hook JSON on stdin.
+  steward.py stop                                  Session-end hook; reads hook JSON on stdin.
+  steward.py check [--fix]                         Completion check (with optional auto-remediation).
+  steward.py approval [get]                        Print the approval mode (ask, true, false) for the project.
+  steward.py approval set <ask|true|false> [note]  Set the persistent approval mode for the project.
+  steward.py approval list                         List recorded project approval modes.
   steward.py ledger add <kind> <target> <removal condition>
   steward.py ledger close <target> [--kept <approval>]
   steward.py ledger list [--all]
@@ -36,6 +39,9 @@ PERSISTENT_LABEL = "agent.persistent=true"
 MAX_THROWAWAY = 2
 AGENTS_HOME = Path.home() / ".agents"
 LEDGER = AGENTS_HOME / "steward" / "ledger.tsv"
+APPROVALS = AGENTS_HOME / "steward" / "approvals.tsv"
+APPROVAL_MODES = ("ask", "true", "false")
+APPROVAL_FIELDS = ("updated", "root", "mode", "note")
 STORE_KINDS = {"evidence": 90, "env": 30, "scratch": 2}  # retention in days since last use
 STORE_DIRS = {"evidence": "evidence", "env": "envs", "scratch": "scratch"}
 EVIDENCE_EXT = re.compile(
@@ -271,21 +277,203 @@ def pre(payload: dict) -> int:
     return 0
 
 
-def read_ledger() -> list[dict]:
-    if not LEDGER.exists():
+def read_tsv(path: Path, fields: tuple[str, ...]) -> list[dict]:
+    """Read a tab-delimited table into a list of field dictionaries."""
+    if not path.exists():
         return []
     rows = []
-    for line in LEDGER.read_text(encoding="utf-8").splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         parts = line.split("\t")
-        if len(parts) == len(LEDGER_FIELDS):
-            rows.append(dict(zip(LEDGER_FIELDS, parts, strict=True)))
+        if len(parts) == len(fields):
+            rows.append(dict(zip(fields, parts, strict=True)))
     return rows
 
 
+def write_tsv(path: Path, fields: tuple[str, ...], rows: list[dict]) -> None:
+    """Write a list of field dictionaries to a tab-delimited file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = "".join("\t".join(row[f] for f in fields) + "\n" for row in rows)
+    path.write_text(text, encoding="utf-8")
+
+
+def read_ledger() -> list[dict]:
+    return read_tsv(LEDGER, LEDGER_FIELDS)
+
+
 def write_ledger(rows: list[dict]) -> None:
-    LEDGER.parent.mkdir(parents=True, exist_ok=True)
-    text = "".join("\t".join(row[f] for f in LEDGER_FIELDS) + "\n" for row in rows)
-    LEDGER.write_text(text, encoding="utf-8")
+    write_tsv(LEDGER, LEDGER_FIELDS, rows)
+
+
+def read_approvals() -> list[dict]:
+    return read_tsv(APPROVALS, APPROVAL_FIELDS)
+
+
+def write_approvals(rows: list[dict]) -> None:
+    write_tsv(APPROVALS, APPROVAL_FIELDS, rows)
+
+
+def approval_json_path(root: str) -> Path:
+    """Return the project-local approval policy path under .agents/brain/."""
+    return Path(root) / ".agents" / "brain" / "approvals.json"
+
+
+def get_approval_mode(cwd: str) -> tuple[str, str]:
+    """Return (mode, note) from approvals.json, approvals.tsv, or default 'ask'."""
+    root = project_root(cwd)
+    local = approval_json_path(root)
+    if local.is_file():
+        try:
+            data = json.loads(local.read_text(encoding="utf-8"))
+            mode = str(data.get("approval_mode", "")).strip().lower()
+            if mode in APPROVAL_MODES:
+                return mode, str(data.get("note", "")).strip()
+        except (OSError, json.JSONDecodeError, AttributeError):
+            pass
+    for row in reversed(read_approvals()):
+        if row["root"] == root and row["mode"] in APPROVAL_MODES:
+            return row["mode"], row["note"]
+    return "ask", "default"
+
+
+def set_approval_mode(cwd: str, mode: str, note: str = "") -> dict:
+    """Persist repository approval mode to approvals.tsv and .agents/brain/approvals.json."""
+    normalized = mode.strip().lower()
+    if normalized not in APPROVAL_MODES:
+        raise ValueError(f"invalid approval mode {mode!r}; expected one of {', '.join(APPROVAL_MODES)}")
+    root = project_root(cwd)
+    stamp = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+    clean_note = note.replace("\t", " ").replace("\n", " ").strip()
+    rows = [r for r in read_approvals() if r["root"] != root]
+    rows.append({"updated": stamp, "root": root, "mode": normalized, "note": clean_note})
+    write_approvals(rows)
+    record = {
+        "schema_version": 1,
+        "root": root,
+        "approval_mode": normalized,
+        "updated_at": stamp,
+        "note": clean_note,
+    }
+    if (Path(root) / ".agents").is_dir():
+        local = approval_json_path(root)
+        local.parent.mkdir(parents=True, exist_ok=True)
+        local.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    return record
+
+
+def approval(args: list[str]) -> int:
+    """Handle 'steward.py approval [get|set|list]'."""
+    action = args[0] if args else "get"
+    rest = args[1:]
+    if action == "get" and not rest:
+        mode, note = get_approval_mode(os.getcwd())
+        print(f"{mode}\t{note}" if note else mode)
+        return 0
+    if action == "set" and rest and rest[0].lower() in APPROVAL_MODES:
+        record = set_approval_mode(os.getcwd(), rest[0], " ".join(rest[1:]))
+        print(f"approval_mode={record['approval_mode']} ({record['root']})")
+        return 0
+    if action == "list" and not rest:
+        for row in read_approvals():
+            print("\t".join(row[f] for f in APPROVAL_FIELDS))
+        return 0
+    print(__doc__, file=sys.stderr)
+    return 1
+
+
+def remove_target(path: Path) -> bool:
+    """Remove a leftover file or directory via system trash when available, else unlink/rmtree."""
+    if not path.exists() and not path.is_symlink():
+        return True
+    for cmd in (["gio", "trash", str(path)], ["trash-put", str(path)], ["trash", str(path)]):
+        if shutil.which(cmd[0]):
+            try:
+                if subprocess.run(cmd, capture_output=True, timeout=15).returncode == 0:
+                    return True
+            except (OSError, subprocess.SubprocessError):
+                pass
+    try:
+        if path.is_dir() and not path.is_symlink():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+        return True
+    except OSError:
+        return False
+
+
+def _clean_containers(eng: str, cleaned: list[str]) -> None:
+    """Remove stopped throwaway containers, dangling unnamed volumes, and abandoned build containers."""
+    stopped = throwaway_ids(("exited", "created"))
+    if stopped:
+        subprocess.run([eng, "rm", "-f", *sorted(stopped)], capture_output=True, timeout=30)
+        cleaned.append(f"removed {len(stopped)} stopped throwaway container(s)")
+    volumes = [v for v in lines(run([eng, "volume", "ls", "-q", "--filter", "dangling=true"]))
+               if re.fullmatch(r"[0-9a-f]{64}", v)]
+    if volumes:
+        subprocess.run([eng, "volume", "rm", *volumes], capture_output=True, timeout=30)
+        cleaned.append(f"removed {len(volumes)} unused unnamed volume(s)")
+    building = run(["pgrep", "-f", r"(podman|buildah) (build|bud)( |$)"]).strip()
+    if eng == "podman" and not building:
+        external = set(lines(run([eng, "ps", "-a", "--external", "-q"])))
+        regular = set(lines(run([eng, "ps", "-a", "-q"])))
+        abandoned = sorted(external - regular)
+        if abandoned:
+            subprocess.run([eng, "rm", "-f", *abandoned], capture_output=True, timeout=30)
+            cleaned.append(f"removed {len(abandoned)} abandoned build container(s)")
+
+
+def auto_clean(cwd: str, mode: str, fix_all: bool = False) -> list[str]:
+    """Auto-clean safe leftovers permitted by the project's approval mode or --fix."""
+    if mode == "false" and not fix_all:
+        return []
+    cleaned: list[str] = []
+    project = project_root(cwd)
+    rows = read_ledger()
+    ledger_changed = False
+
+    for row in rows:
+        if row["status"] == "open" and row["root"] == project and not target_exists(row):
+            row["status"], row["note"] = "closed", "auto-closed: target removed"
+            ledger_changed = True
+            cleaned.append(f"closed stale ledger entry {row['kind']} {row['target']}")
+
+    eng = engine()
+    if eng and (mode in ("true", "ask") or fix_all):
+        _clean_containers(eng, cleaned)
+
+    if mode == "true" or fix_all:
+        root = git_root(cwd)
+        if root:
+            untracked = lines(run(["git", "ls-files", "--others", "--exclude-standard"], cwd=root))
+            for rel in untracked:
+                if is_backup_name(rel) and remove_target(Path(root) / rel):
+                    cleaned.append(f"removed backup copy {rel}")
+                elif rel.startswith(".agents/") and EVIDENCE_EXT.search(rel):
+                    dest_root = store_root("evidence") / Path(root).name / "steward-auto"
+                    dest = dest_root / Path(rel).relative_to(".agents")
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.move(str(Path(root) / rel), str(dest))
+                    (dest_root / ".last-used").touch()
+                    cleaned.append(f"moved evidence {rel} to store")
+        for row in rows:
+            if row["status"] != "open" or row["root"] != project:
+                continue
+            if row["kind"] == "container" and eng:
+                subprocess.run([eng, "rm", "-f", row["target"]], capture_output=True, timeout=30)
+                if not target_exists(row):
+                    row["status"], row["note"] = "closed", "auto-cleaned"
+                    ledger_changed = True
+                    cleaned.append(f"removed container {row['target']} and closed ledger entry")
+            elif row["kind"] in ("backup", "scratch"):
+                target_path = Path(row["target"]) if os.path.isabs(row["target"]) else Path(row["root"]) / row["target"]
+                if remove_target(target_path):
+                    row["status"], row["note"] = "closed", "auto-cleaned"
+                    ledger_changed = True
+                    cleaned.append(f"removed {row['kind']} {row['target']} and closed ledger entry")
+
+    if ledger_changed:
+        write_ledger(rows)
+    return cleaned
 
 
 def target_exists(row: dict) -> bool:
@@ -337,28 +525,58 @@ def findings(cwd: str) -> list[str]:
     return found
 
 
+def allow_stop(host: str) -> int:
+    """Emit valid empty JSON for hosts expecting structured stop responses."""
+    if host in ("antigravity", "copilot"):
+        print(json.dumps({}))
+    return 0
+
+
 def stop(payload: dict) -> int:
+    """Run end-of-turn steward checks and auto-remediation per host and approval mode."""
     host = host_of(payload)
     workspaces = payload.get("workspacePaths") or []
     cwd = payload.get("cwd") or (workspaces[0] if workspaces else os.getcwd())
-    found = findings(cwd)
-    if not found:
-        return 0
-    message = ("Steward: leftovers remain. Delete them before finishing, or keep one only with the "
-               "user's explicit approval recorded through 'steward.py ledger close <target> --kept "
-               "<approval>'. Report what you deleted.\n- " + "\n- ".join(found))
+    marker = (
+        AGENTS_HOME
+        / "steward"
+        / "stop-continued"
+        / re.sub(r"[^A-Za-z0-9_-]", "_", str(payload.get("conversationId") or "default"))
+    )
+
     if host == "antigravity":
-        marker = AGENTS_HOME / "steward" / "stop-continued" / re.sub(r"[^A-Za-z0-9_-]", "_", str(payload.get("conversationId") or "default"))
+        term = payload.get("terminationReason")
+        if payload.get("continuationActive") or (term and term != "NO_TOOL_CALL") or payload.get("fullyIdle") is False:
+            if marker.exists():
+                marker.unlink()
+            return allow_stop(host)
         if marker.exists() and datetime.datetime.now().timestamp() - marker.stat().st_mtime < 600:
             marker.unlink()
-            return 0
+            return allow_stop(host)
+    elif payload.get("stop_hook_active"):
+        return allow_stop(host)
+
+    mode, _ = get_approval_mode(cwd)
+    auto_clean(cwd, mode)
+    found = findings(cwd)
+    if not found:
+        if host == "antigravity" and marker.exists():
+            marker.unlink()
+        return allow_stop(host)
+
+    action_hint = (
+        "Ask the user for approval before removing or keeping any item."
+        if mode == "false"
+        else "Run 'steward.py check --fix' for in-scope leftovers or 'steward.py ledger close <target> "
+        "--kept \"<approval>\"'; ask the user only for pre-existing or out-of-scope items."
+    )
+    items = "\n".join(f"- {item}" for item in found)
+    message = f"Steward (approval_mode={mode}): {len(found)} finding(s) remain.\n{items}\n{action_hint}"
+
+    if host == "antigravity":
         marker.parent.mkdir(parents=True, exist_ok=True)
         marker.touch()
         print(json.dumps({"decision": "continue", "reason": message}))
-        return 0
-    if payload.get("stop_hook_active"):
-        if host == "standard":
-            print(json.dumps({"systemMessage": message}))
         return 0
     if host == "copilot":
         print(json.dumps({"decision": "block", "reason": message}))
@@ -367,12 +585,19 @@ def stop(payload: dict) -> int:
     return 2
 
 
-def check() -> int:
-    found = findings(os.getcwd())
+def check(args: list[str] | None = None) -> int:
+    """Run completion check, auto-remediating when --fix or approval_mode=true."""
+    fix_all = "--fix" in (args or [])
+    cwd = os.getcwd()
+    mode, _ = get_approval_mode(cwd)
+    if fix_all or mode == "true":
+        for item in auto_clean(cwd, mode, fix_all=fix_all):
+            print(f"steward auto-clean: {item}")
+    found = findings(cwd)
     if not found:
         print("steward check: clean")
         return 0
-    print("steward check: findings\n- " + "\n- ".join(found))
+    print(f"steward check (approval_mode={mode}): findings\n- " + "\n- ".join(found))
     return 1
 
 
@@ -648,7 +873,9 @@ def main() -> int:
             payload = {}
         return pre(payload) if mode == "pre" else stop(payload)
     if mode == "check":
-        return check()
+        return check(sys.argv[2:])
+    if mode == "approval":
+        return approval(sys.argv[2:])
     if mode == "ledger":
         return ledger(sys.argv[2:])
     if mode == "store":

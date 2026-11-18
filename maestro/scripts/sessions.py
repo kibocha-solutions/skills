@@ -2,7 +2,10 @@
 """Maestro session housekeeping for one project.
 
 Usage (run from anywhere inside the project):
-  sessions.py status                          List active sessions with state, idle days, and size.
+  sessions.py status                          List active sessions with state, idle days, size, and approval mode.
+  sessions.py approval [get]                  Show the repository approval mode (ask, true, false).
+  sessions.py approval set <ask|true|false> [note]
+                                              Persist the repository approval mode to approvals.json and steward.
   sessions.py close <session> <STATE> [note]  Set a closed state and archive the session.
   sessions.py stale [--apply]                 Close sessions idle past the limit as ABANDONED.
   sessions.py index                           Rewrite sessions/archive/INDEX.md.
@@ -10,7 +13,7 @@ Usage (run from anywhere inside the project):
   sessions.py dormant <session> <reason> [--wake <condition>]...
                                               Park an active session under sessions/dormant/.
   sessions.py wake-check                      Evaluate the wake conditions of every dormant session.
-  sessions.py wake <session> [note]           Move a dormant session back to active (after user approval).
+  sessions.py wake <session> [note]           Move a dormant session back to active (after approval or in true mode).
 
 Closed states: DONE, PARTIAL, SUPERSEDED, ABANDONED.
 Open states: PLANNING, EXECUTING, VERIFYING, BLOCKED.
@@ -23,6 +26,7 @@ Exit codes: 0 success; 1 usage error or refused action.
 from __future__ import annotations
 
 import datetime
+import json
 import re
 import shutil
 import subprocess
@@ -33,6 +37,9 @@ from pathlib import Path
 OPEN_STATES = ("PLANNING", "EXECUTING", "VERIFYING", "BLOCKED")
 CLOSED_STATES = ("DONE", "PARTIAL", "SUPERSEDED", "ABANDONED")
 DORMANT = "DORMANT"
+APPROVAL_MODES = ("ask", "true", "false")
+APPROVALS_TSV = Path.home() / ".agents" / "steward" / "approvals.tsv"
+APPROVAL_FIELDS = ("updated", "root", "mode", "note")
 STALE_DAYS = 14
 KEEP_ARCHIVED = 10
 STATE_LINE = re.compile(r"^\W*state\W*[:=]\s*(.+?)\s*(-->)?\s*$", re.I | re.M)
@@ -60,6 +67,73 @@ def project_root() -> Path:
 
 def brain() -> Path:
     return project_root() / ".agents" / "brain"
+
+
+def read_approval_mode() -> tuple[str, str]:
+    """Return (mode, note) from .agents/brain/approvals.json, ~/.agents/steward/approvals.tsv, or 'ask'."""
+    root = str(project_root())
+    local = brain() / "approvals.json"
+    if local.is_file():
+        try:
+            data = json.loads(local.read_text(encoding="utf-8"))
+            mode = str(data.get("approval_mode", "")).strip().lower()
+            if mode in APPROVAL_MODES:
+                return mode, str(data.get("note", "")).strip()
+        except (OSError, json.JSONDecodeError, AttributeError):
+            pass
+    if APPROVALS_TSV.is_file():
+        for line in reversed(APPROVALS_TSV.read_text(encoding="utf-8").splitlines()):
+            parts = line.split("\t")
+            if len(parts) == len(APPROVAL_FIELDS) and parts[1] == root and parts[2] in APPROVAL_MODES:
+                return parts[2], parts[3]
+    return "ask", "default"
+
+
+def write_approval_mode(mode: str, note: str = "") -> dict:
+    """Persist repository approval mode to .agents/brain/approvals.json and ~/.agents/steward/approvals.tsv."""
+    normalized = mode.strip().lower()
+    if normalized not in APPROVAL_MODES:
+        raise ValueError(f"invalid approval mode {mode!r}")
+    root = str(project_root())
+    stamp = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+    clean_note = note.replace("\t", " ").replace("\n", " ").strip()
+    record = {
+        "schema_version": 1,
+        "root": root,
+        "approval_mode": normalized,
+        "updated_at": stamp,
+        "note": clean_note,
+    }
+    local = brain() / "approvals.json"
+    local.parent.mkdir(parents=True, exist_ok=True)
+    local.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+
+    rows = []
+    if APPROVALS_TSV.is_file():
+        for line in APPROVALS_TSV.read_text(encoding="utf-8").splitlines():
+            parts = line.split("\t")
+            if len(parts) == len(APPROVAL_FIELDS) and parts[1] != root:
+                rows.append(dict(zip(APPROVAL_FIELDS, parts, strict=True)))
+    rows.append({"updated": stamp, "root": root, "mode": normalized, "note": clean_note})
+    APPROVALS_TSV.parent.mkdir(parents=True, exist_ok=True)
+    APPROVALS_TSV.write_text("".join("\t".join(r[f] for f in APPROVAL_FIELDS) + "\n" for r in rows), encoding="utf-8")
+    return record
+
+
+def approval(args: list[str]) -> int:
+    """Handle 'sessions.py approval [get|set <ask|true|false> [note]]'."""
+    action = args[0] if args else "get"
+    rest = args[1:]
+    if action == "get" and not rest:
+        mode, note = read_approval_mode()
+        print(f"{mode}\t{note}" if note else mode)
+        return 0
+    if action == "set" and rest and rest[0].lower() in APPROVAL_MODES:
+        record = write_approval_mode(rest[0], " ".join(rest[1:]))
+        print(f"approval_mode={record['approval_mode']} ({record['root']})")
+        return 0
+    print(__doc__, file=sys.stderr)
+    return 1
 
 
 def in_git(path: Path) -> bool:
@@ -156,7 +230,8 @@ def status() -> int:
     for folder in dormant:
         verdict = wake_verdict(folder)[0]
         print(f"{DORMANT:<11} {'':>5} {size_mb(folder):>6.1f}  {folder.name}  ({verdict})")
-    print(f"active: {len(active)}  dormant: {len(dormant)}  archived: {len(archived)}")
+    mode, _ = read_approval_mode()
+    print(f"active: {len(active)}  dormant: {len(dormant)}  archived: {len(archived)}  approval_mode: {mode}")
     return 0
 
 
@@ -306,7 +381,9 @@ def wake_verdict(folder: Path) -> tuple[str, list[tuple[str, str]]]:
         return "waiting", results
     if any(r == "judge" for _, r in results):
         return "judge conditions", results
-    return "ready: ask the user", results
+    mode, _ = read_approval_mode()
+    verdict = "ready: auto-wake (approval_mode=true)" if mode == "true" else "ready: ask the user"
+    return verdict, results
 
 
 def dormant(args: list[str]) -> int:
@@ -375,6 +452,8 @@ def main() -> int:
         print(__doc__, file=sys.stderr)
         return 1
     command, args = sys.argv[1], sys.argv[2:]
+    if command == "approval":
+        return approval(args)
     if not (project_root() / ".agents").is_dir():
         print("no .agents directory found for this project", file=sys.stderr)
         return 1

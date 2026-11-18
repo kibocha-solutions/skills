@@ -2,6 +2,7 @@
 
 | Session | State | Last change | Outcome |
 | :--- | :--- | :--- | :--- |
+| 2026-11-18-0900-steward-coordinator-refinement | DONE | 2026-11-18 | Refined `steward`, `maestro`, `coordinator`, `ci-cd`, `bootstrap`, and `AGENTS.md` to support persistent per-repository  |
 | 2026-11-15-2213-dormant-maestro-sessions | DONE | 2026-11-15 | Dormant Maestro sessions now live under `sessions/dormant/` with a `wake.md` record, are exempt from closing, staleness, |
 | 2026-11-15-2058-web-standards-floor | DONE | 2026-11-15 | The user chose to route Modern Web Guidance through the repository skills instead of installing its plugin per host, wit |
 | 2026-11-15-1810-session-hygiene-and-writing-split | DONE | 2026-11-15 | Agents now close Maestro sessions with fixed states, archive at close, keep evidence and environments in `~/.agents/`, a |

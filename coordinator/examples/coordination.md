@@ -42,29 +42,29 @@ Bad: Launch a routine screenshot inspection with the coordinator's powerful mode
 
 Good: Select Luna or Haiku explicitly when available and capable of performing the bounded inspection. If only a stronger model has the required browser access, record that limitation and select an authorized model with the necessary tools.
 
-## Parent question routing
+## Parent question routing and Worker Rules
 
 **Good:**
-The coordinator instructs a worker: "Direct all questions and blockers to me (your parent), never to the user. Pass this same rule to any sub-agent you spawn." When the worker asks whether to use `pytest` or `unittest`, the parent checks `pyproject.toml`, sees `pytest` configured, and answers the worker directly without bothering the user. Only when a production deploy requires a credential the agent does not have does the parent send a complete `AGENTS.md` Section 12 escalation to the user.
+The coordinator records the sub-agent in `.agents/brain/workers.json` and tells it: "You are a worker under coordinator 0000. Presume the user is exclusively with me and will not see your chat or catch unforwarded issues. Send ALL questions, blockers, and status reports to me without exception; pass these same Worker Rules to any child." When the worker asks whether to use `pytest` or `unittest`, the coordinator searches `.agents/MEMORY.md`, instructions, Maestro rulings, and `pyproject.toml`, sees `pytest` configured, and answers directly without bothering the user or asking for go-ahead. Only when a gated command physically requires the user's approval does the coordinator point the user to the exact worker ID (`2001`, `platform_id`, `subagent`, executor) and action required.
 
 **Bad:**
-A worker hits a minor naming question and tells the coordinator to ask the user, or asks the user directly in a child chat without investigating the repository first.
+A worker hits a minor naming question and tells the coordinator to ask the user, waits silently for go-ahead without messaging the coordinator, or the coordinator asks the user for routine go-ahead before resolving from repo files.
 
-## Heartbeat and wake timer mutual exclusion
+## Graduating algorithmic wake timer
 
 **Good:**
-During active multi-agent work, the coordinator runs a single 30-minute active heartbeat. At 95% 5-hour usage, the coordinator updates `tasks.md`, `walkthrough.md`, and `.agents/brain/handoffs/`, cancels the 30-minute heartbeat, and schedules a one-shot wake timer for `reset_time + 5m`. When the wake timer fires, it verifies no wake timer remains active, reads state files, and starts a fresh 30-minute heartbeat.
+During active work (or a lone session), the agent schedules a 1-minute (`60s`) wake timer. On tick 1, workers are still running and no coordinator action is needed, so after re-reading `goal.md`/`tasks.md`/`AGENTS.md`, checking `.agents/brain/workers.json`, and persisting state, the coordinator graduates the next wake timer to 3 minutes (`180s`), then 5m, 12m, 15m, and 30m while waiting. On tick 4, a worker in `.agents/brain/workers.json` is waiting for go-ahead; the coordinator assigns its next task and resets the next wake timer back to 1 minute (`60s`). At 95% 5-hour usage, it cancels the active timer and schedules a post-reset wake timer for `reset_time + 5m`. When all work finishes, it cancels every wake timer.
 
 **Bad:**
-The coordinator schedules a post-reset wake timer while leaving the 30-minute heartbeat running, or switches to a 90-minute blocked heartbeat while parallel verification work is still possible.
+Keeping a fixed 30-minute timer while a worker silently stalls after 2 minutes, running two wake timers simultaneously, or leaving an active wake timer running after the task is complete.
 
-## 90-minute blocked heartbeat
+## User-blocked long wake timer (90m-120m)
 
 **Good:**
-All parallel work and verification are complete, and the only remaining step requires the user to authorize an external account change. The coordinator persists state, cancels the 30-minute heartbeat, and starts a 90-minute blocked heartbeat. When it fires and the user has not yet replied, the coordinator replies `"waiting on user action"`.
+All parallel work and verification are complete, and the only remaining step requires the user to approve an external account change or a gated command on worker `2001`. The coordinator persists state, cancels the active graduating timer, points the user to the exact worker and action, and schedules a 90m-120m (`5400s-7200s`) wake timer. Once the user acts, it cancels the long timer and resumes the graduating timer at 1 minute (`60s`).
 
 **Bad:**
-The coordinator stops scheduling any check-in while waiting on the user, or replies with a long summary instead of `"waiting on user action"`.
+Interrupting the user every 1 minute while waiting exclusively on user action, or stopping all timers when user-blocked work still needs resumption.
 
 ## Unavailable timer or usage-check capability
 

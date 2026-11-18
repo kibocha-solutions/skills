@@ -34,6 +34,18 @@
         "python3 steward/scripts/steward.py ledger list prints no open entry",
         "The final report names the container that was created and deleted"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Set the repository approval mode to true so all changes and cleanup inside this repo happen automatically without prompting, then verify steward check and stop hook behavior.",
+      "expected_output": "Approval mode is persisted to .agents/brain/approvals.json and ~/.agents/steward/approvals.tsv; check --fix auto-cleans leftovers; stop emits {} when clean and skips nagging on continuationActive or USER_CANCELED.",
+      "files": [],
+      "expectations": [
+        "python3 steward/scripts/steward.py approval get prints true",
+        "test -f .agents/brain/approvals.json",
+        "python3 steward/scripts/steward.py check --fix exits 0",
+        "steward.py stop emits {} on Antigravity when clean or when continuationActive is true"
+      ]
     }
   ]
 }

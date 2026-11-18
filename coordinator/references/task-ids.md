@@ -2,7 +2,7 @@
 
 ## Assign IDs
 
-1. Maintain a shared registry for the coordinated task with coordination ID, role, parent ID, platform identifier, state, creation order, and deletion confirmation.
+1. Maintain the shared worker registry at `.agents/brain/workers.json` with `coordination_id`, `role`, `kind` (`chat` or `subagent`), `parent_id`, `platform_id` (from `invoke_subagent`, `swarm`, MCP, or chat creation), `model`, `state`, `assignment`, `last_checked_at`, creation order, and `deletion_confirmed`.
 2. Assign the initial coordinator `0000` and each successor the next unused ID in sequence through `0009`.
 3. Keep exactly one designated coordinator; count an overlapping successor chat against the existing visible-chat cap.
 4. Assign inspectors IDs from `1000` through `1999` and executors IDs from `2000` through `2999`.

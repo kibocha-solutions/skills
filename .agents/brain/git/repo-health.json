@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-11-13T02:13:17+03:00",
+  "captured_at": "2026-11-18T09:16:00+03:00",
   "branch": "main",
   "identity": {
     "user_name": "JohnKibocha",
@@ -11,10 +11,10 @@
     "full_log_command": "git log --show-signature -2 --date=iso-strict --format=fuller",
     "entries": [
       {
-        "raw": "commit cdc8647887b84ea6f0916ca2b97cfc23673bc286\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-10-30T19:03:18+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-10-30T19:03:18+03:00\n\n    feat(coordinator): require scenario-based delegation guidance\n    \n    Use relevant examples to route bounded work, separate decisions from execution, and reassess active assignments when model requirements change."
+        "raw": "commit a75c3e1e5d007ec2956e11494e6893979288992d\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-11-15T22:24:01+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-11-15T22:24:01+03:00\n\n    feat(interface-design): route web work through current standards and one design foundation\n    \n    Web and interface work now classifies the product, applies a cited standards floor, keeps one design foundation per surface, queries Modern Web Guidance against the Baseline target, and gates markup with a deterministic anti-slop detector. Steward keeps a device record and installs shared tools at their latest release, Writerside follows the newest builder, and Maestro parks deferred work as dormant sessions woken only with approval."
       },
       {
-        "raw": "commit 94f94ec89410145fcbcb6afe73c80e5d940df4ec\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-10-30T18:55:35+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-10-30T18:55:35+03:00\n\n    feat(coordinator): require lighter models for routine delegation\n    \n    Select suitable lighter models explicitly for bounded child work and record capability-based exceptions when stronger models are necessary."
+        "raw": "commit 6f8c537bf4977f60ec2cb6ac5a70a2cebec9c190\nGood \"git\" signature for johnkibocha@outlook.com with ED25519 key SHA256:1vwcBCjQF9NBNTnfck6OgeRwjyIdjTlGIjLjmDUDNUc\nAuthor:     JohnKibocha <johnkibocha@outlook.com>\nAuthorDate: 2026-11-15T19:49:57+03:00\nCommit:     JohnKibocha <johnkibocha@outlook.com>\nCommitDate: 2026-11-15T19:49:57+03:00\n\n    feat(steward): enforce the guard in Codex, Antigravity, and Copilot\n    \n    The guard now recognises each agent host from its hook input and answers in that host's format, so Antigravity and Copilot refuse throwaway containers and in-repository backup copies and continue a turn while leftovers remain, with loop protection on every host."
       }
     ],
     "inferred_convention": "conventional-commits"
@@ -31,9 +31,8 @@
   "ssh_signing_path": {
     "path": "bitwarden-linux",
     "evidence": [
-      "SSH_AUTH_SOCK uses the keyring socket",
-      "GitHub authentication succeeds with the configured github.com identity",
-      "the signing public-key fingerprint matches the trusted signer entry"
+      "gpg.ssh.program uses /home/vaelric/.ssh/ssh-keygen-bitwarden.sh",
+      "SSH signing key matches /home/vaelric/.ssh/ssh-signing-key-universal.pub"
     ],
     "requires_user_action": false
   },
@@ -42,7 +41,7 @@
     "cli": "gh",
     "installed": true,
     "authenticated": true,
-    "auth_checked_at": "2026-11-13T02:13:17+03:00",
+    "auth_checked_at": "2026-11-18T09:15:38+03:00",
     "preferred_for_remote_operations": true
   },
   "signing": {

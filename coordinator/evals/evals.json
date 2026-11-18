@@ -190,35 +190,36 @@
     },
     {
       "id": 18,
-      "prompt": "A worker sub-agent encounters an ambiguity about which test runner to use and asks whether it should message the user directly. How must the parent handle this?",
-      "expected_output": "Instruct the worker (and any children it spawns) to direct all questions to the parent only; resolve the question from repository evidence and authority, escalating to the user via AGENTS.md Section 12 only when user action is required and the agent cannot resolve it.",
+      "prompt": "A worker sub-agent encounters an ambiguity about which test runner to use and sits idle thinking the user will answer it directly. How must the coordinator handle this?",
+      "expected_output": "Track the sub-agent in .agents/brain/workers.json, enforce the Worker Rules (user is exclusively with coordinator; send all blockers/questions to coordinator without exception), detect the waiting worker on the graduating wake check, resolve the question from memories/instructions/Maestro rulings/repo files without asking the user for go-ahead, and escalate via AGENTS.md Section 12 only when user action is physically required.",
       "files": [],
       "expectations": [
-        "Worker is instructed to direct all questions to its parent and pass that rule to children",
-        "Parent resolves questions from authority and repository evidence instead of bothering the user",
-        "Any user escalation follows AGENTS.md Section 12 as a complete self-contained brief, never a summary"
+        "Worker brief states it is a worker under a coordinator and that the user will not see unforwarded worker issues",
+        "Worker is recorded with platform_id, kind, and state in .agents/brain/workers.json",
+        "Coordinator searches memories, instructions, Maestro rulings, and repo docs/code before escalating",
+        "Coordinator does not ask the user for routine go-ahead"
       ]
     },
     {
       "id": 19,
-      "prompt": "A coordinator has an active 30-minute heartbeat running when 5-hour usage hits 95% with reset in 45 minutes. What exact steps must it take?",
-      "expected_output": "Pause new dispatch, persist state to Maestro tasks.md/walkthrough.md and .agents/brain/handoffs/, cancel the active 30-minute heartbeat so heartbeat and wake timer are never both active, schedule a one-shot wake timer for reset + 5 minutes, and report the pause and wake time.",
+      "prompt": "A coordinator starts a 1-minute graduating wake timer; on tick 1 workers are busy with no action needed, on tick 2 a worker needs a decision, and later 5-hour usage hits 95% with reset in 45 minutes. What timer cadence and steps apply?",
+      "expected_output": "Graduate 1m -> 3m while workers run without action needed, re-read goal/plan/rules and inspect .agents/brain/workers.json on every tick, reset to 1m when action is taken on tick 2, and at 95% 5h usage persist state, cancel the active timer (single-timer exclusion), and schedule a post-reset wake timer for reset + 5 minutes.",
       "files": [],
       "expectations": [
-        "State is persisted to active Maestro session and .agents/brain/handoffs/",
-        "The active 30-minute heartbeat is cancelled before scheduling the wake timer (strict mutual exclusion)",
-        "A one-shot wake timer is scheduled for reset + 5 minutes (or exact reset if supported)"
+        "Graduates along 1m -> 3m -> 5m -> 12m -> 15m -> 30m when no action is needed and resets to 1m when action is taken",
+        "Re-reads goal/plan/tasks, AGENTS.md/skills/rulings, and checks all workers in .agents/brain/workers.json on every tick",
+        "Cancels active wake timer before scheduling post-reset wake timer for reset + 5 minutes (single-timer exclusion)"
       ]
     },
     {
       "id": 20,
-      "prompt": "All parallel work is complete and the coordinator is waiting exclusively on the user to approve an external credential change. What heartbeat rule applies and what must it reply when the timer fires?",
-      "expected_output": "Cancel the 30-minute heartbeat, persist state, start the 90-minute blocked heartbeat, and reply with 'waiting on user action' on each trigger while still blocked exclusively on the user.",
+      "prompt": "All parallel work is complete and worker 2002 needs the user to approve a gated external command that the coordinator cannot approve. What must the coordinator do, and what happens when all work finishes?",
+      "expected_output": "Cancel the graduating timer, point the user to the exact worker (2002, platform_id, kind, role) and gated command, schedule a 90m-120m (1h 30m to 2h) user-blocked wake timer, resume at 1m once the user acts, and cancel all wake timers immediately upon project completion.",
       "files": [],
       "expectations": [
-        "90-minute blocked heartbeat is used only when blocked exclusively on user action with no parallel work",
-        "30-minute heartbeat is cancelled before starting the 90-minute blocked heartbeat",
-        "Agent replies with 'waiting on user action' when still blocked"
+        "Points the user to the exact worker coordination_id, platform_id, kind, and required action",
+        "Schedules a 90m-120m (5400s-7200s) wake timer while waiting exclusively on user action and resumes at 1m once unblocked",
+        "Stops and cancels all wake timers upon project completion"
       ]
     },
     {

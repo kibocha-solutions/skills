@@ -6,4 +6,4 @@ set -euo pipefail
 
 # shellcheck disable=SC2088 # literal tilde shown to the agent
 print_directive "GEMINI ANTIGRAVITY" "~/.gemini/GEMINI.md, the repository GEMINI.md and AGENTS.md," "GEMINI.md or AGENTS.md" \
-  | python3 -c 'import json,sys; print(json.dumps({"injectSteps": [{"ephemeralMessage": sys.stdin.read().rstrip()}]}))'
+  | python3 -c 'import json,sys; print(json.dumps({"injectSteps": [{"systemMessage": {"systemMessage": sys.stdin.read().rstrip()}}]}))'

@@ -19,7 +19,7 @@ Each agent host has a dedicated enforcement script in `bootstrap/scripts/` that 
 | Agent Host | Governing Instruction File | Enforcement Script | Hook Event | Output Format |
 | :--- | :--- | :--- | :--- | :--- |
 | Claude Code | `~/.claude/CLAUDE.md` + repo `CLAUDE.md`/`AGENTS.md` | `enforce-claude-rules.sh` | `UserPromptSubmit` | Plain text directive injected into prompt context |
-| Gemini Antigravity | `~/.gemini/GEMINI.md` + repo `GEMINI.md`/`AGENTS.md` | `enforce-gemini-rules.sh` | `PreInvocation` | `{"injectSteps":[{"ephemeralMessage":"..."}]}` |
+| Gemini Antigravity | `~/.gemini/GEMINI.md` + repo `GEMINI.md`/`AGENTS.md` | `enforce-gemini-rules.sh` | `PreInvocation` | `{"injectSteps":[{"systemMessage":{"systemMessage":"..."}}]}` |
 | Gemini CLI | `~/.gemini/GEMINI.md` + repo `GEMINI.md`/`AGENTS.md` | `enforce-gemini-cli-rules.sh` | `SessionStart` | `{"systemMessage":"...","suppressOutput":false}` |
 | Codex CLI / Desktop | `~/.codex/AGENTS.md` + repo `AGENTS.md` | `enforce-codex-rules.sh` | `SessionStart` (`startup\|resume`) | `{"systemMessage":"...","suppressOutput":false}` |
 | GitHub Copilot CLI | `~/.copilot/copilot-instructions.md` + repo `AGENTS.md` | `enforce-copilot-rules.sh` | `sessionStart` | `{"systemMessage":"...","suppressOutput":false}` |
@@ -289,7 +289,7 @@ Register these hooks on every installed host. `steward.py pre` refuses a command
 | Antigravity | `~/.gemini/config/hooks.json`, group `steward-guard` | `PreToolUse`, matcher `run_command` | `Stop` | `SessionStart` |
 | GitHub Copilot CLI | `~/.copilot/hooks/steward.json` | `preToolUse`, matcher `bash` | `agentStop` | `sessionStart` |
 
-`steward.py` detects the host from its input and answers in that host's format: exit code `2` with the reason on stderr for Claude Code and Codex, `{"decision": "deny"}` and `{"decision": "continue"}` for Antigravity, and `{"permissionDecision": "deny"}` and `{"decision": "block"}` for Copilot. Gemini CLI is registered only when the `gemini` command is installed.
+`steward.py` detects the host from its input, runs mode-aware auto-cleanup during `stop`, emits `{}` when clean on Antigravity and Copilot, respects `continuationActive`, `terminationReason`, `fullyIdle`, and `stop_hook_active`, and answers when findings remain with exit code `2` and stderr for Claude Code and Codex, `{"decision": "deny"}` / `{"decision": "continue"}` for Antigravity, and `{"permissionDecision": "deny"}` / `{"decision": "block"}` for Copilot. Gemini CLI is registered only when the `gemini` command is installed.
 
 Codex skips new or changed hooks until the user trusts them in the `/hooks` review; tell the user to approve the steward hooks there after registration.
 

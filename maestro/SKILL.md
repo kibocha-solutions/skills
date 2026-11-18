@@ -11,15 +11,19 @@ Run scripts with the skill directory as the base path, for example `python3 <ski
 
 ## 1. Orient
 
-1. Identify the project root. Discover the repository's agent instruction and state directories. Names vary across tools: look for `AGENTS.md`, `CLAUDE.md`, and hidden directories such as `.agents/`, `.claude/`, `.cursor/`, or `.github/`, plus any memory index, handoff folder, or sessions folder they reference.
-2. Read `.agents/MEMORY.md` in full when it exists.
-3. Read every topic file linked from relevant memory entries.
-4. Read relevant files in `.agents/brain/handoffs/`.
-5. Run `python3 scripts/sessions.py status` to list every active and dormant Maestro session.
-6. Close finished and stale Maestro sessions with `python3 scripts/sessions.py stale --apply`, and report the closures to the user in one line.
-7. Match the current task to the remaining active Maestro sessions by objective and slug. Match it to a dormant Maestro session only when the user names that work.
-8. Do not create a duplicate Maestro session.
-9. Activate `steward/SKILL.md` and size the plan to the capacity in `~/.agents/system-profile.md`.
+Before forming or resuming any Maestro session, acquaint yourself thoroughly with the repository, rules, and skills:
+
+1. Identify the project root and discover all agent instruction and state directories (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.agents/`, `.claude/`, `.cursor/`, `.github/`, and any memory index, handoff folder, or sessions folder).
+2. Read the host's global rules and every repository instruction and `.agents/rules/*.md` file in full.
+3. Map the project: if `graphify-out/graph.json` or `graphify-out/GRAPH_REPORT.md` exists (or when `graphify` applies to the repository), activate `graphify/SKILL.md` and query `graph_stats`, `god_nodes`, and `GRAPH_REPORT.md`; where `graphify` does not apply, read the repository's documentation and configuration files in full.
+4. Inspect the skill catalogue against the project map and task, identify every skill applicable to the project, and read each applicable `SKILL.md` (with its routed `references/` and `examples/`) in full from disk.
+5. Read `.agents/MEMORY.md` in full when it exists, every topic file linked from relevant memory entries, and relevant files in `.agents/brain/handoffs/`.
+6. Read the repository's persistent approval mode with `python3 scripts/sessions.py approval` (`ask`, `true`, `false`); record any new user approval directive immediately with `python3 scripts/sessions.py approval set <ask|true|false> "<note>"`.
+7. Run `python3 scripts/sessions.py status` to list every active and dormant Maestro session and the active `approval_mode`.
+8. Close finished and stale Maestro sessions with `python3 scripts/sessions.py stale --apply`, and report the closures to the user in one line.
+9. Match the current task to the remaining active Maestro sessions by objective and slug. Match it to a dormant Maestro session only when the user names that work or `approval_mode` is `true` and its conditions are met.
+10. Do not create a duplicate Maestro session.
+11. Activate `steward/SKILL.md` and size the plan to the capacity in `~/.agents/system-profile.md`.
 
 Read [dormant sessions](references/session-lifecycle.md#dormant) before parking, checking, or waking a Maestro session.
 
@@ -54,7 +58,7 @@ Write `implementation_plan.md` before substantive edits.
 4. Mark each file `[NEW]`, `[MODIFY]`, `[MOVE]`, or `[DELETE]`.
 5. List blocking questions.
 6. List the verification method for every acceptance criterion.
-7. Stop for user input only when a missing decision would materially change the result or authority.
+7. Decide missing questions from repository memories, instructions, user rulings, and docs/code first; stop for user input only when `approval_mode` is `false`, or when `approval_mode` is `ask` and a missing major or out-of-scope decision cannot be resolved from repository authority.
 8. List each temporary artifact the work will create and the step that removes it.
 
 ## 4. Write and maintain tasks
@@ -86,7 +90,7 @@ Read [goal protocol](references/goal-protocol.md) when `goal.md` exists.
 1. Check progress, quality, and scope thresholds at the start of each continuation.
 2. Decompose stalled work.
 3. Re-plan work with repeated verification failures.
-4. Stop for the user when added scope crosses the approved threshold.
+4. Handle scope additions by `approval_mode`: in `true` mode, record and execute bounded in-repository additions in `walkthrough.md`; in `ask` mode, stop for the user when added scope crosses the approved threshold; in `false` mode, obtain approval before any added work.
 5. Record every threshold event in `walkthrough.md`.
 
 ## 7. Verify
@@ -134,9 +138,10 @@ Read [session lifecycle](references/session-lifecycle.md#close).
 3. Never close, abandon, prune, or edit the plan of a dormant Maestro session.
 4. Work every open active Maestro session first.
 5. When no active Maestro session remains open, run `python3 scripts/sessions.py wake-check`.
-6. For each session reported `ready` or `judge conditions`, decide each plain-word condition from current evidence, then ask the user for permission to resume every session whose conditions are met or that has none. Name the session, its reason, and each condition with its result.
-7. Run `python3 scripts/sessions.py wake <session> "<user approval>"` only after the user approves, then resume it under Section 2.
-8. Leave a session dormant when its conditions are not met or the user declines, and report it in one line.
+6. For each session reported `ready` or `judge conditions`, decide each plain-word condition from current evidence, and apply `approval_mode`:
+   - In `true` mode, automatically run `python3 scripts/sessions.py wake <session> "auto-wake under approval_mode=true"` for sessions whose conditions are met or that have none, and resume under Section 2.
+   - In `ask` or `false` mode, ask the user for permission before running `python3 scripts/sessions.py wake <session> "<user approval>"`, naming the session, its reason, and each condition with its result.
+7. Leave a session dormant when its conditions are not met or the user declines, and report it in one line.
 
 Inspect [session examples](examples/session-lifecycle-and-recovery.md) for task state transitions and recovery patterns.
 
@@ -144,6 +149,7 @@ Inspect [session examples](examples/session-lifecycle-and-recovery.md) for task 
 
 Before marking a Maestro session complete, confirm evidence exists for each item:
 
+- [ ] Global rules, repository instructions, project map (`graphify` or docs/configs), applicable skills, memories, and `approval_mode` read before forming or resuming the session.
 - [ ] Every listed task in `tasks.md` is marked `[x]`.
 - [ ] Every acceptance criterion in `implementation_plan.md` verified against the exact final artifact.
 - [ ] Any failed check or unexpected defect reopened under `## Added` and resolved.
@@ -152,7 +158,7 @@ Before marking a Maestro session complete, confirm evidence exists for each item
 - [ ] Durable knowledge and decisions recorded in `.agents/MEMORY.md` or topic files.
 - [ ] Steward check clean and every temporary artifact removed.
 - [ ] Maestro session closed with `DONE`, `PARTIAL`, `SUPERSEDED`, or `ABANDONED` and archived, parked as `DORMANT` with its reason and wake conditions, or left active in an open state.
-- [ ] Dormant Maestro sessions checked with `wake-check` once no active Maestro session remained open, and none woken without the user's approval.
+- [ ] Dormant Maestro sessions checked with `wake-check` once no active Maestro session remained open, and woken only under `approval_mode=true` (when conditions pass) or explicit user approval.
 - [ ] Zero AI attribution across all session artifacts and commits.
 - [ ] No U+2014 em dashes in normal prose.
 
