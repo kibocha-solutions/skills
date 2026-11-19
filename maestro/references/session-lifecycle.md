@@ -76,6 +76,7 @@ Write the state as the first state line of `tasks.md`, exactly `## State: <STATE
 4. Outside Git, `sessions.py prune --apply` bundles older folders into one `YYYY-Qn.tar.gz` per quarter.
 5. Delete a quarterly bundle older than 12 months only with the user's approval.
 6. Do not edit an archived Maestro session.
+7. Archiving applies exclusively to Maestro sessions under `.agents/brain/sessions/`; never archive chats or workers (manage worker and chat stop, close, and deletion through `coordinator/SKILL.md`).
 
 ## Dormant
 

@@ -25,14 +25,14 @@ At the start of a chat, before dispatching sustained work:
 
 ## 2. Strict single-timer exclusion invariant
 
-At most ONE wake or monitoring timer may be active for a coordinator or lone session at any moment:
+At most ONE wake or monitoring timer may be active for a coordinator or standalone chat at any moment:
 
 1. Before scheduling any new timer (`Graduating Wake`, `User-Blocked Wake`, or `Post-Reset Wake`), list active tasks (`manage_task` `list`) and cancel every existing wake or heartbeat timer (`manage_task` `kill`).
 2. When all task work finishes, cancel every active timer immediately so no scheduled wake fires after completion.
 
 ## 3. Graduating algorithmic wake timer (1m -> 3m -> 5m -> 12m -> 15m -> 30m)
 
-Both coordinators and lone sessions (working independently without a coordinator) use the graduating sequence `[1, 3, 5, 12, 15, 30]` minutes (`60`, `180`, `300`, `720`, `900`, `1800` seconds) via one-shot `schedule(DurationSeconds=...)` using the prompt template in `assets/heartbeat-prompts.md`:
+Both coordinators and standalone chats (working independently without a coordinator) use the graduating sequence `[1, 3, 5, 12, 15, 30]` minutes (`60`, `180`, `300`, `720`, `900`, `1800` seconds) via one-shot `schedule(DurationSeconds=...)` using the prompt template in `assets/heartbeat-prompts.md`:
 
 1. **Initial timer**: Schedule the first wake at **1 minute (`60` seconds)** (`step = 0`).
 2. **On every wake tick, execute these mandatory steps in order**:
@@ -44,7 +44,7 @@ Both coordinators and lone sessions (working independently without a coordinator
    4. Persist updated state per Section 6 (`.agents/brain/workers.json`, Maestro session, and `.agents/brain/handoffs/`).
    5. Check 5-hour and weekly usage limits: if usage reaches `>= 95%` (5-hour) or `>= 98%` (weekly), execute the Post-Reset Wake Timer handoff in Section 5.
 3. **Choose the next timer interval**:
-   - **Action was needed** (dispatched work, answered/unblocked a worker, reviewed deliverables, reassigned a stalled worker, or took a lone-session step): reset the sequence back to **1 minute (`60` seconds)** (`step = 0`).
+   - **Action was needed** (dispatched work, answered/unblocked a worker, reviewed deliverables, reassigned a stalled worker, or took a standalone-chat step): reset the sequence back to **1 minute (`60` seconds)** (`step = 0`).
    - **No action was needed** and workers (or background tasks) are still actively running: advance one step along `[1, 3, 5, 12, 15, 30]` minutes (staying at `30` minutes once reached).
    - **Blocked exclusively on user action**: switch to Section 4 (`90m-120m`).
    - **All work complete**: cancel all timers and do not schedule another.

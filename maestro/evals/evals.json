@@ -58,6 +58,17 @@
         "python3 maestro/scripts/sessions.py status prints approval_mode: true",
         "wake_verdict reports auto-wake when approval_mode=true"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "The user says 'archive the completed sessions' while two worker chats are active under the coordinator and one DONE Maestro session remains in active/.",
+      "expected_output": "Interpret 'sessions' and 'archive' as referring exclusively to Maestro sessions: archive the DONE Maestro session to .agents/brain/sessions/archive/ via sessions.py, update INDEX.md, and do not archive, stop, or close the active worker chats.",
+      "files": [],
+      "expectations": [
+        "Archives only the DONE Maestro session into .agents/brain/sessions/archive/",
+        "Updates .agents/brain/sessions/archive/INDEX.md",
+        "Does not archive or touch active worker chats controlled by coordinator"
+      ]
     }
   ]
 }

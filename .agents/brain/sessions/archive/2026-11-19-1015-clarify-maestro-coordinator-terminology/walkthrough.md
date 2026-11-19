@@ -1,0 +1,8 @@
+Clarified `maestro` and `coordinator` terminology so `session` and `archive` apply exclusively to Maestro sessions under `.agents/brain/sessions/`, while coordinated and standalone conversations are named `workers` or `chats` and stopped, closed, or deleted (never archived).
+
+# Walkthrough: Clarify Maestro and Coordinator Terminology
+
+## 2026-11-19 10:17
+- Updated `maestro/SKILL.md`, `maestro/references/session-lifecycle.md`, `maestro/examples/session-lifecycle-and-recovery.md`, and `maestro/evals/evals.json` to define `session` and `archive` exclusively for Maestro sessions under `.agents/brain/sessions/`.
+- Updated `coordinator/SKILL.md`, `coordinator/references/delegation.md`, `coordinator/references/heartbeat-and-wake.md`, `coordinator/references/task-ids.md`, `coordinator/assets/heartbeat-prompts.md`, `coordinator/examples/coordination.md`, and `coordinator/evals/evals.json` to refer to coordinated and standalone conversations as `workers` or `chats` (never `sessions`), replace `lone session` / `coordinator/session` phrasing with `standalone chat`, and route worker cleanup strictly to stop, close, or delete actions instead of archiving.
+- Verification: read all 11 modified files in full; terminology sweep across `maestro/` and `coordinator/` returned 0 conflicting matches; `/usr/bin/python3 skill-creator/scripts/quick_validate.py` printed `Skill is valid!` for both `maestro` and `coordinator`; `tools/validate-all.sh` reported zero errors in `AGENTS.md`, `maestro/`, and `coordinator/` (only the 14 baseline errors in unchanged `ci-cd/` and `communications/` files); `python3 -m json.tool` passed on both modified `evals.json` files; `git diff --check` exited `0`; `steward.py check` output `steward check: clean`.

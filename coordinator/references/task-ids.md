@@ -30,7 +30,7 @@
 3. Check that the child has stopped, its descendants are closed, and no work or required records will be lost before deletion.
 4. Apply applicable authorization and irreversible-action rules; do not delete a pre-existing user task or an active child.
 5. Confirm deletion with the platform before marking the ID available for reuse; retain the registry history and distinguish each reuse by creation order and platform identifier.
-6. Do not equate archiving, hiding, interruption, or a request to delete with confirmed deletion.
+6. Do not equate UI-archiving, hiding, interruption, or a request to delete with confirmed deletion; never treat a user request to "archive" as a worker or chat action (archiving applies exclusively to Maestro sessions under `maestro/SKILL.md`).
 7. When deletion is unavailable, denied, or unconfirmed, preserve the child and reserve its ID; report the limitation and use another available ID.
 
 ## Coordinator rollover

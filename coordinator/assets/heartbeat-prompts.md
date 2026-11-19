@@ -12,7 +12,7 @@ GRADUATING WAKE (Step <1m|3m|5m|12m|15m|30m>):
 6. Schedule the next single wake timer:
    - If work is complete: cancel all timers and do not schedule another.
    - If blocked exclusively on user action: switch to the 90m-120m (5400s-7200s) user-blocked timer.
-   - If coordinator/session action was needed on this tick: reset to 1m (60s).
+   - If coordinator or standalone-chat action was needed on this tick: reset to 1m (60s).
    - If no action was needed and workers are progressing: graduate to the next interval in [1m, 3m, 5m, 12m, 15m, 30m].
 ```
 

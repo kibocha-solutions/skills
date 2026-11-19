@@ -232,6 +232,17 @@
         "Coordinator notifies the user instead of silently ignoring the missing capability",
         "Notification follows AGENTS.md Section 12 with attempted command, error, consequence, and fallback"
       ]
+    },
+    {
+      "id": 22,
+      "prompt": "The user asks to archive completed sessions while two worker chats are running under the coordinator. How must the coordinator respond and refer to the active conversations?",
+      "expected_output": "Treat 'sessions' and 'archive' as applying exclusively to Maestro sessions under .agents/brain/sessions/archive/, leave active worker chats running without archiving them, and refer to coordinated conversations as workers or chats, never as sessions.",
+      "files": [],
+      "expectations": [
+        "Interprets 'sessions' exclusively as Maestro sessions under .agents/brain/sessions/",
+        "Routes 'archive' exclusively to Maestro session archival and never archives workers or chats",
+        "Refers to coordinated conversations as workers or chats, never as sessions"
+      ]
     }
   ]
 }

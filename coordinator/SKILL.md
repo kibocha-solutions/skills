@@ -1,13 +1,13 @@
 ---
 name: coordinator
-description: Coordinate delegated work across agents, visible chats, and narrowly scoped sub-agents. Use when the user requests a coordinator, coordinated multi-agent work, delegation across chats, independent executor and auditor roles, team handoff, or management of a delegated project; before any agent starts a new chat or a sub-agent; when applying the graduating wake timer for a coordinator or lone session; and when cleaning up chats or sub-agents an agent started.
+description: Coordinate delegated work across workers, visible chats, and narrowly scoped sub-agents. Use when the user requests a coordinator, coordinated multi-agent work, delegation across workers or chats, independent executor and auditor roles, team handoff, or management of a delegated project; before any agent starts a new worker, chat, or sub-agent; when applying the graduating wake timer for a coordinator or standalone chat; and when stopping, closing, or deleting workers, chats, or sub-agents an agent started.
 ---
 
 # Coordinator
 
-A chat is a separate conversation with its own lifecycle; when the user says "session", the user means a chat. A sub-agent runs inside the current chat and returns its result in the same turn. A Maestro session is the work-record folder under `.agents/brain/sessions/`.
+A **chat** (or **worker**) is a separate conversation with its own lifecycle controlled by this skill; never call a chat or worker a "session". A **sub-agent** is a worker that runs inside the current chat and returns its result in the same turn. A **session** (or **Maestro session**) is exclusively a work-record folder under `.agents/brain/sessions/`, governed by `maestro/SKILL.md`. Treat every user reference to a "session" as a Maestro session, and treat every user request to "archive" as moving Maestro sessions to `.agents/brain/sessions/archive/`, never as archiving workers or chats. Stop, close, or delete completed workers and chats under Section 6.
 
-Every agent applies [channel selection](references/delegation.md#channel-selection) before starting a chat or sub-agent, and applies [graduating wake timer controls](references/heartbeat-and-wake.md) for sustained work in either a coordinated team or a lone session.
+Every agent applies [channel selection](references/delegation.md#channel-selection) before starting a worker, chat, or sub-agent, and applies [graduating wake timer controls](references/heartbeat-and-wake.md) for sustained work in either a coordinated team or a standalone chat.
 
 ## 1. Assume the mantle of the user
 
@@ -58,7 +58,7 @@ Every agent applies [channel selection](references/delegation.md#channel-selecti
 2. Treat the environment as a shared two-core system; schedule at most two heavy worker operations concurrently.
 3. Reuse authorized services and batch audits, compatible fixes, and verification around a coordinated refresh.
 4. Run the **graduating algorithmic wake timer** (`1m -> 3m -> 5m -> 12m -> 15m -> 30m`) per `references/heartbeat-and-wake.md` using prompts in `assets/heartbeat-prompts.md`, keeping at most ONE timer active at any moment:
-   - Start at `1` minute (`60s`). When no coordinator/session action is needed and workers are progressing, graduate through `1m`, `3m`, `5m`, `12m`, `15m`, and `30m` (capped at `30m`).
+   - Start at `1` minute (`60s`). When no coordinator or standalone-chat action is needed and workers are progressing, graduate through `1m`, `3m`, `5m`, `12m`, `15m`, and `30m` (capped at `30m`).
    - Reset immediately back to `1` minute (`60s`) whenever action is needed (dispatching, answering a worker, unblocking, reviewing, or handling completion), then graduate upward again.
    - On every wake tick: (a) re-read `goal.md`, `implementation_plan.md`, and `tasks.md`; (b) re-read `AGENTS.md`, active skills, memories, `approval_mode`, and user rulings; (c) inspect every worker (`chat` and `subagent`) in `.agents/brain/workers.json`, unblock or assign work to any worker sitting idle or waiting for go-ahead even if it failed to forward its blocker; and (d) persist state and check usage limits.
    - Switch to a `90m-120m` (`1h 30m` to `2h`) user-blocked wake timer ONLY when waiting exclusively on the user to act; once the user acts, cancel it and resume at `1` minute.
@@ -80,7 +80,7 @@ Every agent applies [channel selection](references/delegation.md#channel-selecti
 ## 6. Close the team
 
 1. Stop completed workers, verify no assigned work remains running, and cancel every active wake timer.
-2. Close or archive every chat and sub-agent started for the task once its result is reported or merged, updating `.agents/brain/workers.json`.
+2. Close every worker chat and sub-agent started for the task once its result is reported or merged, updating `.agents/brain/workers.json`. Never archive workers or chats when the user asks to archive; archiving moves Maestro sessions under `maestro/SKILL.md`.
 3. Preserve required evidence and report outcomes, verification, blockers, and exact remaining work.
 4. Delete completed task-created children and release their IDs only after confirmed deletion, following [task IDs and cleanup](references/task-ids.md).
 5. Preserve pre-existing user chats; report when deletion is unavailable.
@@ -99,4 +99,5 @@ Before closing a coordinated project, confirm evidence exists for each item:
 - [ ] Usage windows monitored against `95%` 5-hour (`5%` remaining) and `98%` weekly (`2%` remaining) thresholds.
 - [ ] Completed task-created children deleted and IDs released only after confirmed deletion.
 - [ ] Acceptance criteria verified with concrete evidence; zero unsupported percentage claims.
+- [ ] Terminology kept distinct: "session" and "archive" applied exclusively to Maestro sessions, and coordinated conversations referred to as workers or chats (stopped, closed, or deleted, never archived).
 - [ ] Zero AI attribution and no U+2014 em dashes in deliverables or reports.

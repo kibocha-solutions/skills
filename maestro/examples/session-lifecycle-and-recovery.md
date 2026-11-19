@@ -43,3 +43,21 @@ Advantages:
 - Single active task `[/]` matches ongoing execution.
 - Discovered verification failure immediately converted into explicit tasks under `## Added`.
 - Session state remains `IN_PROGRESS` until all criteria pass.
+
+## 2. Archiving Sessions vs Worker Chats
+
+### Bad (Treating "Session" or "Archive" as Worker Chats)
+
+The user says: "Archive the finished sessions." The agent closes or UI-archives active worker chats managed by `coordinator` and leaves completed folders in `.agents/brain/sessions/active/`.
+
+Defects:
+- Confuses chats and workers with Maestro sessions.
+- Applies "archive" to worker chats while leaving completed Maestro sessions unarchived.
+
+### Good (Exclusively Archiving Maestro Sessions)
+
+The user says: "Archive the finished sessions." The agent runs `python3 maestro/scripts/sessions.py status` and `python3 maestro/scripts/sessions.py stale --apply` (or `close <session> DONE "<note>"`) to move finished Maestro sessions into `.agents/brain/sessions/archive/` and update `INDEX.md`, leaving active worker chats untouched for `coordinator`.
+
+Advantages:
+- Keeps "session" and "archive" scoped exclusively to Maestro sessions.
+- Leaves worker and chat lifecycle operations (stop, close, delete) under `coordinator`.

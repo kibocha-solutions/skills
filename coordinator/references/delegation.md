@@ -9,7 +9,7 @@ Every agent applies these rules, with or without a coordinated team:
 3. Start a new chat only for independent work that outlives the current turn, needs the user's steering, or ends in its own branch, pull request, or repository change.
 4. Never start a chat for part of the current task. Never start a sub-agent for a single command.
 5. Keep at most two started chats running at once. Count a coordinated team's chats against the same limit.
-6. Close each sub-agent when its result returns. Close or archive each started chat when its work is reported or merged, and report any that cannot be closed.
+6. Close each sub-agent when its result returns. Stop, close, or delete each started worker chat when its work is reported or merged (never archive workers or chats), and report any that cannot be closed or deleted.
 7. In a coordinated team, let executors and inspectors request children through the coordinator, which approves within platform permissions, the chat limit, and shared usage limits.
 8. Share the usage budget and the two-heavy-worker limit across the whole team, including nested agents, and record every active worker in the coordinator ledger.
 9. Honor lower platform concurrency limits and do not represent a sub-agent as a visible chat.

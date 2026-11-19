@@ -1,11 +1,11 @@
 ---
 name: maestro
-description: Plan, track, resume, verify, park, wake, and archive substantial or multi-session work with repository-local sessions under `.agents/brain/`. Use for multi-step tasks, phased work, long-running tasks, project orchestration, explicit planning requests, work that must survive context changes, deferred or future work that must be kept as a dormant session with wake conditions, and checking dormant sessions once active work is cleared.
+description: Plan, track, resume, verify, park, wake, and archive work using repository-local Maestro sessions under `.agents/brain/sessions/`. Use for multi-step tasks, phased work, long-running tasks, project orchestration, explicit planning requests, work that must survive context changes across chats, archiving sessions, parking deferred or future work as a dormant session with wake conditions, and checking dormant sessions once active work is cleared.
 ---
 
 # Maestro
 
-A Maestro session is the work-record folder under `.agents/brain/sessions/`. A chat is a separate conversation. When the user says "session", the user means a chat; always write "Maestro session" for the folder.
+A **session** (or **Maestro session**) is exclusively a repository-local work-record folder under `.agents/brain/sessions/`. A **chat** or **worker** is a conversation controlled by `coordinator/SKILL.md` and is never a session. Treat every user reference to a "session" as a Maestro session. Treat every user request to "archive" as moving one or more Maestro sessions to `.agents/brain/sessions/archive/`, never as archiving chats or workers.
 
 Run scripts with the skill directory as the base path, for example `python3 <skill-dir>/scripts/sessions.py status`.
 
@@ -127,9 +127,10 @@ Read [session lifecycle](references/session-lifecycle.md#close).
    - `ABANDONED`: no change for 14 days, no open user request, and no deferral by the user; park deferred work under Section 10 instead.
 2. Fold the Maestro session's handoffs into `walkthrough.md`, then delete them.
 3. Run `python3 scripts/sessions.py close <session> <STATE> "<note>"` to set the state, move evidence to the agent store, archive the folder, and update `sessions/archive/INDEX.md`.
-4. Do not edit an archived Maestro session; reopen one by moving it back to `sessions/active/`.
-5. Run `python3 scripts/sessions.py prune --apply` after the archive is committed and holds more than 10 folders.
-6. Report each closure to the user in one line.
+4. Apply user "archive" requests exclusively to Maestro sessions under `.agents/brain/sessions/`; route worker and chat cleanup (stop, close, delete) to `coordinator/SKILL.md`.
+5. Do not edit an archived Maestro session; reopen one by moving it back to `sessions/active/`.
+6. Run `python3 scripts/sessions.py prune --apply` after the archive is committed and holds more than 10 folders.
+7. Report each closure to the user in one line.
 
 ## 10. Park and wake dormant sessions
 
@@ -159,6 +160,7 @@ Before marking a Maestro session complete, confirm evidence exists for each item
 - [ ] Steward check clean and every temporary artifact removed.
 - [ ] Maestro session closed with `DONE`, `PARTIAL`, `SUPERSEDED`, or `ABANDONED` and archived, parked as `DORMANT` with its reason and wake conditions, or left active in an open state.
 - [ ] Dormant Maestro sessions checked with `wake-check` once no active Maestro session remained open, and woken only under `approval_mode=true` (when conditions pass) or explicit user approval.
+- [ ] Terminology kept distinct: "session" and "archive" applied exclusively to Maestro sessions, never to chats or workers.
 - [ ] Zero AI attribution across all session artifacts and commits.
 - [ ] No U+2014 em dashes in normal prose.
 

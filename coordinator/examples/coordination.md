@@ -4,7 +4,7 @@
 
 Bad: “Audit the application and fix everything.”
 
-Good: “Inspect the candidate table in the existing browser session. Record sort steps, observed row order, expected order, and screenshots. Do not change code or restart services. Return DONE or BLOCKED with evidence after the seven listed columns are checked.”
+Good: “Inspect the candidate table in the existing browser tab. Record sort steps, observed row order, expected order, and screenshots. Do not change code or restart services. Return DONE or BLOCKED with evidence after the seven listed columns are checked.”
 
 ## Independent verification
 
@@ -53,7 +53,7 @@ A worker hits a minor naming question and tells the coordinator to ask the user,
 ## Graduating algorithmic wake timer
 
 **Good:**
-During active work (or a lone session), the agent schedules a 1-minute (`60s`) wake timer. On tick 1, workers are still running and no coordinator action is needed, so after re-reading `goal.md`/`tasks.md`/`AGENTS.md`, checking `.agents/brain/workers.json`, and persisting state, the coordinator graduates the next wake timer to 3 minutes (`180s`), then 5m, 12m, 15m, and 30m while waiting. On tick 4, a worker in `.agents/brain/workers.json` is waiting for go-ahead; the coordinator assigns its next task and resets the next wake timer back to 1 minute (`60s`). At 95% 5-hour usage, it cancels the active timer and schedules a post-reset wake timer for `reset_time + 5m`. When all work finishes, it cancels every wake timer.
+During active work (or a standalone chat), the agent schedules a 1-minute (`60s`) wake timer. On tick 1, workers are still running and no coordinator action is needed, so after re-reading `goal.md`/`tasks.md`/`AGENTS.md`, checking `.agents/brain/workers.json`, and persisting state, the coordinator graduates the next wake timer to 3 minutes (`180s`), then 5m, 12m, 15m, and 30m while waiting. On tick 4, a worker in `.agents/brain/workers.json` is waiting for go-ahead; the coordinator assigns its next task and resets the next wake timer back to 1 minute (`60s`). At 95% 5-hour usage, it cancels the active timer and schedules a post-reset wake timer for `reset_time + 5m`. When all work finishes, it cancels every wake timer.
 
 **Bad:**
 Keeping a fixed 30-minute timer while a worker silently stalls after 2 minutes, running two wake timers simultaneously, or leaving an active wake timer running after the task is complete.
@@ -73,3 +73,11 @@ The coordinator inspects the `schedule` tool schema and platform usage command d
 
 **Bad:**
 The coordinator notices the usage command is missing and silently skips usage monitoring and wake timers without telling the user.
+
+## Terminology: sessions, workers, and archiving
+
+**Good:**
+When the user says "archive the finished sessions", the agent uses `maestro/scripts/sessions.py` to move finished Maestro sessions into `.agents/brain/sessions/archive/` and leaves active worker chats untouched. When referring to conversations controlled by the coordinator, the agent calls them workers or chats and cleans up completed ones by stopping, closing, or deleting them.
+
+**Bad:**
+Calling a worker chat a "session", or closing or UI-archiving worker chats when the user asks to "archive" or refers to "sessions".
