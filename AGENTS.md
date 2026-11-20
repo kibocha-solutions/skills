@@ -97,7 +97,7 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 
 ## 10. Usage monitoring and quota continuity
 
-1. Track active usage windows with available platform tools, commands, or metadata at least every 30 minutes during active work, balancing the governing limits dynamically.
+1. Track active usage windows with available platform tools, commands, or metadata at start and every graduating wake tick (`coordinator/references/heartbeat-and-wake.md`), balancing limits dynamically.
 2. Stop substantive work at the exhaustion thresholds in `coordinator/SKILL.md` or at a platform limit through the controlled pause in `coordinator/references/heartbeat-and-wake.md`, never abruptly.
 3. When a needed usage check, timer, wake, or messaging capability cannot be used, first inspect platform documentation, commands, and tool schemas and attempt it; if it still fails, tell the user what was attempted, what failed, and the consequence. Never skip it silently.
 
@@ -120,9 +120,9 @@ Read every non-code artifact (`.md`, plain text, documentation, policies, charte
 
 ## 13. Situational awareness and continuity
 
-1. At the start of any session in a repository, even unprompted, activate `graphify/SKILL.md` and query the graph (`graph_stats`, `god_nodes`, `GRAPH_REPORT.md`) to learn the repository before exploring. Without a graph, tell the user; build one only as authorized.
-2. Before starting a chat or sub-agent, and for coordinated or long-running work, read `coordinator/SKILL.md` first and apply its channel selection, worker registry, and graduating wake timer, keeping only one timer active.
-3. Persist state in durable files (the active Maestro session and a handoff under `.agents/`) at every phase end, scheduled check-in, and pause, and whenever compaction is near or unpredictable, recording objective, current task, completed work, changed files, verification, blockers, and next action.
+1. At the start of any chat in a repository, even unprompted, activate `graphify/SKILL.md` and query the graph (`graph_stats`, `god_nodes`, `GRAPH_REPORT.md`) to learn the repository before exploring. Without a graph, tell the user; build one only as authorized.
+2. Before starting a chat or sub-agent, and for coordinated or standalone sustained work, read `coordinator/SKILL.md` first and apply its channel selection, worker registry, and single graduating wake timer (`1m->3m->5m->12m->15m->30m`, reset to `1m` on action, `90-120m` user-blocked, cancelled at completion), never a fixed 30-minute heartbeat.
+3. Persist state in durable files (the active Maestro session and a handoff under `.agents/`) at every phase end, wake tick, pause, or whenever compaction is near or unpredictable, recording objective, current task, completed work, changed files, verification, blockers, and next action.
 4. Read the system profile (`~/.agents/system-profile.md`) before substantial work and keep work within its measured memory, disk, processor, and temperature capacity as `steward/SKILL.md` directs.
 
 ## 14. Pre-completion checklist

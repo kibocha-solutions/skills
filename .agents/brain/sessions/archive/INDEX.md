@@ -2,6 +2,7 @@
 
 | Session | State | Last change | Outcome |
 | :--- | :--- | :--- | :--- |
+| 2026-11-20-1139-align-agents-graduating-wake | DONE | 2026-11-20 | Aligned `AGENTS.md` Sections 10.1 and 13.1 through 13.3 and `.agents/memory/agents-md-limits-and-cross-references.md` wi |
 | 2026-11-19-1015-clarify-maestro-coordinator-terminology | DONE | 2026-11-19 | Clarified `maestro` and `coordinator` terminology so `session` and `archive` apply exclusively to Maestro sessions under |
 | 2026-11-18-0900-steward-coordinator-refinement | DONE | 2026-11-18 | Refined `steward`, `maestro`, `coordinator`, `ci-cd`, `bootstrap`, and `AGENTS.md` to support persistent per-repository  |
 | 2026-11-15-2213-dormant-maestro-sessions | DONE | 2026-11-15 | Dormant Maestro sessions now live under `sessions/dormant/` with a `wake.md` record, are exempt from closing, staleness, |
